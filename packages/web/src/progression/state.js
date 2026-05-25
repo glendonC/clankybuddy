@@ -677,5 +677,8 @@ export function resetSave() {
     try { fn(_activeCharId); } catch { /* ignore */ }
   }
 }
-// Expose for the dev console: window.__clankyReset = resetSave
-if (typeof window !== 'undefined') window.__clankyReset = resetSave;
+// Expose for the dev console: window.__clankyReset = resetSave.
+// Dev builds only. Prod bundles don't ship a save-wipe global.
+if (typeof window !== 'undefined' && import.meta.env?.DEV) {
+  window.__clankyReset = resetSave;
+}

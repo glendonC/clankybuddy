@@ -1,7 +1,9 @@
 // Hidden admin/dev panel. Toggle with backtick (`). Lets a tester grant
 // currency, force-unlock tools/nodes, jump mood states, paint statuses across
-// the ragdoll, slow time, and reset the save. Production-safe, panel only
-// renders when explicitly toggled, never auto-opens.
+// the ragdoll, slow time, and reset the save. DEV BUILDS ONLY: main.js
+// dynamically imports this module behind `import.meta.env.DEV` so Vite
+// tree-shakes it out of the production bundle. Never expose otherwise,
+// the panel grants free currency and unlocks every tool.
 
 import { TOOLS } from './tools-table.js';
 import {

@@ -35,7 +35,8 @@ import { startChat, enqueuePendingMessage } from './net/chat-bootstrap.js';
 import { startChatSeed } from './net/chat-seed.js';
 import { bindBossNameplate, showBossNameplate } from './ui/boss-nameplate.js';
 import { openPicker } from './ui/slot-picker.js';
-import { bindDevPanel } from './ui/dev-panel.js';
+// Dev panel: dynamically imported in dev builds only (see below). Static
+// import would pull the whole module into prod bundles even when unused.
 import { bindSettings } from './ui/settings-popover.js';
 import { bindStatsPopover } from './ui/stats-popover.js';
 import { bindTargetPicker } from './ui/target-picker.js';
@@ -292,7 +293,9 @@ bindBossNameplate();
 // index.html so the initial active highlight (which runs during bindHotbar,
 // before this wire) picks it up alongside the hotbar slots.
 { const _g = $('grab-btn'); if (_g) _g.addEventListener('click', () => setActiveTool('grab')); }
-bindDevPanel();
+if (import.meta.env?.DEV) {
+  import('./ui/dev-panel.js').then(({ bindDevPanel }) => bindDevPanel());
+}
 bindSettings($('settings-btn'));
 bindStatsPopover($('stats-btn'));
 bindTargetPicker();
