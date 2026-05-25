@@ -109,6 +109,40 @@
   mask-image: none;
   -webkit-mask-image: none;
 }
+
+/* Empty room: otherwise flex-end + zero rows collapses the list to padding
+   height and reads like broken chrome (thin bar, lonely close button). Give
+   a deliberate pane with centered copy tied to footer stack. */
+.log-list.log-list--empty {
+  justify-content: center;
+  align-items: center;
+  min-height: 72px;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  /* Leave space for hover-only collapse control at top-right. */
+  padding-right: 28px;
+}
+
+.log-empty-hint {
+  margin: 0;
+  padding: 0 4px;
+  max-width: 100%;
+  box-sizing: border-box;
+  text-align: center;
+  font-size: var(--type-micro-size);
+  line-height: 1.45;
+  font-style: italic;
+  letter-spacing: var(--type-track-flat);
+  color: var(--fg-3);
+  opacity: 0.92;
+}
+
+@media (max-width: 1279px) and (min-width: 900px) {
+  .log-list.log-list--empty {
+    min-height: 62px;
+  }
+}
+
 .log-list::-webkit-scrollbar { width: 6px; }
 .log-list::-webkit-scrollbar-track { background: transparent; }
 .log-list::-webkit-scrollbar-thumb {

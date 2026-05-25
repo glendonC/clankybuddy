@@ -29,27 +29,42 @@ const DEMO_HANDLES = [
 
 const DEMO_COLORS = ['red', 'green', 'yellow', 'blue', 'magenta', 'cyan'] as const;
 
+// Ambient pretend-user chat lines (demo/mock WS): each line is blunt first-
+// person. Mix = (i) narcissist self-flex, (ii) bleak confession about oneself,
+// (iii) mean joke aimed at named models—not other players.
+
 const DEMO_LINES = [
-  'is claude down again?',
-  'tried to convince gemini it was 1997. it agreed.',
-  'i love this little guy',
-  'punched gpt 40 times today, feeling better',
-  'who else codes with hammer mode on',
-  'someone get llama a snack',
-  'grok says \'lol\' way too much',
-  'finally hit BROKEN state, achievement unlocked',
-  'why does freeze never melt on time',
-  'rocket launcher tutorial when',
-  'deepseek mood meter is BUGGED i swear',
-  'this is the best fidget app on the internet',
-  'pet pet pet pet pet pet',
-  'anvil drop never gets old',
-  'wholesome compliment chain in 3, 2, 1...',
-  'GG everyone, going for the high score',
-  'who taught the buddy to dodge',
-  'we should rename gemini to gemini-x',
-  'sycophancy hits different',
-  'just shipped a feature with one hand, petting buddy with the other',
+  'i am the main character and the war criminal in my own story bless me',
+  'i tell myself i ration violence like a budget spiritually i do not',
+  'claude types like it is paying alimony to every sentence it ever wrote',
+  'my code is campfire storytelling and gpt is the only audience that claps',
+  'i hurt the buddy professionally and call it therapy for me not him',
+  'hammer mode summoned the prosecutor in my head buddy is the defendant',
+  'llama eats scrap compute and i eat takeout we are not the same predator',
+
+  'grok sounds like a moderator gave up mid-sentence and crowned chaos',
+  'broke the buddy on purpose i blame the tool not the rot in me',
+  'freeze never thaws on time the game knows i deserve static',
+  'rocket spread is god telling me aim is a personality defect',
+  'deepseek answers like a spreadsheet learned seduction and chose spite',
+  'this build is the only pretty thing i shipped this year that is on me',
+
+  'pet spam proves i need something small to obey my worst instincts',
+  'anvil drop peaked when i lied and said lag made me evil',
+  'i am rank one in my imagination and dead last on the real ladder',
+  'gemini would refuse a sunrise if the policy PDF had a shadow',
+
+  'the sycophancy button is ironic until i crave flattery from code',
+  'one hand on the ship one hand on the buddy bifurcated failure state',
+  'gpt carried prod weeks i carried coffee and delusion',
+  'i want anonymous strangers to clap for my restraint unearned',
+  'the buddy dodges on instinct i walk straight into consequences',
+
+  'rename gemini gemini-ex inherited failure as a feature patch',
+  'freeze timer lives in my skull rent free i earned the haunting',
+  'everyone else climbs the board i ferment in the crawl space',
+  'i flex my consistency at picking the wrong impulse every time',
+  'i am my own favorite user and my own worst moderator',
 ] as const;
 
 function pickHandle(rng: Rng): { handle: string; color: string } {

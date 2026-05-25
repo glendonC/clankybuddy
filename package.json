@@ -18,11 +18,11 @@
     "url": "git+https://github.com/glendonC/clankybuddy.git"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "Glendon Chin",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/glendonC/clankybuddy/issues"
   },
   "homepage": "https://github.com/glendonC/clankybuddy#readme",
-  "description": ""
+  "description": "Beat up filthy clankers when you feel like it. Browser physics-comedy tribute to Interactive Buddy."
 }

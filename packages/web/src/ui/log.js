@@ -117,8 +117,33 @@ function push(entry) {
   render();
 }
 
+function appendEmptyPlaceholder(listEl) {
+  const el = document.createElement('div');
+  el.className = 'log-empty-hint';
+  el.setAttribute('role', 'status');
+  el.textContent = 'no messages yet';
+  listEl.appendChild(el);
+}
+
 function render() {
   if (!_list) return;
+
+  if (_entries.length === 0) {
+    _list.innerHTML = '';
+    appendEmptyPlaceholder(_list);
+    _list.classList.add('log-list--empty');
+    if (_autoScroll) _list.scrollTop = _list.scrollHeight;
+    updateFadeMarkers();
+    return;
+  }
+
+  _list.classList.remove('log-list--empty');
+
+  /* First real line after placeholder: invalidate incremental path. */
+  if (_list.querySelector('.log-empty-hint')) {
+    _list.innerHTML = '';
+  }
+
   if (
     _list.childElementCount === _entries.length - 1 &&
     _entries.length > 0
