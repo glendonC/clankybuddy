@@ -1,0 +1,360 @@
+/* ============================================================
+   CHAT PANEL, FFXIV-style transparent log. The wrapper is invisible;
+   the two children (.log-list and .log-input-row) are the visible
+   surfaces. Both wear the same translucent dark wash with light blur,
+   minimal corner rounding, and zero header chrome. A close button
+   appears top-right only on hover and collapses the message list.
+   ID stays #log-window for JS continuity.
+   ============================================================ */
+#log-window {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 6px;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  pointer-events: auto;
+  overflow: visible;
+  box-shadow: none;
+  /* No fixed cap: the window grows from the bottom up only as far as
+     content needs. The list itself caps its own scrollable height so a
+     packed channel doesn't blot out the stage. */
+}
+#log-window.collapsed { max-height: none; }
+#log-window.collapsed .log-list { display: none; }
+#log-window.collapsed .log-input-row { display: none; }
+#log-window.expanded  .log-open-btn { display: none; }
+
+/* The two visible squircles, same wash, slight corner rounding. The
+   chat panel is a sidebar surface, not a floating panel, no backdrop-blur
+   (glassmorphism is reserved for .popover-sheet only). */
+.log-list,
+.log-input-row {
+  background: var(--surface-translucent);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+}
+
+.log-list {
+  /* Shrink to content; the cap is local to the list so the wrapper
+     can collapse around few messages instead of holding a tall empty
+     well above an input row. */
+  flex: 0 1 auto;
+  max-height: 380px;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 6px 10px;
+  scrollbar-width: thin;
+  scrollbar-color: color-mix(in srgb, var(--fg) 12%, transparent) transparent;
+  /* Anchor the message stream to the bottom, when there are only a
+     handful of rows they sit just above the input, FFXIV-style, rather
+     than pinned at the top of an empty list. */
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  /* Edge fades, text dissolves at top/bottom instead of hard-cutting at
+     the panel border. Both edges default to faded; data-at-top /
+     data-at-bottom (set by onScroll in log.js) flatten the corresponding
+     gradient stop when there's nothing scrolled past that edge, so a fully
+     visible message doesn't get clipped for no reason. */
+  --log-fade: 14px;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--log-fade),
+    #000 calc(100% - var(--log-fade)),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--log-fade),
+    #000 calc(100% - var(--log-fade)),
+    transparent 100%
+  );
+}
+.log-list[data-at-top="true"] {
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 calc(100% - var(--log-fade)),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 calc(100% - var(--log-fade)),
+    transparent 100%
+  );
+}
+.log-list[data-at-bottom="true"] {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--log-fade),
+    #000 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--log-fade),
+    #000 100%
+  );
+}
+.log-list[data-at-top="true"][data-at-bottom="true"] {
+  /* Short list that doesn't overflow, no fade at all. */
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+.log-list::-webkit-scrollbar { width: 6px; }
+.log-list::-webkit-scrollbar-track { background: transparent; }
+.log-list::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--fg) 12%, transparent);
+  border-radius: 3px;
+}
+
+/* Hover-only close button. Sits over the top-right corner of the list,
+   reveals on hover of the whole panel so reaching for it doesn't feel
+   like aiming at a moving target. */
+.log-close-btn {
+  position: absolute;
+  top: 2px;
+  right: 4px;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--fg-3);
+  font-size: var(--type-dismiss-size);
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity .12s ease, color .12s ease;
+  z-index: 2;
+}
+#log-window:hover .log-close-btn { opacity: 0.6; }
+.log-close-btn:hover { opacity: 1; color: var(--fg); }
+#log-window.collapsed .log-close-btn { display: none; }
+
+/* ============================================================
+   ROWS, FFXIV-style inline lines. Everything on one flowing line:
+   [hh:mm] handle text…  No stripe column, no row dividers, the chat
+   reads as a continuous stream. Long messages wrap with a hanging
+   indent so each row's metadata stays glanceable.
+   ============================================================ */
+.log-row {
+  padding: 1px 0;
+  font-size: var(--type-caption-size);
+  line-height: 1.35;
+  letter-spacing: var(--tr-snug);
+  color: var(--fg);
+  word-break: break-word;
+}
+
+.log-text {
+  color: var(--fg);
+}
+.log-chat-time {
+  display: inline;
+  margin-right: 5px;
+  font-size: var(--type-micro-size);
+  color: var(--fg-3);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--type-track-flat);
+  opacity: 0.75;
+}
+.log-chat-handle {
+  display: inline;
+  margin-right: 6px;
+  font-weight: var(--w-bold);
+  text-transform: lowercase;
+}
+.log-row.log-chat-self {
+  background: linear-gradient(90deg, color-mix(in srgb, var(--fg) 4%, transparent), transparent);
+  border-radius: 2px;
+}
+.log-row.log-kind-chat-event .log-text {
+  color: var(--fg-3);
+  font-style: italic;
+  font-size: var(--type-micro-size);
+}
+
+/* ============================================================
+   INPUT ROW, its own translucent squircle below the list, same wash.
+   Sends a message via the form submit; its border tints with chat
+   status (yellow=connecting/reconnecting, red=disconnected, accent
+   on focus). No send-button chrome by default; reveal on hover.
+   ============================================================ */
+.log-input-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 8px;
+  flex-shrink: 0;
+}
+#log-window[data-status="connecting"]   .log-input-row,
+#log-window[data-status="reconnecting"] .log-input-row { border-color: color-mix(in srgb, var(--warn) 45%, transparent); }
+#log-window[data-status="disconnected"] .log-input-row { border-color: color-mix(in srgb, var(--danger) 45%, transparent); }
+
+.log-input {
+  flex: 1 1 auto;
+  min-width: 0;
+  background: transparent;
+  border: 0;
+  color: var(--fg);
+  padding: 2px 4px;
+  font: inherit;
+  font-size: var(--type-caption-size);
+  outline: none;
+}
+.log-input::placeholder {
+  color: var(--fg-3);
+  opacity: 0.65;
+}
+.log-input-send {
+  background: transparent;
+  border: 0;
+  color: var(--fg-3);
+  padding: 0 4px;
+  font-size: var(--type-control-size);
+  line-height: 1;
+  cursor: pointer;
+  /* Always visible (required affordance); quiet at rest, full opacity on
+     hover/focus. Hidden-until-hover violates the banned-list rule about
+     hover-only required information. */
+  opacity: 0.6;
+  transition: color .12s ease, opacity .12s ease;
+}
+.log-input-row:hover .log-input-send,
+.log-input:focus + .log-input-send,
+.log-input-send:focus-visible { opacity: 1; }
+.log-input-send:hover { color: var(--char-accent); opacity: 1; }
+
+/* ============================================================
+   COLLAPSED STATE, the message list hides and the input row is
+   replaced by a full-width "open chat" bar that matches the input
+   bar's height and wash. Click anywhere to re-expand. Reads as a
+   sibling of the input, not a tiny pill.
+   ============================================================ */
+.log-open-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 10px;
+  /* Quiet sidebar entry, not a CTA. The chat cluster shouldn't compete
+     with the apex hotbar slot for attention; hover ramps to char-accent
+     for the affordance, but resting state is a subtle border + muted text. */
+  background: transparent;
+  border: 1px solid var(--border-2);
+  border-radius: 4px;
+  color: var(--fg-2);
+  font: inherit;
+  font-size: var(--type-caption-size);
+  font-weight: var(--w-bold);
+  text-transform: lowercase;
+  letter-spacing: var(--type-track-cta);
+  cursor: pointer;
+  transition: color .12s ease, border-color .12s ease, transform .08s ease;
+}
+.log-open-btn:hover {
+  color: var(--char-accent);
+  border-color: var(--char-accent);
+}
+.log-open-btn:active { transform: translateY(1px); }
+.log-open-btn:focus-visible {
+  outline: 2px solid var(--char-accent);
+  outline-offset: 2px;
+}
+.log-open-glyph {
+  display: block;
+  flex-shrink: 0;
+  color: currentColor;
+}
+.log-open-label { line-height: 1; }
+
+/* ============================================================
+   CHAT ACTIONS, three equal-width buttons under the chat panel:
+   settings · stats · switch model. Quiet by default; hover ramps to
+   accent. Each button is icon + label, kept compact so the row reads
+   as a single bar of admin glyphs and not a wall of CTAs.
+   ============================================================ */
+.chat-actions {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  flex-shrink: 0;
+}
+.chat-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 8px;
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  color: var(--fg-2);
+  cursor: pointer;
+  font: inherit;
+  font-size: var(--type-micro-size);
+  font-weight: var(--w-bold);
+  /* Demoted: sentence-case + minimal tracking; reads as admin glyphs,
+     not a wall of CTAs. No backdrop-filter, no inset highlight, no
+     drop-shadow, the chat cluster is a sidebar, not a primary action. */
+  text-transform: lowercase;
+  letter-spacing: var(--type-track-ui);
+  transition: color .12s ease, border-color .12s ease, background .12s ease;
+}
+.chat-action-btn:hover {
+  color: var(--char-accent);
+  border-color: var(--char-accent);
+}
+.chat-action-btn.active {
+  color: var(--char-accent);
+  border-color: var(--char-accent);
+  background: var(--char-accent-soft);
+}
+.chat-action-btn:focus-visible {
+  outline: 2px solid var(--char-accent);
+  outline-offset: 2px;
+}
+.chat-action-btn svg { display: block; flex-shrink: 0; }
+.chat-action-btn .icon-stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+/* Inline key-hints, used by the switch button to surface the [ and ]
+   persona-cycle shortcuts. Subtler than .slot-key (which is a slot-sized
+   chip): just a faint mono character flanking the label, accent-tinted on
+   hover so it reads as part of the button identity, not a separate badge. */
+.chat-action-btn .chat-action-key {
+  font-family: var(--font-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+  font-size: 11px;
+  font-weight: var(--w-regular);
+  line-height: 1;
+  color: var(--fg-3);
+  opacity: 0.65;
+  padding: 1px 3px;
+  border-radius: 3px;
+  border: 1px solid var(--border-2);
+  background: transparent;
+  text-transform: none;
+  letter-spacing: 0;
+  transition: color .12s ease, border-color .12s ease, opacity .12s ease;
+}
+.chat-action-btn:hover .chat-action-key,
+.chat-action-btn.active .chat-action-key {
+  color: var(--char-accent);
+  border-color: var(--char-accent);
+  opacity: 1;
+}

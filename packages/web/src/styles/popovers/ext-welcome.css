@@ -1,0 +1,169 @@
+/* ---------- in-panel ext-welcome card ----------
+   First-launch overlay shown inside the VS Code extension webview only
+   (gated on window.__clankybuddyExtConfig.firstRun). Sits above the stage
+   but below modals (age-gate, etc.). Dismisses on CTA click, outside
+   click, Escape, or first canvas interaction. */
+
+.ext-welcome-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 5500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: color-mix(in srgb, var(--bg) 70%, transparent);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  animation: ext-welcome-fade .18s ease-out;
+  pointer-events: auto;
+}
+.ext-welcome-backdrop.is-dismissing {
+  animation: ext-welcome-fade-out .14s ease-in forwards;
+}
+@keyframes ext-welcome-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ext-welcome-fade-out { from { opacity: 1; } to { opacity: 0; } }
+
+.ext-welcome-card {
+  position: relative;
+  width: min(360px, calc(100vw - 32px));
+  padding: 22px 22px 18px;
+  border-radius: 28px;
+  background: color-mix(in srgb, var(--bg) 92%, var(--fg) 8%);
+  border: 1px solid var(--border-2);
+  box-shadow:
+    0 1px 0 color-mix(in srgb, var(--fg) 10%, transparent) inset,
+    0 20px 60px -20px rgba(0, 0, 0, 0.6),
+    0 8px 24px -12px color-mix(in srgb, var(--char-accent) 30%, transparent);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  animation: ext-welcome-rise .22s var(--ease-spring);
+}
+@keyframes ext-welcome-rise {
+  from { opacity: 0; transform: translateY(10px) scale(.985); }
+  to   { opacity: 1; transform: translateY(0)    scale(1);    }
+}
+
+.ext-welcome-eyebrow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: var(--type-micro-size);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-eyebrow);
+  color: var(--fg-3);
+  line-height: 1;
+  text-transform: lowercase;
+}
+.ext-welcome-eyebrow .dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: var(--char-accent);
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--char-accent) 25%, transparent);
+}
+
+.ext-welcome-title {
+  font-family: var(--sans-display);
+  font-size: 22px;
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  color: var(--fg);
+  line-height: 1.08;
+  margin: 0;
+}
+.ext-welcome-sub {
+  font-size: var(--t-sm);
+  color: var(--fg-2);
+  line-height: 1.4;
+  margin: -4px 0 2px;
+}
+
+.ext-welcome-rows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 2px 0 4px;
+}
+.ext-welcome-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--fg) 4%, transparent);
+  border: 1px solid color-mix(in srgb, var(--fg) 6%, transparent);
+}
+.ext-welcome-row .glyph {
+  flex: 0 0 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--char-accent) 18%, transparent);
+  color: var(--char-accent);
+  font-size: 13px;
+  line-height: 1;
+}
+.ext-welcome-row .text {
+  display: flex; flex-direction: column; gap: 2px; min-width: 0;
+}
+.ext-welcome-row .text .k {
+  font-size: var(--t-sm);
+  font-weight: var(--w-bold);
+  color: var(--fg);
+  line-height: 1.15;
+}
+.ext-welcome-row .text .v {
+  font-size: var(--t-xs);
+  color: var(--fg-2);
+  line-height: 1.35;
+}
+
+.ext-welcome-cta {
+  height: 40px;
+  padding: 0 16px;
+  font-size: var(--t-base);
+  font-weight: var(--w-bold);
+  letter-spacing: var(--tr-snug);
+  text-transform: lowercase;
+  border-radius: 12px;
+  cursor: pointer;
+  border: 1px solid var(--fg);
+  background: var(--fg);
+  color: var(--bg);
+  line-height: 1;
+  transition: background .12s ease, border-color .12s ease, transform .08s ease;
+}
+.ext-welcome-cta:hover {
+  background: color-mix(in srgb, var(--fg) 90%, var(--bg));
+  transform: translateY(-1px);
+}
+.ext-welcome-cta:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--fg) 42%, transparent);
+  outline-offset: 3px;
+}
+
+.ext-welcome-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 28px;
+  height: 28px;
+  border-radius: 10px;
+  display: grid; place-items: center;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--fg-3);
+  cursor: pointer;
+  font-size: 16px;
+  line-height: 1;
+  transition: background .12s ease, color .12s ease, border-color .12s ease;
+}
+.ext-welcome-close:hover {
+  background: color-mix(in srgb, var(--fg) 8%, transparent);
+  color: var(--fg);
+  border-color: var(--border-2);
+}
+.ext-welcome-close:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--fg) 30%, transparent);
+  outline-offset: 2px;
+}

@@ -1,0 +1,347 @@
+/* ──────────────────────────────────────────────────────────────────────
+ * Pulse + small multiples (section B)
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-pulse {
+  width: 100%;
+  height: 300px;
+  display: block;
+}
+.sd-baseline {
+  stroke: var(--sd-hairline);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+.sd-pulse-line { fill: none; stroke-width: 1.75; stroke-linecap: round; stroke-linejoin: round; }
+.sd-pulse-line-help { stroke: var(--success); }
+.sd-pulse-line-hurt { stroke: var(--danger); }
+.sd-pulse-line-net { stroke: var(--sd-ink); stroke-width: 1.25; opacity: 0.85; }
+/* Global benchmark overlay: faint dashed lines under the personal curves.
+   Stroke colors share the help/hurt palette but at lowered opacity so the
+   overlay reads as "same axis, shape only", never confusable with personal
+   data, but visually anchored to the same green/red semantics. */
+.sd-pulse-line-bench-help { stroke: var(--success); stroke-width: 1.25; opacity: 0.45; stroke-dasharray: 4 4; }
+.sd-pulse-line-bench-hurt { stroke: var(--danger); stroke-width: 1.25; opacity: 0.45; stroke-dasharray: 4 4; }
+.sd-tick {
+  fill: var(--sd-soft);
+  font-size: 10px;
+  font-family: var(--mono);
+  font-feature-settings: "tnum";
+}
+.sd-hit-strip {
+  fill: transparent;
+  cursor: crosshair;
+}
+.sd-hit-strip:hover { fill: var(--sd-faint); }
+
+.sd-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 12px;
+  font-size: 11px;
+  color: var(--sd-muted);
+  letter-spacing: -0.005em;
+}
+.sd-legend-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sd-legend-item i {
+  width: 8px; height: 8px; border-radius: 999px; display: inline-block;
+  background: var(--accent, var(--sd-ink));
+}
+
+.sd-multi-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px 28px;
+}
+.sd-multi-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sd-multi-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  font-size: 11px;
+  color: var(--sd-muted);
+  letter-spacing: -0.005em;
+}
+.sd-multi-name { color: var(--sd-ink); font-weight: var(--w-reg); }
+.sd-multi-num { font-family: var(--sans-display); font-feature-settings: "tnum"; }
+.sd-multi-spark { height: 64px; }
+.sd-multi-spark .sd-spark { width: 100%; height: 100%; display: block; }
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Calendar (section C)
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-cal-tabs {
+  display: inline-flex;
+  margin-bottom: 14px;
+  gap: 2px;
+  background: var(--sd-faint);
+  padding: 2px;
+  border-radius: 8px;
+}
+.sd-cal-tab {
+  background: transparent;
+  border: 0;
+  padding: 6px 12px;
+  font-size: 11px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  font-weight: var(--w-reg);
+  color: var(--sd-muted);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.sd-cal-tab.active { color: var(--sd-ink); background: var(--sd-surface); box-shadow: 0 1px 2px rgba(0,0,0,0.04); }
+
+/* Hour-of-week 7×24 grid. */
+.sd-hgrid { display: flex; flex-direction: column; gap: 4px; }
+.sd-hgrid-row { display: grid; grid-template-columns: 36px 1fr; gap: 8px; align-items: center; }
+.sd-hgrid-rowlabel { font-size: 10px; color: var(--sd-soft); letter-spacing: 0.04em; text-align: right; text-transform: uppercase; }
+.sd-hgrid-cells {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  gap: 2px;
+}
+.sd-hgrid-cell {
+  aspect-ratio: 1 / 1;
+  background: color-mix(in srgb, var(--info) calc(var(--intensity, 0) * 100%), var(--sd-faint));
+  border-radius: 2px;
+  cursor: pointer;
+  transition: outline-color var(--dur-fast) var(--ease);
+  outline: 1px solid transparent;
+}
+.sd-hgrid-cell:hover { outline-color: var(--sd-ink); }
+.sd-hgrid-axis-row {
+  display: grid;
+  grid-template-columns: repeat(24, 1fr);
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--sd-soft);
+}
+.sd-hgrid-axis-row span { grid-column: span 1; opacity: 0; text-align: center; }
+.sd-hgrid-axis-row span[data-h="0"]  { grid-column: 1; opacity: 1; text-align: left; }
+.sd-hgrid-axis-row span[data-h="6"]  { grid-column: 7;  opacity: 1; }
+.sd-hgrid-axis-row span[data-h="12"] { grid-column: 13; opacity: 1; }
+.sd-hgrid-axis-row span[data-h="18"] { grid-column: 19; opacity: 1; }
+.sd-hgrid-axis-row span[data-h="23"] { grid-column: 24; opacity: 1; text-align: right; }
+
+/* Daily streak heatmap. */
+.sd-streak {
+  display: grid;
+  grid-template-columns: 28px 1fr;
+  gap: 6px;
+}
+.sd-streak-ylabels {
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  font-size: 9px;
+  font-family: var(--mono);
+  color: var(--sd-soft);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+.sd-streak-cols {
+  display: grid;
+  grid-auto-flow: column;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 3px;
+}
+.sd-streak-col {
+  display: grid;
+  grid-template-rows: repeat(7, 1fr);
+  gap: 3px;
+}
+.sd-streak-cell {
+  width: 16px; height: 16px;
+  border-radius: 3px;
+  background: color-mix(in srgb, var(--success) calc(var(--intensity, 0) * 100%), var(--sd-faint));
+  cursor: pointer;
+}
+.sd-streak-cell.sd-streak-empty { background: transparent; }
+.sd-streak-cell:hover { outline: 1px solid var(--sd-ink); }
+.sd-streak-meta {
+  margin-top: 12px;
+  display: flex;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--sd-muted);
+  font-family: var(--mono);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Anatomy (section D)
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-anatomy {
+  display: grid;
+  /* Generous figure column on the left, ranked-rows on the right. At
+     full-screen widths the figure can render at full intrinsic size. */
+  grid-template-columns: 360px minmax(280px, 1fr);
+  gap: 56px;
+  align-items: center;
+}
+.sd-anatomy-figure { display: flex; align-items: center; justify-content: center; }
+/* Silhouette gains a filled body so the buddy reads as "a thing that took
+   hits," not a sketchy outline. The bloom (radial gradient with persona
+   accent) layers on top to paint the heat. --accent is inherited from the
+   .sd-anatomy wrapper and tints the stroke when a persona is active. */
+.sd-anatomy-svg .sd-anatomy-silhouette circle {
+  fill: color-mix(in srgb, var(--sd-ink) 9%, var(--sd-surface));
+  stroke: color-mix(in srgb, var(--sd-ink) 28%, transparent);
+  stroke-width: 1.5;
+  vector-effect: non-scaling-stroke;
+}
+.sd-anatomy-svg .sd-anatomy-hits ellipse,
+.sd-anatomy-svg .sd-anatomy-hits circle {
+  fill: transparent;
+  cursor: crosshair;
+  transition: fill var(--dur-fast) var(--ease);
+}
+.sd-anatomy-svg .sd-anatomy-hits ellipse:hover,
+.sd-anatomy-svg .sd-anatomy-hits circle:hover {
+  fill: color-mix(in srgb, var(--accent, var(--sd-ink)) 10%, transparent);
+}
+
+/* Right-panel composition: headline + stacked share bar + runner-up dots.
+   Replaces the old vertical list. Reads top-to-bottom as a single beat. */
+.sd-anatomy-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+.sd-anatomy-headline {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.sd-anatomy-eyebrow {
+  font-size: var(--sd-eyebrow);
+  letter-spacing: var(--sd-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--sd-muted);
+  font-weight: var(--w-reg);
+}
+.sd-anatomy-hero {
+  font-family: var(--sans-display);
+  font-size: 44px;
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  line-height: 1.0;
+  color: var(--sd-ink);
+  text-transform: uppercase;
+}
+.sd-anatomy-cap {
+  font-size: 13px;
+  color: var(--sd-muted);
+  letter-spacing: -0.005em;
+}
+
+/* Stacked share bar, substantial height so the magnitudes feel physical.
+   Each segment gets its own tone of the accent (rank 0 = full accent,
+   rank 1..3 = decreasing color-mix toward surface). Inline labels render
+   inside wide-enough segments; narrow ones rely on hover. */
+.sd-anatomy-stack {
+  display: flex;
+  height: 36px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--sd-faint);
+  gap: 2px;
+}
+.sd-anatomy-seg {
+  position: relative;
+  flex: 1 0 0;
+  min-width: 0;
+  /* background + color are inlined per-segment in JS so the literal accent
+     hex reaches color-mix without var() indirection. */
+  cursor: default;
+  transition: filter var(--dur-fast) var(--ease);
+}
+.sd-anatomy-seg:hover { filter: brightness(1.06) saturate(1.05); }
+.sd-anatomy-seg-inner {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-size: 11px;
+  letter-spacing: -0.005em;
+  white-space: nowrap;
+  overflow: hidden;
+  /* Inherits color from the segment's inlined style. */
+}
+.sd-anatomy-seg-label { font-weight: var(--w-med); }
+.sd-anatomy-seg-pct {
+  font-family: var(--sans-display);
+  font-feature-settings: "tnum";
+}
+
+/* Runners-up row: small color-keyed dots + label + count. The dot tone
+   matches the same rank palette as the stack so the cross-reference is
+   visual, not numeric. */
+.sd-anatomy-runners {
+  display: flex;
+  gap: 18px;
+  flex-wrap: wrap;
+  font-size: 12px;
+  color: var(--sd-muted);
+  letter-spacing: -0.005em;
+}
+.sd-anatomy-runner {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.sd-anatomy-runner-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  display: inline-block;
+  /* Background inlined per-rank to match the segment palette exactly. */
+}
+.sd-anatomy-runner-label { color: var(--sd-muted); }
+.sd-anatomy-runner-num {
+  color: var(--sd-ink);
+  font-family: var(--sans-display);
+  font-feature-settings: "tnum";
+  font-weight: var(--w-med);
+}
+.sd-anatomy-multi {
+  display: grid;
+  /* Enough room for 6-up at full-screen; auto-fit keeps it readable when
+     fewer personas are selected (e.g. 3 selected = 3-up). */
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 28px 24px;
+}
+.sd-anatomy-mini {
+  grid-template-columns: 1fr;
+  gap: 4px;
+  align-items: center;
+}
+.sd-anatomy-mini-name {
+  font-size: 11px;
+  text-align: center;
+  color: var(--sd-muted);
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  margin-bottom: 4px;
+}
+.sd-anatomy-mini .sd-anatomy-figure { margin-bottom: 6px; }
+/* Mini layout (multi-persona grid) scales the right-panel composition
+   down so the dominance card + stack bar still read at column width.
+   Runner-up row hides because horizontal space is tight; the bar
+   tooltips carry the same info. */
+.sd-anatomy-mini .sd-anatomy-stats { gap: 10px; }
+.sd-anatomy-mini .sd-anatomy-hero { font-size: 22px; }
+.sd-anatomy-mini .sd-anatomy-cap { font-size: 11px; }
+.sd-anatomy-mini .sd-anatomy-stack { height: 22px; }
+.sd-anatomy-mini .sd-anatomy-seg-inner { font-size: 10px; padding: 0 6px; }
+.sd-anatomy-mini .sd-anatomy-runners { display: none; }
+

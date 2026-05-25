@@ -1,0 +1,13 @@
+/* Analytics dashboard (stats-dashboard.js).
+ *
+ * Full-screen stats surface, split by responsibility so chart/table/view
+ * changes stay local. Import order mirrors the former monolithic file.
+ */
+
+@import url('./dashboard/shell.css');
+@import url('./dashboard/bento.css');
+@import url('./dashboard/sections.css');
+@import url('./dashboard/charts.css');
+@import url('./dashboard/tables.css');
+@import url('./dashboard/tooltip.css');
+@import url('./dashboard/responsive.css');

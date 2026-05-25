@@ -1,0 +1,120 @@
+/* ---- viewport guard (< 900px) ---------------------------------------- */
+#viewport-guard {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-guard);
+  background:
+    radial-gradient(circle at 50% 45%,
+      color-mix(in srgb, var(--char-accent) 8%, transparent) 0%,
+      transparent 34%),
+    var(--bg);
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+}
+.vg-card {
+  width: min(390px, calc(100vw - 48px));
+  text-align: left;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+.vg-eyebrow {
+  font-size: var(--type-micro-size);
+  letter-spacing: var(--type-track-eyebrow);
+  text-transform: lowercase;
+  color: var(--fg-3);
+  font-weight: var(--w-reg);
+  line-height: 1;
+}
+.vg-title {
+  font-family: var(--sans-display);
+  font-size: var(--type-age-title-size);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  color: var(--fg);
+  line-height: 0.98;
+  -webkit-font-smoothing: antialiased;
+}
+.vg-msg {
+  max-width: 340px;
+  font-size: var(--type-body-size);
+  color: var(--fg-2);
+  line-height: 1.55;
+}
+.vg-meta {
+  font-size: var(--type-micro-size);
+  letter-spacing: var(--tr-snug);
+  text-transform: lowercase;
+  color: var(--fg-2);
+  margin-top: 2px;
+  opacity: 0.78;
+}
+.vg-size {
+  font-size: var(--type-micro-size);
+  letter-spacing: var(--tr-snug);
+  text-transform: lowercase;
+  color: var(--fg-3);
+  line-height: 1.45;
+}
+
+/* ---- 900-1280px: tighter rails + slots so the stage breathes ---- */
+@media (max-width: 1279px) and (min-width: 900px) {
+  :root {
+    --slot-size: 36px;
+    --rail-w: 220px;
+    --hud-edge: 14px;
+  }
+  .wallet-num   { font-size: var(--type-display-sm-size); }
+  #boss-nameplate { top: 14px; }
+  #boss-nameplate .boss-name { font-size: var(--type-title-size); }
+  /* Cap the LIST per viewport, the wrapper shrinks to content so an
+     empty chat doesn't reserve a tall hole at the top. */
+  #log-window.expanded .log-list { max-height: 240px; }
+}
+
+/* ---- ≥ 1600px: chunkier rails + bigger slots ---- */
+@media (min-width: 1600px) {
+  :root {
+    --slot-size: 50px;
+    --rail-w: 300px;
+    --hud-edge: 28px;
+  }
+  .wallet-num   { font-size: var(--type-display-2xl-size); }
+  #boss-nameplate { top: 28px; }
+  #boss-nameplate .boss-name { font-size: var(--type-display-lg-size); }
+  #log-window.expanded .log-list { max-height: 380px; }
+}
+
+/* ---- ≥ 2200px: ultra-ultrawide ---- */
+@media (min-width: 2200px) {
+  :root {
+    --slot-size: 58px;
+    --rail-w: 360px;
+    --hud-edge: 36px;
+  }
+  .wallet-num   { font-size: var(--type-display-4xl-size); }
+  #boss-nameplate { top: 36px; }
+  #boss-nameplate .boss-name { font-size: var(--type-display-3xl-size); }
+  #log-window.expanded .log-list { max-height: 440px; }
+}
+
+/* ---- < 900px: show the guard, freeze the app behind it -------------- */
+@media (max-width: 899px) {
+  #viewport-guard { display: flex; }
+  #app { pointer-events: none; }
+}
+
+/* ---- < 700px tall: smaller everything --- */
+@media (max-height: 699px) {
+  :root { --slot-size: 36px; }
+  .wallet-num { font-size: var(--type-display-xs-size); }
+  #boss-nameplate .boss-name { font-size: var(--type-title-sm-size); }
+}

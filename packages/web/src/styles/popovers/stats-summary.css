@@ -1,0 +1,81 @@
+/* ---------- stats popover, bottom-left lifetime career snapshot ----------
+   Apple-clean: a quiet panel of label/value rows separated by spacing (not
+   borders). One weight for body, regular tracking, tabular numerals.
+   The deep-link is a flat text link, not a gradient button. */
+.stats-popover {
+  position: fixed;
+  z-index: var(--z-popover);
+  width: 268px;
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  background: color-mix(in srgb, var(--surface-overlay) 94%, var(--surface) 6%);
+  border: 1px solid color-mix(in srgb, var(--border-2) 68%, transparent);
+  border-radius: 16px;
+  box-shadow: var(--shadow-popover);
+  backdrop-filter: blur(18px) saturate(1.06);
+  -webkit-backdrop-filter: blur(18px) saturate(1.06);
+  padding: 16px 16px 12px;
+  font-size: var(--t-sm);
+  animation: popover-rise 0.15s var(--ease-spring);
+  transform-origin: bottom left;
+}
+body.theme-light .stats-popover {
+  background: rgba(255, 255, 255, 0.86);
+  border-color: rgba(210, 210, 218, 0.7);
+}
+@keyframes popover-rise {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.stats-popover-title {
+  font-family: var(--mono);
+  font-size: var(--type-caption-size);
+  text-transform: uppercase;
+  letter-spacing: var(--type-track-eyebrow);
+  color: var(--soft);
+  margin: 0 var(--sp-1) var(--sp-3);
+  font-weight: var(--w-reg);
+}
+.stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.stats-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: baseline;
+  gap: var(--sp-4);
+  padding: 7px var(--sp-1);
+  border: 0;
+}
+.stats-row:first-child { border: 0; }
+.stats-divider {
+  height: 1px;
+  background: var(--hairline);
+  margin: var(--sp-2) 0;
+}
+.stats-label {
+  font-size: var(--t-base);
+  color: var(--muted);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-flat);
+  text-transform: none;
+}
+.stats-value {
+  font-family: var(--mono);
+  font-size: var(--t-sm);
+  color: var(--ink);
+  font-weight: var(--w-reg);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--type-track-flat);
+}
+.stats-popover-hint {
+  margin: var(--sp-3) var(--sp-1) 0;
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  letter-spacing: var(--tr-loose);
+  text-transform: lowercase;
+  color: var(--soft);
+  text-align: right;
+}

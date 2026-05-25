@@ -1,0 +1,797 @@
+/* ──────────────────────────────────────────────────────────────────────
+ * Bento, the home / overview layout. 8 tiles in a 4-column grid; two
+ * heroes (activity, buddies) span 2 columns each. Each tile carries a
+ * soft per-section pastel tint (--tile-tint) and a saturated tone
+ * (--tile-tone) used by mini previews inside. Click anywhere in a tile
+ * to drill into the full section view.
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-bento {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-auto-rows: clamp(304px, 31vh, 348px);
+  align-items: stretch;
+  gap: 12px;
+  width: 100%;
+  min-height: 0;
+}
+.sd-tile {
+  --tile-ink: #15161a;
+  --tile-muted: rgba(21, 22, 26, 0.68);
+  --tile-soft: rgba(21, 22, 26, 0.46);
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  height: 100%;
+  min-height: 0;
+  padding: var(--sd-tile-pad-x);
+  border: 1px solid var(--sd-hairline);
+  border-radius: 18px;
+  background:
+    radial-gradient(circle at 74% 12%, color-mix(in srgb, var(--tile-tone, #94a3b8) 30%, white) 0%, transparent 34%),
+    linear-gradient(145deg,
+      color-mix(in srgb, var(--tile-tone, #94a3b8) 16%, white) 0%,
+      color-mix(in srgb, var(--tile-tone, #94a3b8) 6%, white) 54%,
+      color-mix(in srgb, var(--tile-tone, #94a3b8) 12%, white) 100%);
+  color: var(--tile-ink);
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--sans);
+  overflow: hidden;
+  isolation: isolate;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.66),
+    0 14px 38px -32px color-mix(in srgb, var(--tile-tone, #94a3b8) 38%, #000);
+  transition:
+    transform var(--dur-fast) var(--ease),
+    box-shadow var(--dur-fast) var(--ease),
+    border-color var(--dur-fast) var(--ease);
+}
+.sd-tile::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -2;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.34), transparent 42%),
+    radial-gradient(circle at 18% 92%, rgba(255, 255, 255, 0.54), transparent 38%);
+  pointer-events: none;
+}
+.sd-tile::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0;
+  z-index: -1;
+  height: 44%;
+  background: linear-gradient(180deg, transparent, rgba(255, 255, 255, 0.45));
+  pointer-events: none;
+}
+.sd-tile > * { position: relative; }
+.sd-tile[data-col="2"] { grid-column: span 2; }
+.sd-tile[data-row="2"] { grid-row: span 2; }
+.sd-tile:hover {
+  transform: translateY(-2px);
+  border-color: var(--tile-tone, var(--sd-muted));
+  box-shadow: 0 12px 32px -12px rgba(15, 17, 21, 0.12);
+}
+.sd-tile:focus-visible {
+  outline: 2px solid var(--tile-tone, var(--sd-ink));
+  outline-offset: 2px;
+}
+.sd-tile-num {
+  display: inline-flex;
+  align-items: center;
+  align-self: flex-start;
+  padding: 3px 8px;
+  border: 1px solid color-mix(in srgb, var(--tile-tone, var(--tile-ink)) 22%, transparent);
+  border-radius: 7px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: var(--w-reg);
+  letter-spacing: 0.04em;
+  color: color-mix(in srgb, var(--tile-tone, var(--tile-ink)) 46%, rgba(21, 22, 26, 0.42));
+  background: rgba(255, 255, 255, 0.26);
+  font-feature-settings: "tnum";
+}
+.sd-tile-preview {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  overflow: hidden;
+  color: var(--tile-tone, var(--sd-ink));
+}
+.sd-tile-foot {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: auto;
+}
+.sd-tile-title {
+  font-family: var(--sans-display);
+  font-size: 18px;
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  color: var(--tile-ink);
+  margin: 0;
+}
+.sd-tile-desc {
+  font-size: 12px;
+  letter-spacing: -0.005em;
+  color: var(--tile-muted);
+  margin: 0;
+  line-height: 1.5;
+  max-width: 28ch;
+}
+.sd-tile-desc strong {
+  color: var(--tile-ink);
+  font-weight: var(--w-reg);
+}
+
+/* Tile preview primitives, large, single-glance summaries. */
+.sd-tile-insight {
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: 12px;
+  align-self: stretch;
+}
+.sd-tile-insight-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+.sd-tile-headline {
+  font-family: var(--sans-display);
+  font-size: clamp(24px, 2.8vw, 34px);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  line-height: 1.04;
+  color: var(--tile-ink);
+  overflow-wrap: anywhere;
+}
+.sd-tile[data-col="2"] .sd-tile-headline {
+  font-size: clamp(32px, 3.5vw, 44px);
+}
+.sd-tile-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+.sd-tile-chips span {
+  display: inline-flex;
+  align-items: center;
+  min-height: 20px;
+  padding: 2px 7px;
+  border: 1px solid color-mix(in srgb, var(--tile-tone, var(--tile-ink)) 18%, transparent);
+  border-radius: 999px;
+  color: var(--tile-muted);
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.01em;
+  background: rgba(255, 255, 255, 0.28);
+  backdrop-filter: blur(8px);
+}
+.sd-tile-viz {
+  width: 100%;
+  min-width: 0;
+  min-height: 74px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sd-tile-moodline,
+.sd-balance-wave {
+  display: block;
+  width: 100%;
+  height: 74px;
+}
+.sd-balance-wave {
+  filter: drop-shadow(0 12px 22px color-mix(in srgb, var(--tile-tone, #94a3b8) 18%, transparent));
+}
+.sd-tile-stat {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  align-items: flex-start;
+  width: 100%;
+}
+.sd-tile-num-big {
+  font-family: var(--sans-display);
+  font-size: clamp(38px, 5vw, 48px);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  line-height: 1;
+  color: var(--tile-ink);
+  font-feature-settings: "tnum";
+}
+.sd-tile[data-col="2"] .sd-tile-num-big { font-size: clamp(44px, 6vw, 56px); }
+.sd-tile-num-cap {
+  font-size: 11px;
+  letter-spacing: 0.02em;
+  color: var(--tile-muted);
+  text-transform: lowercase;
+}
+.sd-tile-spark {
+  width: 100%;
+  margin-top: 8px;
+}
+.sd-tile-spark .sd-spark { display: block; width: 100%; }
+.sd-tile-empty {
+  font-size: 12px;
+  color: var(--tile-muted);
+  letter-spacing: -0.005em;
+}
+
+/* Hour-grid mini (tile preview): 7 rows × 8 columns, soft squares. */
+.sd-tile-mini-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-auto-rows: 1fr;
+  gap: 3px;
+  width: min(100%, 214px);
+  max-height: 130px;
+  aspect-ratio: 8 / 7;
+}
+.sd-tile-cell {
+  display: block;
+  background: var(--tile-tone, var(--sd-ink));
+  border-radius: 3px;
+}
+
+.sd-tile-body-stat {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+  min-width: 0;
+}
+.sd-tile-body-stat strong {
+  font-family: var(--sans-display);
+  font-size: clamp(36px, 4.6vw, 42px);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  line-height: 1;
+  color: var(--tile-ink);
+  font-feature-settings: "tnum";
+}
+.sd-tile-body-stat span {
+  color: var(--tile-muted);
+  font-size: 11px;
+  letter-spacing: -0.005em;
+  text-transform: lowercase;
+}
+
+/* Top-N list mini (fallback list preview). */
+.sd-tile-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.sd-tile-list-row {
+  display: grid;
+  grid-template-columns: 1fr 60px auto;
+  align-items: center;
+  gap: 10px;
+  font-size: 12px;
+}
+.sd-tile-list-label {
+  color: var(--tile-ink);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sd-tile-list-bar {
+  position: relative;
+  height: 4px;
+  border-radius: 2px;
+  background: rgba(15, 17, 21, 0.12);
+  overflow: hidden;
+}
+.sd-tile-list-bar i {
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--pct, 0%);
+  background: var(--sd-ink);
+  border-radius: 2px;
+}
+.sd-tile-list-num {
+  font-variant-numeric: tabular-nums;
+  font-family: var(--sans-display);
+  font-size: 11px;
+  color: var(--tile-muted);
+}
+
+/* Tool composition preview (tile 04): one clean stat + share strip. */
+.sd-tool-composition {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 11px;
+}
+
+.sd-tool-composition-total {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+.sd-tool-composition-total strong {
+  font-family: var(--sans-display);
+  font-size: clamp(34px, 4.4vw, 40px);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  color: var(--tile-ink);
+  line-height: 1;
+}
+.sd-tool-composition-total span {
+  color: var(--tile-muted);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sd-tool-share {
+  display: flex;
+  gap: 3px;
+  height: clamp(30px, 5vh, 42px);
+  width: 100%;
+}
+.sd-tool-share i {
+  flex-basis: var(--share);
+  min-width: 8px;
+  background: var(--tone);
+  opacity: var(--alpha);
+  border-radius: 3px;
+}
+.sd-tool-ranks {
+  display: flex;
+  gap: 12px;
+  min-width: 0;
+}
+.sd-tool-ranks span {
+  display: inline-flex;
+  gap: 5px;
+  min-width: 0;
+  max-width: 33%;
+  color: var(--tile-muted);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sd-tool-ranks b {
+  color: var(--tile-soft);
+  font-family: var(--sans);
+  font-size: 9px;
+  font-weight: var(--w-reg);
+  flex: 0 0 auto;
+}
+
+.sd-location-bars,
+.sd-ranked-bars {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.sd-location-row,
+.sd-ranked-row {
+  display: grid;
+  grid-template-columns: minmax(54px, 0.72fr) minmax(72px, 1fr) auto;
+  align-items: center;
+  gap: 9px;
+  min-width: 0;
+}
+.sd-location-row span,
+.sd-ranked-row span {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: var(--tile-ink);
+  font-size: 11px;
+  letter-spacing: -0.01em;
+}
+.sd-location-row i,
+.sd-ranked-row i {
+  position: relative;
+  height: 8px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: color-mix(in srgb, var(--tile-tone, #94a3b8) 12%, rgba(21, 22, 26, 0.08));
+}
+.sd-location-row i::before,
+.sd-ranked-row i::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--pct, 0%);
+  border-radius: inherit;
+  background: var(--tone, var(--tile-tone));
+  opacity: var(--alpha, 0.82);
+}
+.sd-location-row b,
+.sd-ranked-row b {
+  color: var(--tile-muted);
+  font-family: var(--sans-display);
+  font-size: 12px;
+  font-weight: var(--w-reg);
+  font-feature-settings: "tnum";
+}
+.sd-ranked-row {
+  grid-template-columns: minmax(64px, 0.84fr) minmax(70px, 1fr) auto;
+}
+
+.sd-session-histogram {
+  width: 100%;
+  height: 82px;
+  display: grid;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  align-items: end;
+  gap: 7px;
+  padding: 8px 0 3px;
+  border-bottom: 1px solid color-mix(in srgb, var(--tile-tone, var(--sd-ink)) 20%, transparent);
+}
+.sd-session-histogram i {
+  height: var(--h);
+  border-radius: 10px 10px 2px 2px;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.42), transparent 28%),
+    var(--tone, var(--tile-tone));
+  opacity: var(--alpha, 0.55);
+  box-shadow: 0 12px 18px -16px var(--tone, var(--tile-tone));
+}
+
+.sd-metric-stack {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.sd-metric-stack div {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: baseline;
+  gap: 9px;
+  padding-bottom: 7px;
+  border-bottom: 1px solid color-mix(in srgb, var(--tile-tone, var(--sd-ink)) 16%, transparent);
+}
+.sd-metric-stack b {
+  font-family: var(--sans-display);
+  font-size: 20px;
+  font-weight: var(--w-reg);
+  color: var(--tile-ink);
+  font-feature-settings: "tnum";
+}
+.sd-metric-stack span {
+  min-width: 0;
+  color: var(--tile-muted);
+  font-size: 11px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+/* Legacy split bars still support focused/fallback previews. */
+.sd-buddy-splits {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.sd-buddy-split {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  opacity: calc(0.45 + var(--size) * 0.55);
+}
+.sd-buddy-split-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  font-size: 11px;
+  color: var(--tile-muted);
+}
+.sd-buddy-split-head span {
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sd-buddy-split-head b {
+  font-family: var(--sans-display);
+  color: var(--tile-ink);
+  font-size: 10px;
+  flex: 0 0 auto;
+}
+.sd-buddy-split-track {
+  position: relative;
+  display: flex;
+  height: 9px;
+  border-radius: 999px;
+  overflow: hidden;
+  background: rgba(21, 22, 26, 0.12);
+}
+.sd-buddy-split-track i {
+  display: block;
+  height: 100%;
+  width: var(--pct, 0%);
+  border-radius: inherit;
+  background: var(--tone, var(--tile-tone));
+  opacity: 0.78;
+}
+.sd-buddy-split-track .help {
+  width: var(--pct, 0%);
+  background: var(--tone, var(--tile-tone));
+  opacity: 0.86;
+}
+.sd-buddy-split-track .hurt {
+  width: var(--pct, 0%);
+  background: var(--tone, var(--tile-tone));
+  opacity: 0.32;
+}
+
+/* Drilled-in section view, full-width chart stage with an editorial readout. */
+.sd-page {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sd-section-focused {
+  padding: 12px var(--sd-pad) max(120px, calc(var(--sd-pad) + 64px));
+  max-width: var(--sd-content-max);
+  width: 100%;
+  margin: 0 auto;
+  animation: sd-content-in 220ms var(--ease) both;
+}
+.sd-focused-stack {
+  display: grid;
+  grid-template-rows: minmax(300px, 46vh) auto;
+  gap: clamp(24px, 4vh, 42px);
+  min-height: calc(100vh - 214px);
+}
+.sd-focused-text {
+  display: grid;
+  /* Metric column sizes to its content (the unwrapped hero numeral) so a
+     wide screen never breaks "2,075" across two lines. Cap at 0.42fr so
+     the editorial sentence still gets the majority of the row. */
+  grid-template-columns: minmax(min-content, 0.42fr) minmax(0, 1fr) auto;
+  align-items: start;
+  gap: clamp(24px, 4vw, 56px);
+  padding-top: clamp(10px, 2vh, 24px);
+  border-top: 1px solid color-mix(in srgb, var(--sd-ink) 14%, transparent);
+  animation: sd-content-in 260ms var(--ease) both;
+}
+.sd-focused-metric {
+  min-width: 0;
+}
+.sd-focused-meta-row {
+  display: none;
+}
+.sd-focused-eyebrow {
+  display: none;
+}
+.sd-focused-title {
+  font-family: var(--sans-display);
+  font-size: 40px;
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  line-height: 1.05;
+  color: var(--sd-ink);
+  margin: 0;
+}
+.sd-focused-big {
+  font-family: var(--sans-display);
+  font-size: clamp(52px, 6.4vw, 88px);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  line-height: 0.9;
+  color: var(--sd-ink);
+  font-feature-settings: "tnum";
+  /* The hero numeral must read as one figure, never let it wrap mid-comma.
+     The metric column uses min-content sizing to grow with this. */
+  white-space: nowrap;
+}
+.sd-focused-bigcap {
+  max-width: 30ch;
+  font-size: 13px;
+  letter-spacing: -0.005em;
+  color: var(--sd-muted);
+  margin-top: 10px;
+  line-height: 1.45;
+}
+.sd-focused-brief {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  max-width: 780px;
+  padding-top: 2px;
+}
+.sd-focused-takeaway {
+  font-family: var(--sans-display);
+  font-size: clamp(28px, 3.6vw, 52px);
+  color: var(--sd-ink);
+  letter-spacing: var(--type-track-display);
+  line-height: 1.05;
+  margin: 0;
+}
+.sd-focused-copy {
+  max-width: 64ch;
+  font-size: clamp(15px, 1.25vw, 18px);
+  color: var(--sd-muted);
+  letter-spacing: -0.005em;
+  line-height: 1.5;
+  margin: 0;
+}
+.sd-focused-takeaway strong,
+.sd-focused-copy strong {
+  color: color-mix(in srgb, var(--info) 68%, var(--sd-ink));
+  font-weight: var(--w-reg);
+}
+.sd-inline-underline {
+  color: color-mix(in srgb, var(--info) 68%, var(--sd-ink));
+  cursor: help;
+  text-decoration: underline;
+  text-decoration-color: color-mix(in srgb, var(--info) 48%, transparent);
+  text-decoration-thickness: 0.06em;
+  text-underline-offset: 0.14em;
+  text-decoration-skip-ink: auto;
+}
+.sd-inline-underline:hover {
+  color: var(--sd-ink);
+  text-decoration-color: var(--sd-ink);
+}
+/* Audience switch, pill action. Icon + label, with a calm hover that
+   echoes the dashboard's --info accent. Sized larger than the original
+   so it reads as a real affordance rather than a footnote. */
+.sd-audience-action {
+  align-self: start;
+  justify-self: end;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding: 9px 16px 9px 13px;
+  border: 1px solid color-mix(in srgb, var(--sd-ink) 18%, transparent);
+  border-radius: 999px;
+  background: transparent;
+  color: var(--sd-ink);
+  font-family: var(--sans);
+  font-size: 14px;
+  font-weight: var(--w-med);
+  letter-spacing: -0.005em;
+  line-height: 1;
+  text-align: left;
+  cursor: pointer;
+  transition: border-color 160ms var(--ease), background 160ms var(--ease), color 160ms var(--ease), transform 160ms var(--ease);
+}
+.sd-audience-action:hover {
+  border-color: color-mix(in srgb, var(--info) 55%, transparent);
+  background: color-mix(in srgb, var(--info) 9%, transparent);
+  color: color-mix(in srgb, var(--info) 70%, var(--sd-ink));
+  transform: translateY(-1px);
+}
+.sd-audience-action:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--info) 70%, transparent);
+  outline-offset: 2px;
+}
+.sd-audience-action:active {
+  transform: translateY(0);
+}
+/* Filled state when the benchmark overlay is active. Reads as "this is on"
+   without competing with the persona-accent system. */
+.sd-audience-action.is-on {
+  background: var(--sd-ink);
+  border-color: var(--sd-ink);
+  color: var(--sd-surface);
+}
+.sd-audience-action.is-on:hover {
+  background: color-mix(in srgb, var(--sd-ink) 88%, var(--info));
+  border-color: color-mix(in srgb, var(--sd-ink) 88%, var(--info));
+  color: var(--sd-surface);
+}
+.sd-audience-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  flex: none;
+  color: currentColor;
+}
+.sd-audience-icon svg {
+  display: block;
+}
+.sd-audience-label {
+  display: inline-block;
+  white-space: nowrap;
+}
+body.theme-light .sd-focused-title,
+body.theme-light .sd-focused-big {
+  color: var(--sd-ink);
+}
+body.theme-light .sd-focused-eyebrow,
+body.theme-light .sd-focused-bigcap,
+body.theme-light .sd-focused-copy {
+  color: var(--sd-muted);
+}
+.sd-focused-viz {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 14px;
+  min-height: 0;
+  animation: sd-content-in 300ms var(--ease) both;
+}
+.sd-focused-viz-head {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+}
+.sd-focused-viz-body {
+  min-width: 0;
+  width: 100%;
+}
+.sd-focused-viz-note {
+  max-width: 76ch;
+  margin: 0;
+  color: var(--sd-muted);
+  font-size: 12px;
+  line-height: 1.5;
+  letter-spacing: -0.005em;
+}
+.sd-focused-viz-note strong {
+  color: var(--sd-ink);
+  font-weight: var(--w-reg);
+}
+
+/* Bento wrapper, lets the body own scrolling instead of squeezing tiles. */
+.sd-bento-wrap {
+  flex: 0 0 auto;
+  display: block;
+  max-width: var(--sd-content-max);
+  width: 100%;
+  margin: 0 auto;
+  padding: 6px var(--sd-pad) max(132px, calc(var(--sd-pad) + 72px)) max(0px, calc(var(--sd-pad) - var(--sd-tile-pad-x)));
+  box-sizing: border-box;
+  min-height: max-content;
+  overflow: visible;
+}
+/* Benchmark-toggle pill row beneath the tile grid. Stays in the bento's
+   horizontal padding so it aligns with tile edges. */
+.sd-bento-footer {
+  display: flex;
+  justify-content: flex-start;
+  padding: 18px var(--sd-tile-pad-x) 0;
+  margin-top: 8px;
+}
+/* Narrow viewports, collapse the bento to 2 columns, then 1. */
+@media (max-width: 960px) {
+  .sd-bento { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .sd-tile[data-col="2"] { grid-column: span 2; }
+}
+@media (max-width: 640px) {
+  .sd-bento { grid-template-columns: 1fr; }
+  .sd-tile[data-col="2"] { grid-column: auto; }
+  .sd-tile,
+  .sd-tile[data-col="2"] {
+    min-height: 224px;
+  }
+  .sd-tile[data-col="2"] .sd-tile-headline {
+    font-size: clamp(23px, 8vw, 32px);
+  }
+}

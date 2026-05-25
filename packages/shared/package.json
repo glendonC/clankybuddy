@@ -1,0 +1,22 @@
+{
+  "name": "@clankybuddy/shared",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./urls": "./src/urls.ts",
+    "./chat": "./src/chat.ts",
+    "./colors": "./src/colors.ts",
+    "./agents": "./src/agents.ts",
+    "./personas": "./src/personas.ts",
+    "./events": "./src/events.ts",
+    "./auth-tokens": "./src/auth-tokens.ts",
+    "./auth-events": "./src/auth-events.ts",
+    "./age-gate": "./src/age-gate.ts",
+    "./verbs": "./src/verbs.ts",
+    "./stats": "./src/stats/index.ts",
+    "./stats/fixtures": "./src/stats/fixtures/index.ts"
+  }
+}

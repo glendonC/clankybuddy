@@ -1,0 +1,39 @@
+/* Full-bleed playfield. The stage is the entire viewport, no docked
+   chrome, no grid rows, no footer. HUD widgets float over the stage via
+   #hud (a pointer-events:none overlay), each widget re-enables pointer
+   events on itself. The stage canvas underneath stays fully clickable in
+   the gaps between widgets. */
+#app {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+#stage {
+  position: absolute;
+  inset: 0;
+}
+
+#hud {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: var(--z-overlays);
+}
+
+/* Each corner widget is positioned absolutely off the viewport edges and
+   re-enables pointer events. The .hud-corner base is just a positioning
+   anchor, visual styling lives in widget-specific classes. */
+.hud-corner {
+  position: absolute;
+  pointer-events: auto;
+}
+
+.hud-tr { top: var(--hud-edge);    right: var(--hud-edge); }
+.hud-bl { bottom: var(--hud-edge); left: var(--hud-edge); }
+.hud-bc {
+  bottom: var(--hud-edge);
+  left: 50%;
+  transform: translateX(-50%);
+}

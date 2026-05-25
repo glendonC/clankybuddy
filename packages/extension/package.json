@@ -1,0 +1,122 @@
+{
+  "name": "clankybuddy-extension",
+  "displayName": "ClankyBuddy",
+  "description": "Beat up (or pet) an AI buddy without leaving your editor.",
+  "version": "0.1.0",
+  "private": true,
+  "publisher": "clankybuddy",
+  "license": "MIT",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "keywords": [
+    "claude",
+    "chatgpt",
+    "gemini",
+    "llama",
+    "game"
+  ],
+  "main": "./out/extension.js",
+  "activationEvents": [
+    "onStartupFinished",
+    "onCommand:clankybuddy.open",
+    "onCommand:clankybuddy.reload",
+    "onCommand:clankybuddy.nudge",
+    "onCommand:clankybuddy.resetOnboarding",
+    "onCommand:clankybuddy.showWalkthrough"
+  ],
+  "contributes": {
+    "commands": [
+      {
+        "command": "clankybuddy.open",
+        "title": "Open",
+        "category": "ClankyBuddy"
+      },
+      {
+        "command": "clankybuddy.reload",
+        "title": "Reload Panel",
+        "category": "ClankyBuddy"
+      },
+      {
+        "command": "clankybuddy.nudge",
+        "title": "Nudge Me",
+        "category": "ClankyBuddy"
+      },
+      {
+        "command": "clankybuddy.resetOnboarding",
+        "title": "Reset Onboarding (Dev)",
+        "category": "ClankyBuddy"
+      },
+      {
+        "command": "clankybuddy.showWalkthrough",
+        "title": "Show Walkthrough",
+        "category": "ClankyBuddy"
+      }
+    ],
+    "walkthroughs": [
+      {
+        "id": "clankybuddy.welcome",
+        "title": "Get started with ClankyBuddy",
+        "description": "Open the panel, pick a buddy, and (optionally) get nudged.",
+        "steps": [
+          {
+            "id": "open",
+            "title": "Open ClankyBuddy",
+            "description": "Pop the panel beside your editor.\n[Open ClankyBuddy](command:clankybuddy.open)",
+            "media": { "markdown": "walkthrough/open.md" },
+            "completionEvents": ["onCommand:clankybuddy.open"]
+          },
+          {
+            "id": "pick",
+            "title": "Pick your buddy",
+            "description": "Cycle Claude, GPT, Gemini, Grok, Llama, DeepSeek from the picker in the top-right of the panel.",
+            "media": { "markdown": "walkthrough/pick.md" }
+          },
+          {
+            "id": "nudge",
+            "title": "Optional: get nudged",
+            "description": "Set a recurring break reminder.\n[Open Settings](command:workbench.action.openSettings?%22clankybuddy.nudge%22)",
+            "media": { "markdown": "walkthrough/nudge.md" }
+          }
+        ]
+      }
+    ],
+    "configuration": {
+      "title": "ClankyBuddy",
+      "properties": {
+        "clankybuddy.apiBase": {
+          "type": "string",
+          "default": "",
+          "description": "Override the worker API base. Empty = use the bundled default (https://api.clankybuddy.com). Set to e.g. http://localhost:8788 to run against a local wrangler dev."
+        },
+        "clankybuddy.showStatusBar": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show the ClankyBuddy entry in the editor status bar."
+        },
+        "clankybuddy.nudge.intervalMinutes": {
+          "type": "number",
+          "default": 0,
+          "minimum": 0,
+          "description": "If > 0, periodically pop a small toast offering to open ClankyBuddy. 0 disables. Try 60–120 for an hourly-ish nudge."
+        }
+      }
+    }
+  },
+  "scripts": {
+    "build:web": "node scripts/bundle-web.mjs",
+    "build:ts": "tsc -p .",
+    "build": "npm run build:web && npm run build:ts",
+    "watch": "tsc -p . --watch",
+    "typecheck": "tsc -p . --noEmit",
+    "vscode:prepublish": "npm run build"
+  },
+  "devDependencies": {
+    "@types/node": "^22.0.0",
+    "@types/vscode": "^1.85.0",
+    "typescript": "^5.6.0"
+  }
+}

@@ -1,0 +1,894 @@
+/* ---------- slot picker, Destiny-style two-stage inspect ----------
+   The picker itself is GRID-ONLY: tile grid grouped by spine→group.
+   Hover a tile and a floating .sp-tooltip appears anchored next to it.
+   Press the tooltip's "details" button (or right-click any tile) and a
+   stacked .sp-inspect-overlay opens with the full detail view.
+   Touch fallback (`@media (hover: none)`) suppresses tooltips and reverts
+   the inspect to a tap-driven flow. */
+.slot-picker {
+  position: fixed;
+  z-index: var(--z-popover);
+  width: 520px;
+  max-width: calc(100vw - 16px);
+  height: 540px;
+  max-height: calc(100vh - 16px);
+  display: flex;
+  flex-direction: column;
+  /* Matches the chat cluster, translucent wash, hairline border, minimal
+     corner rounding. Reads as the same family of chrome as the log panel
+     rather than a separate "modal" surface. */
+  background: var(--surface-translucent);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.45);
+  font-size: var(--t-sm);
+  animation: popover-rise 0.14s ease-out;
+  transform-origin: bottom center;
+  overflow: hidden;
+}
+.slot-picker.centered {
+  width: 600px;
+  height: 620px;
+  transform-origin: center center;
+  animation: shop-pop 0.18s ease-out;
+  box-shadow: 0 18px 44px rgba(0,0,0,0.55);
+}
+@keyframes shop-pop {
+  from { opacity: 0; transform: translate(-50%, -50%) scale(0.96); }
+  to   { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+}
+body.theme-light .slot-picker {
+  box-shadow: 0 16px 48px rgba(20, 20, 30, 0.18);
+}
+.slot-picker-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 9px;
+  border-bottom: 1px solid var(--border);
+}
+.slot-picker-eyebrow {
+  font-size: var(--t-xs);
+  text-transform: lowercase;
+  letter-spacing: var(--type-track-wide);
+  color: var(--fg-3);
+  font-weight: var(--w-reg);
+}
+.slot-picker-slotchip {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 22px;
+  padding: 2px 7px;
+  border: 1px solid var(--border-2);
+  border-radius: 5px;
+  background: var(--surface-2);
+  color: var(--fg);
+  font-size: var(--t-xs);
+  font-weight: var(--w-bold);
+  letter-spacing: var(--tr-snug);
+  font-variant-numeric: tabular-nums;
+}
+.slot-picker-close {
+  margin-left: auto;
+  background: transparent;
+  border: 0;
+  color: var(--fg-2);
+  font-size: var(--type-close-size);
+  line-height: 1;
+  padding: 2px 6px;
+  cursor: pointer;
+  border-radius: 4px;
+}
+.slot-picker-close:hover { color: var(--fg); background: var(--char-accent-soft); }
+
+/* The picker is now grid-only, no flex/grid container needed. The
+   .slot-picker-left fills the body between header and footer. */
+.slot-picker-left {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  padding: 10px 12px 12px;
+  min-height: 0;
+  /* Edge fades, content dissolves at top/bottom instead of hard-cutting
+     at the panel border. Mirrors .log-list in log.css. data-at-top /
+     data-at-bottom (set by updateFadeMarkers in slot-picker.js) flatten
+     the corresponding stop when there's nothing past that edge. */
+  --sp-fade: 14px;
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--sp-fade),
+    #000 calc(100% - var(--sp-fade)),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--sp-fade),
+    #000 calc(100% - var(--sp-fade)),
+    transparent 100%
+  );
+}
+.slot-picker-left[data-at-top="true"] {
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 calc(100% - var(--sp-fade)),
+    transparent 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 calc(100% - var(--sp-fade)),
+    transparent 100%
+  );
+}
+.slot-picker-left[data-at-bottom="true"] {
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--sp-fade),
+    #000 100%
+  );
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 var(--sp-fade),
+    #000 100%
+  );
+}
+.slot-picker-left[data-at-top="true"][data-at-bottom="true"] {
+  mask-image: none;
+  -webkit-mask-image: none;
+}
+.slot-picker-empty {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--fg-3);
+  font-size: var(--t-sm);
+}
+/* Each group reads as its own band, a hairline rule + breathing on top,
+   the label sits flush left in its own row. The bands are the structural
+   read of the picker; the tile grid lives inside them. */
+.slot-picker-group {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--hairline);
+}
+.slot-picker-group:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+.slot-picker-group-label {
+  font-size: 10px;
+  text-transform: lowercase;
+  letter-spacing: var(--type-track-wide);
+  color: var(--fg-3);
+  margin-bottom: 8px;
+  font-weight: var(--w-reg);
+}
+/* Section-label color tracks the GROUP hue rather than the spine. The
+   eye reads the label color → matches the radial wash on the tiles
+   beneath. Spine signal lives in render order (positive groups first). */
+.slot-picker-group[data-group] .slot-picker-group-label {
+  color: color-mix(in srgb, var(--group-hue-bright) 75%, var(--fg-2));
+}
+.slot-picker-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 5px;
+}
+.slot-picker-tile {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  /* Compact: just enough room for a 20px icon, a one-line label, and a
+     tiny corner badge. ~60px tall vs the earlier ~90px. The pastel wash
+     comes from the shared tile primitive but we override its intensity
+     below so the section label carries category and the tile carries
+     identity. */
+  padding: 7px 3px 5px;
+  min-height: 58px;
+  background: var(--slot-bg);
+  border: 1px solid var(--border-2);
+  border-radius: 4px;
+  color: var(--fg);
+  cursor: pointer;
+  transition: border-color .12s ease, background .12s ease, transform .08s ease, box-shadow .12s ease;
+  box-shadow: var(--slot-shadow);
+}
+/* Tone the per-tile pastel wash way down inside the picker. The hotbar
+   keeps the full wash (group identity at a glance is the whole point of
+   that surface), here the section label already names the group so the
+   tile only needs a hue *hint*. Hover restores the punchier wash so the
+   hovered tile reads as the focus. */
+.slot-picker-tile[data-group] {
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--group-hue-bright) 8%, transparent) 0%,
+      transparent 100%),
+    var(--slot-bg);
+  border-color: color-mix(in srgb, var(--group-hue) 20%, var(--border-2));
+  color: color-mix(in srgb, var(--group-hue-bright) 60%, var(--fg));
+}
+.slot-picker-tile[data-group]:where(:hover, .inspecting, :focus-visible) {
+  background:
+    linear-gradient(180deg,
+      color-mix(in srgb, var(--group-hue-bright) 22%, transparent) 0%,
+      color-mix(in srgb, var(--group-hue) 10%, transparent) 100%),
+    var(--slot-bg);
+  border-color: color-mix(in srgb, var(--group-hue-bright) 55%, var(--border-2));
+  color: var(--group-hue-bright);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 1px 4px color-mix(in srgb, var(--group-hue) 25%, transparent);
+}
+/* Group tile chroma lives in ../primitives/tool-tile.css and is shared with the hotbar. */
+.slot-picker-tile:hover,
+.slot-picker-tile.inspecting,
+.slot-picker-tile:focus-visible {
+  box-shadow: var(--slot-shadow-hover);
+  transform: translateY(-1px);
+  outline: none;
+}
+.slot-picker-tile-icon {
+  width: 20px;
+  height: 20px;
+  color: currentColor;
+}
+.slot-picker-tile-icon .icon-stroke { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.slot-picker-tile-icon .icon-fill   { fill: currentColor; stroke: none; }
+.slot-picker-tile-glyph {
+  font-size: var(--t-base);
+  font-weight: var(--w-bold);
+  color: var(--fg-2);
+  text-transform: uppercase;
+}
+.slot-picker-tile-label {
+  font-size: var(--t-xs);
+  color: var(--fg-2);
+  text-transform: lowercase;
+  letter-spacing: 0;
+  text-align: center;
+  line-height: 1.1;
+  max-width: 100%;
+  padding: 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.slot-picker-tile-dot {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--char-accent);
+  box-shadow: 0 0 0 2px var(--surface-overlay);
+}
+/* Equipped-here state, character-accent ring on top of the group wash,
+   so the player's *choice* glows above the *category*. Same pattern as
+   .slot.active in chrome.css. */
+.slot-picker-tile.equipped-here {
+  border-color: var(--char-accent);
+  box-shadow:
+    var(--slot-shadow),
+    0 0 0 1px var(--char-accent-soft);
+}
+.slot-picker-tile.equipped-elsewhere { opacity: 0.78; }
+.slot-picker-tile.locked {
+  opacity: 0.5;
+  filter: saturate(0.6);
+}
+.slot-picker-tile.locked:hover,
+.slot-picker-tile.locked.inspecting,
+.slot-picker-tile.locked:focus-visible {
+  opacity: 0.85;
+  filter: none;
+  border-color: var(--fg-3);
+}
+.slot-picker-tile-cost {
+  position: absolute;
+  top: 4px;
+  right: 5px;
+  font-size: 10px;
+  font-family: var(--mono);
+  font-weight: var(--w-reg);
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-3);
+  background: transparent;
+  border: 0;
+  padding: 0;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+.slot-picker-tile.locked .slot-picker-tile-label { color: var(--fg-3); }
+
+/* Tier dots, bottom-right of the tile. One dot per stat-upgrade node
+   in this tool's progression chain; filled when owned, hollow when not.
+   Suppressed entirely on tools with no stat upgrades, and on locked tiles
+   (the cost badge in the top-right is the relevant signal there). */
+.slot-picker-tile-tier {
+  position: absolute;
+  bottom: 4px;
+  right: 5px;
+  display: inline-flex;
+  gap: 2px;
+  pointer-events: none;
+}
+.slot-picker-tile-tier-dot {
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: transparent;
+  border: 1px solid color-mix(in srgb, currentColor 55%, transparent);
+}
+.slot-picker-tile-tier-dot.filled {
+  background: currentColor;
+  border-color: currentColor;
+}
+
+/* ----- RIGHT pane (inspect) ----- */
+.slot-picker-right {
+  position: relative;
+  overflow-y: auto;
+  padding: 14px 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background:
+    radial-gradient(80% 70% at 50% 0%,
+      color-mix(in srgb, var(--ip-hue, transparent) 18%, transparent) 0%,
+      transparent 70%),
+    var(--surface);
+  transition: background .18s ease;
+}
+/* Group hue map for the inspect wash. Uses the same group hue tokens as the
+   shared tile primitive so the tile and inspect panel feel linked. */
+.slot-picker-right { --ip-hue: var(--group-hue-bright); }
+
+.slot-picker-inspect-empty {
+  margin: auto;
+  text-align: center;
+  color: var(--fg-3);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.slot-picker-inspect-eyebrow {
+  font-size: var(--t-xs);
+  text-transform: lowercase;
+  letter-spacing: var(--type-track-wide);
+  color: var(--fg-3);
+}
+.slot-picker-inspect-prompt {
+  font-size: var(--t-base);
+  color: var(--fg-2);
+  line-height: 1.4;
+}
+
+.slot-picker-inspect-head {
+  display: grid;
+  grid-template-columns: 64px 1fr;
+  align-items: center;
+  gap: 14px;
+}
+.slot-picker-inspect-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 6px;
+  background:
+    radial-gradient(120% 90% at 50% 30%,
+      color-mix(in srgb, var(--ip-hue, var(--fg-3)) 28%, transparent) 0%,
+      color-mix(in srgb, var(--ip-hue, var(--fg-3)) 12%, transparent) 60%,
+      transparent 100%),
+    var(--surface-2);
+  border: 1px solid color-mix(in srgb, var(--ip-hue, var(--border-2)) 35%, var(--border-2));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.slot-picker-inspect-icon-svg {
+  width: 70%;
+  height: 70%;
+  color: var(--fg);
+}
+.slot-picker-inspect-icon-svg .icon-stroke { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.slot-picker-inspect-icon-svg .icon-fill   { fill: currentColor; stroke: none; }
+.slot-picker-right[data-spine="positive"] .slot-picker-inspect-icon-svg { color: var(--mood-positive); }
+.slot-picker-right[data-spine="negative"] .slot-picker-inspect-icon-svg { color: var(--mood-negative); }
+.slot-picker-right[data-spine="utility"]  .slot-picker-inspect-icon-svg { color: color-mix(in srgb, var(--ip-hue) 70%, var(--fg)); }
+
+.slot-picker-inspect-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+.slot-picker-inspect-name {
+  font-family: var(--sans-display);
+  font-size: clamp(28px, 3.4vw, 36px);
+  font-weight: var(--w-reg);
+  color: var(--fg);
+  text-transform: lowercase;
+  letter-spacing: var(--type-track-display);
+  line-height: 1.04;
+}
+
+.slot-picker-inspect-chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+.ip-chip {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  border-radius: 5px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  color: var(--fg-2);
+  font-size: var(--type-micro-size);
+  text-transform: lowercase;
+  letter-spacing: var(--tr-snug);
+  font-weight: var(--w-reg);
+}
+.ip-chip-delta {
+  color: var(--fg);
+  font-variant-numeric: tabular-nums;
+  font-weight: var(--w-bold);
+}
+.slot-picker-right[data-spine="positive"] .ip-chip-delta { color: var(--mood-positive); }
+.slot-picker-right[data-spine="negative"] .ip-chip-delta { color: var(--mood-negative); }
+.ip-chip-cd  { color: color-mix(in srgb, var(--ip-hue) 70%, var(--fg-2)); }
+.ip-chip-key {
+  text-transform: uppercase;
+  letter-spacing: var(--tr-snug);
+  font-weight: var(--w-bold);
+  color: var(--fg);
+}
+
+.slot-picker-inspect-blurb {
+  font-size: var(--t-sm);
+  color: var(--fg-2);
+  line-height: 1.45;
+  font-style: italic;
+}
+
+.slot-picker-inspect-progress {
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  background: var(--surface-2);
+  padding: 9px 10px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.ip-progress-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+}
+.ip-progress-title {
+  font-size: 10px;
+  text-transform: lowercase;
+  letter-spacing: var(--type-track-wide);
+  color: var(--fg-3);
+  font-weight: var(--w-reg);
+}
+.ip-progress-count {
+  font-size: var(--t-xs);
+  color: var(--fg-3);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: var(--tr-snug);
+}
+.ip-progress-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+}
+.ip-node {
+  position: relative;
+  display: grid;
+  grid-template-columns: 16px 1fr auto;
+  gap: 9px;
+  align-items: start;
+  padding: 6px 0;
+}
+.ip-node + .ip-node { border-top: 1px dashed color-mix(in srgb, var(--border) 60%, transparent); }
+.ip-node-bullet {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-top: 4px;
+  border: 1.5px solid var(--fg-3);
+  background: transparent;
+  justify-self: center;
+  transition: background .12s ease, border-color .12s ease, box-shadow .12s ease;
+}
+.ip-node[data-state="owned"]       .ip-node-bullet { background: color-mix(in srgb, var(--ip-hue) 80%, var(--fg)); border-color: transparent; box-shadow: 0 0 0 2px color-mix(in srgb, var(--ip-hue) 25%, transparent); }
+.ip-node[data-state="affordable"]  .ip-node-bullet { border-color: color-mix(in srgb, var(--ip-hue) 80%, var(--fg)); box-shadow: 0 0 6px color-mix(in srgb, var(--ip-hue) 60%, transparent); }
+.ip-node[data-state="unaffordable"] .ip-node-bullet { border-color: var(--fg-3); }
+.ip-node[data-state="locked"]      .ip-node-bullet { border-color: var(--border-2); opacity: 0.6; }
+
+.ip-node-body { min-width: 0; }
+.ip-node-label {
+  font-size: var(--t-base);
+  color: var(--fg);
+  font-weight: var(--w-reg);
+  text-transform: lowercase;
+  letter-spacing: 0;
+  line-height: 1.2;
+}
+.ip-node[data-kind="tool"] .ip-node-label {
+  font-family: var(--sans-display);
+  font-size: 15px;
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+}
+.ip-node[data-capstone="true"] .ip-node-label {
+  font-family: var(--sans-display);
+  font-size: 16px;
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  color: color-mix(in srgb, var(--ip-hue, var(--fg)) 70%, var(--fg));
+}
+.ip-node[data-capstone="true"] .ip-node-bullet {
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--ip-hue, var(--fg-3)) 32%, transparent);
+}
+.ip-node[data-state="locked"] .ip-node-label,
+.ip-node[data-state="unaffordable"] .ip-node-label { color: var(--fg-2); }
+.ip-node-blurb {
+  font-size: var(--t-xs);
+  color: var(--fg-3);
+  line-height: 1.4;
+  margin-top: 2px;
+}
+.ip-node-cost {
+  font-family: var(--mono);
+  font-size: var(--t-xs);
+  font-weight: var(--w-reg);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0;
+  color: var(--fg-3);
+  align-self: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+}
+.ip-node-cost[data-state="owned"]      { color: color-mix(in srgb, var(--ip-hue) 70%, var(--fg)); }
+.ip-node-cost[data-state="affordable"] { color: var(--fg); }
+.ip-node-cost[data-state="locked"]     { opacity: 0.6; }
+
+.slot-picker-inspect-footer {
+  margin-top: auto;
+  display: flex;
+  padding-top: 6px;
+}
+.slot-picker-cta {
+  flex: 1 1 100%;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 14px 22px;
+  border-radius: 4px;
+  border: 1px solid color-mix(in srgb, var(--ip-hue, var(--char-accent)) 60%, var(--border-2));
+  background: color-mix(in srgb, var(--ip-hue, var(--char-accent)) 18%, var(--surface-2));
+  color: var(--fg);
+  font-family: var(--sans-display);
+  font-size: clamp(20px, 2.1vw, 24px);
+  font-weight: var(--w-reg);
+  text-transform: lowercase;
+  letter-spacing: var(--type-track-display);
+  cursor: pointer;
+  transition: background .12s ease, border-color .12s ease, transform .08s ease;
+}
+.slot-picker-cta:hover {
+  background: color-mix(in srgb, var(--ip-hue, var(--char-accent)) 32%, var(--surface-2));
+  transform: translateY(-1px);
+}
+.slot-picker-cta[data-state="equipped"] {
+  background: transparent;
+  color: var(--fg-2);
+  border-color: var(--border);
+  cursor: default;
+}
+.slot-picker-cta[data-state="equipped"]:hover { transform: none; }
+.slot-picker-cta[data-state="unequip"] {
+  background: transparent;
+  color: var(--fg-2);
+  border-color: var(--border-2);
+}
+.slot-picker-cta[data-state="unequip"]:hover {
+  background: color-mix(in srgb, var(--fg-2) 8%, transparent);
+  color: var(--fg);
+  border-color: color-mix(in srgb, var(--fg-2) 40%, var(--border-2));
+}
+.slot-picker-cta[data-state="locked"] {
+  background: transparent;
+  color: var(--fg-3);
+  border-color: var(--border);
+  cursor: not-allowed;
+}
+.slot-picker-cta[data-state="locked"]:hover { background: transparent; transform: none; }
+.slot-picker-cta[data-state="buy"] {
+  background: color-mix(in srgb, var(--ip-hue, var(--char-accent)) 28%, var(--surface-2));
+  border-color: color-mix(in srgb, var(--ip-hue, var(--char-accent)) 75%, var(--border-2));
+  color: var(--fg);
+}
+.slot-picker-cta[data-state="buy"]:hover {
+  background: color-mix(in srgb, var(--ip-hue, var(--char-accent)) 45%, var(--surface-2));
+}
+
+/* Affordable progression pills are clickable. Hover gives them a hint. */
+.ip-node[data-buyable="true"] {
+  border-radius: 6px;
+  margin: 0 -6px;
+  padding: 6px 6px;
+  transition: background .12s ease;
+}
+.ip-node[data-buyable="true"]:hover {
+  background: color-mix(in srgb, var(--ip-hue, var(--char-accent)) 14%, transparent);
+}
+.ip-node[data-buyable="true"] + .ip-node,
+.ip-node + .ip-node[data-buyable="true"] { border-top-color: transparent; }
+
+/* ----- footer ----- */
+.slot-picker-footer {
+  border-top: 1px solid var(--border);
+  padding: 8px 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.slot-picker-hint {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+  font-size: var(--t-xs);
+  color: var(--fg-3);
+  text-transform: lowercase;
+  letter-spacing: 0;
+}
+.sp-hint-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  white-space: nowrap;
+}
+.sp-hint-sep {
+  color: var(--border-2);
+  user-select: none;
+}
+.sp-hint-icon {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  color: var(--fg-3);
+  opacity: 0.85;
+}
+.slot-picker-shop {
+  background: transparent;
+  border: 0;
+  color: var(--fg-2);
+  font-size: var(--t-xs);
+  text-transform: lowercase;
+  letter-spacing: var(--tr-snug);
+  cursor: pointer;
+  padding: 4px 6px;
+  border-radius: 4px;
+}
+.slot-picker-shop:hover { color: var(--fg); background: var(--char-accent-soft); }
+
+
+/* ---------- floating hover tooltip ----------
+   Single shared element on document.body. Pointer-events:auto so the user
+   can move the cursor into it to click the "details" button without it
+   disappearing, the JS exit-delay handles the leave timing. */
+.sp-tooltip {
+  position: fixed;
+  z-index: calc(var(--z-popover) + 1);
+  width: 240px;
+  max-width: 280px;
+  padding: 10px 12px 9px;
+  background: var(--surface-overlay);
+  backdrop-filter: blur(14px) saturate(1.05);
+  -webkit-backdrop-filter: blur(14px) saturate(1.05);
+  border: 1px solid var(--border-2);
+  border-radius: 4px;
+  box-shadow: var(--shadow-tooltip), 0 4px 14px rgba(0, 0, 0, 0.35);
+  font-size: var(--t-sm);
+  pointer-events: auto;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity .08s linear, visibility 0s linear .08s;
+}
+.sp-tooltip[aria-hidden="false"] {
+  opacity: 1;
+  visibility: visible;
+  transition: opacity .08s linear;
+}
+.sp-tooltip { --ip-hue: var(--group-hue-bright); }
+.sp-tt-head {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 9px;
+  align-items: center;
+}
+.sp-tt-icon {
+  width: 32px;
+  height: 32px;
+  border-radius: 6px;
+  background:
+    radial-gradient(120% 90% at 50% 30%,
+      color-mix(in srgb, var(--ip-hue, var(--fg-3)) 28%, transparent) 0%,
+      transparent 90%),
+    var(--surface-2);
+  border: 1px solid color-mix(in srgb, var(--ip-hue, var(--border-2)) 30%, var(--border-2));
+  display: flex; align-items: center; justify-content: center;
+}
+.sp-tt-icon-svg {
+  width: 70%; height: 70%; color: var(--fg);
+}
+.sp-tt-icon-svg .icon-stroke { fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.sp-tt-icon-svg .icon-fill   { fill: currentColor; stroke: none; }
+.sp-tooltip[data-spine="positive"] .sp-tt-icon-svg { color: var(--mood-positive); }
+.sp-tooltip[data-spine="negative"] .sp-tt-icon-svg { color: var(--mood-negative); }
+.sp-tooltip[data-spine="utility"]  .sp-tt-icon-svg { color: color-mix(in srgb, var(--ip-hue) 70%, var(--fg)); }
+.sp-tt-meta { min-width: 0; }
+.sp-tt-name {
+  font-family: var(--sans-display);
+  font-size: 17px;
+  font-weight: var(--w-reg);
+  color: var(--fg);
+  text-transform: lowercase;
+  letter-spacing: var(--type-track-display);
+  line-height: 1.08;
+}
+.sp-tt-chips {
+  display: flex; flex-wrap: wrap; gap: 4px;
+  margin-top: 7px;
+}
+.sp-tt-blurb {
+  margin-top: 6px;
+  font-size: var(--t-xs);
+  color: var(--fg-2);
+  font-style: italic;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.sp-tt-foot {
+  margin-top: 10px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.sp-tt-state {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: var(--t-xs);
+  font-weight: var(--w-reg);
+  text-transform: lowercase;
+  letter-spacing: 0;
+  color: var(--fg-3);
+}
+.sp-state-icon {
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  color: currentColor;
+  opacity: 0.9;
+}
+.sp-tt-state[data-state="owned"]     { color: var(--fg); }
+.sp-tt-state[data-state="equipped"]  { color: var(--char-accent); }
+.sp-tt-state[data-state="locked"]    { color: var(--fg-3); }
+.sp-tt-state[data-state="available"] { color: color-mix(in srgb, var(--ip-hue, var(--fg)) 80%, var(--fg)); }
+.sp-tt-more {
+  background: transparent;
+  border: 0;
+  color: var(--fg-2);
+  font-size: var(--t-xs);
+  text-transform: lowercase;
+  letter-spacing: 0;
+  font-weight: var(--w-reg);
+  padding: 3px 6px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+.sp-tt-more:hover {
+  color: var(--fg);
+  background: color-mix(in srgb, var(--ip-hue, var(--char-accent)) 22%, transparent);
+}
+
+
+/* ---------- inspect overlay (stacked on top of picker) ----------
+   Modal layer that hosts the full inspect view. Backdrop click + back button
+   + close × all return to the picker. The card is wider than the picker so
+   it visibly sits on top, framed by the dimmed backdrop. */
+.sp-inspect-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: calc(var(--z-popover) + 2);
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: sp-fade .14s ease-out;
+}
+body.theme-light .sp-inspect-overlay { background: rgba(20, 20, 30, 0.35); }
+@keyframes sp-fade { from { opacity: 0; } to { opacity: 1; } }
+.sp-inspect-card {
+  width: 720px;
+  max-width: calc(100vw - 24px);
+  height: 540px;
+  max-height: calc(100vh - 24px);
+  display: flex;
+  flex-direction: column;
+  background: var(--surface-translucent);
+  border: 1px solid var(--hairline);
+  border-radius: 4px;
+  box-shadow: 0 18px 44px rgba(0,0,0,0.55);
+  overflow: hidden;
+  animation: shop-pop .18s ease-out;
+}
+body.theme-light .sp-inspect-card { box-shadow: 0 24px 64px rgba(20, 20, 30, 0.2); }
+.sp-inspect-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px 9px;
+  border-bottom: 1px solid var(--border);
+}
+.sp-inspect-eyebrow {
+  font-size: var(--t-xs);
+  text-transform: lowercase;
+  letter-spacing: var(--type-track-wide);
+  color: var(--fg-3);
+  font-weight: var(--w-reg);
+}
+.sp-inspect-back, .sp-inspect-close {
+  background: transparent;
+  border: 0;
+  color: var(--fg-2);
+  font-size: var(--t-xs);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  text-transform: lowercase;
+  letter-spacing: 0;
+  font-weight: var(--w-reg);
+}
+.sp-inspect-close { font-size: var(--type-close-size); line-height: 1; padding: 2px 8px; margin-left: auto; }
+.sp-inspect-back:hover, .sp-inspect-close:hover {
+  color: var(--fg);
+  background: var(--char-accent-soft);
+}
+/* The inspect body re-uses .slot-picker-right rules from earlier in the file. */
+.sp-inspect-card .slot-picker-right {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
+
+/* ---------- touch / pointer:coarse fallback ----------
+   No hover state on touch, so suppress the floating tooltip outright. The
+   inspect overlay is reachable via tap on locked tiles, the right-click
+   gesture (long-press on iOS), and explicit details affordances. */
+@media (hover: none) and (pointer: coarse) {
+  .sp-tooltip { display: none !important; }
+}

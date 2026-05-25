@@ -1,0 +1,46 @@
+/* Stylesheet entry. Each partial owns one slice of the chrome:
+ *
+ *   tokens    , :root vars (colors, type scale, sizes), CSS reset, body
+ *   layout    , #app grid (rows/columns/areas)
+ *   stage     , #stage, vignette, ground glow, speech bubbles
+ *   chrome    , HUD manifests: boss nameplate, anchors, wallet, hotbar
+ *   popovers  , popover/modal manifests: settings, stats, target picker,
+ *                slot picker, age gate
+ *   primitives, shared visual recipes used by multiple surfaces
+ *   dashboard , full-screen analytics surface manifest
+ *   overlays  , chaos abilities (anvil, blackhole, flash, nuke), AI plumbing,
+ *                game-mode + panic-move overlays
+ *   dev       , dev panel
+ *   viewport  , < 900px guard splash, 900-1279 / ≥1600 / ≥2200 scaling tiers
+ *
+ * Order matters only for the cascade where rules collide. Tokens first,
+ * viewport last (so its media-query overrides win).
+ */
+
+@import url('./styles/tokens.css');
+@import url('./styles/layout.css');
+@import url('./styles/stage.css');
+@import url('./styles/chrome.css');
+@import url('./styles/popovers.css');
+@import url('./styles/primitives/tool-tile.css');
+@import url('./styles/dashboard.css');
+@import url('./styles/log.css');
+@import url('./styles/overlays.css');
+@import url('./styles/dev.css');
+@import url('./styles/viewport.css');
+
+/* ============================================================
+   prefers-reduced-motion, global guard. Every animation in this app is
+   decoration (boss-flash, popover-rise, anvil-drop, combo-pop, slot
+   cooldown sweep). Functionality never depends on a transition completing,
+   so collapsing them to ~instant is safe. Stage physics keep running,
+   that's WebGL/canvas, not CSS, but persistent UI chrome calms down.
+   ============================================================ */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

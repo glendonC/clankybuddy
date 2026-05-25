@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no" />
+    <title>ClankyBuddy</title>
+    <meta name="theme-color" content="#08080a" />
+    <link rel="icon" type="image/png" href="/icons/icon-192.png" />
+    <link rel="preconnect" href="https://rsms.me/" crossorigin />
+    <link rel="stylesheet" href="https://rsms.me/inter/inter.css" />
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="viewport-guard" aria-hidden="true">
+      <div class="vg-card">
+        <div class="vg-eyebrow">clankybuddy</div>
+        <div class="vg-title">Widen your window.</div>
+        <div class="vg-msg">ClankyBuddy needs a little more room to keep the stage and hotbar usable.</div>
+        <div class="vg-meta">minimum width: 900px</div>
+        <div class="vg-size" aria-live="polite"></div>
+      </div>
+    </div>
+
+    <!-- Full-bleed playfield. The stage IS the app. The HUD is two persistent
+         side rails plus a floating bottom hotbar, corners are no longer
+         islands of negative space. -->
+    <div id="app">
+      <main id="stage">
+        <canvas id="game"></canvas>
+        <div id="stage-overlays"></div>
+
+        <!-- TOP-CENTER: Boss nameplate. Pure-aesthetic transient, name +
+             provider + a thin accent underline. Plays a Sekiro/Souls-style
+             intro→hold→outro on boot and again on every character switch.
+             Disappears when the cycle ends. No mood binding. -->
+        <div id="boss-nameplate" aria-live="polite" aria-label="target">
+          <div class="boss-logo" aria-hidden="true"></div>
+          <div class="boss-name"></div>
+          <div class="boss-subtitle"></div>
+          <div class="boss-bar"></div>
+        </div>
+
+        <span id="mood-label" hidden></span>
+        <span id="stat-pets" hidden>0</span>
+        <span id="stat-hits" hidden>0</span>
+        <nav id="character-picker" hidden></nav>
+
+        <div id="speech-bubbles"></div>
+      </main>
+
+      <div id="hud" aria-label="hud">
+
+        <!-- BOTTOM-LEFT: Chat cluster. Tabbed chat panel anchored to the
+             viewport bottom; action row below it carries the three "admin"
+             buttons (settings, stats, switch model). The cluster grows
+             upward as the chat panel expands. -->
+        <div class="hud-corner hud-bl chat-cluster" aria-label="chat cluster">
+          <aside id="log-window" class="chat-panel" aria-label="chat"></aside>
+          <div class="chat-actions" aria-label="chat actions">
+            <button id="settings-btn" type="button" class="chat-action-btn" title="settings" aria-label="settings">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M 8 5.6 a 2.4 2.4 0 1 0 0 4.8 a 2.4 2.4 0 1 0 0 -4.8 z M 7 1 h 2 l 0.4 1.8 1.4 0.6 1.6 -1 1.4 1.4 -1 1.6 0.6 1.4 1.8 0.4 v 2 l -1.8 0.4 -0.6 1.4 1 1.6 -1.4 1.4 -1.6 -1 -1.4 0.6 -0.4 1.8 h -2 l -0.4 -1.8 -1.4 -0.6 -1.6 1 -1.4 -1.4 1 -1.6 -0.6 -1.4 -1.8 -0.4 v -2 l 1.8 -0.4 0.6 -1.4 -1 -1.6 1.4 -1.4 1.6 1 1.4 -0.6 z" fill="currentColor"/>
+              </svg>
+              <span>settings</span>
+            </button>
+            <button id="stats-btn" type="button" class="chat-action-btn" title="stats" aria-label="stats">
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M 2 13 h 12 M 4 11 v -4 M 8 11 v -7 M 12 11 v -2" class="icon-stroke"/>
+              </svg>
+              <span>stats</span>
+            </button>
+            <button id="switch-target-btn" type="button" class="chat-action-btn has-keys" data-action="open-target-picker" title="switch model, [ prev · ] next · ` last-used" aria-label="switch model">
+              <kbd class="chat-action-key" aria-hidden="true">[</kbd>
+              <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">
+                <path d="M 2 6 h 9 l -2 -2 M 14 10 h -9 l 2 2" class="icon-stroke"/>
+              </svg>
+              <span>switch</span>
+              <kbd class="chat-action-key" aria-hidden="true">]</kbd>
+            </button>
+          </div>
+        </div>
+
+        <!-- TOP-RIGHT: token readout. No card chrome, just the number
+             and a subdued unit label. The shop entry has moved to the
+             bottom-center hotbar row as a fixed system slot. -->
+        <div class="hud-corner hud-tr token-readout">
+          <div class="wallet">
+            <span id="currency-amount" class="wallet-num">0</span>
+            <span class="wallet-unit">tokens</span>
+          </div>
+        </div>
+
+        <!-- BOTTOM-CENTER: floating pick-ten hotbar. Grab is fixed left,
+             shop is fixed right, both system slots that bookend the
+             player's combat row. Grab is the permanent cursor verb
+             (Space hotkey); shop is the upgrades portal. -->
+        <div class="hud-corner hud-bc" aria-label="actions">
+          <button id="grab-btn" type="button" class="slot slot-system" data-tool="grab" title="grab, drag to throw" aria-label="grab">
+            <span class="slot-key">␣</span>
+            <svg viewBox="-10 -14 20 24" class="slot-icon" aria-hidden="true">
+              <path d="M -6.5 -9.5 v 8 M -2.5 -11.5 v 10 M 1.5 -9.5 v 8 M 5.5 -6.5 v 5 M -6.5 -1.5 v 8 q 0 5 6 5 q 7 0 7 -5 v -9" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round"/>
+            </svg>
+          </button>
+          <div class="hotbar-stack">
+            <div id="hotbar" aria-label="equipped tools"></div>
+          </div>
+          <button id="upgrades-btn" type="button" class="slot slot-system" title="open shop" aria-label="open shop">
+            <span class="slot-key">S</span>
+            <svg viewBox="0 0 16 16" class="slot-icon" aria-hidden="true">
+              <path d="M 3 6 H 13 L 14 15 H 2 Z M 6 6 V 4.5 A 2 2 0 0 1 10 4.5 V 6 H 9 V 4.5 A 1 1 0 0 0 7 4.5 V 6 Z" class="icon-fill"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

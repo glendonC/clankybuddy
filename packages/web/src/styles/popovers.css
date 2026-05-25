@@ -1,0 +1,14 @@
+/* Popover and modal surfaces.
+ *
+ * Shared popover primitives come first, then each concrete surface. The slot
+ * picker intentionally imports before primitives/tool-tile.css in style.css so
+ * its base tile rules exist before shared group chroma is applied.
+ */
+
+@import url('./popovers/stats-summary.css');
+@import url('./popovers/base.css');
+@import url('./popovers/settings.css');
+@import url('./popovers/target-picker.css');
+@import url('./popovers/slot-picker.css');
+@import url('./popovers/age-gate.css');
+@import url('./popovers/ext-welcome.css');

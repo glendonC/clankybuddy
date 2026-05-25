@@ -1,0 +1,130 @@
+/* ---------- target picker modal, portrait-dominant character select ----------
+   Centered modal, dimmed stage. Cards are square portrait tiles filled with
+   the persona's body color, logo dead-center, name underneath. Active card
+   gets an accent outline + soft glow. No taglines, no stats, no signature
+   teaser, the portrait + name carries the identity, the way SF6/Tekken/
+   Smash rosters do. Stats and signature copy live in the shop.
+
+   Per-card CSS variables (--persona-body, --persona-accent) are written
+   inline by target-picker.js so all chrome flows from the persona registry. */
+.target-modal {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-target);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}
+.target-modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--modal-backdrop-2);
+  pointer-events: auto;
+  animation: target-fade 0.18s ease-out;
+}
+@keyframes target-fade { from { opacity: 0; } to { opacity: 1; } }
+.target-modal-panel {
+  position: relative;
+  pointer-events: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 28px 32px 32px;
+  width: min(720px, 92vw);
+  max-height: 88vh;
+  overflow-y: auto;
+  animation: target-rise 0.18s ease-out;
+}
+@keyframes target-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.target-modal-eyebrow {
+  font-size: var(--type-micro-size);
+  text-transform: uppercase;
+  letter-spacing: var(--type-track-eyebrow);
+  color: var(--fg-3);
+  font-weight: var(--w-reg);
+  margin-bottom: 22px;
+}
+.target-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 14px;
+}
+@media (max-width: 640px) {
+  .target-grid { grid-template-columns: repeat(2, 1fr); }
+  .target-modal-panel { padding: 22px 18px; }
+}
+
+.target-card {
+  --persona-body: #888;
+  --persona-accent: #fff;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  background: transparent;
+  border: 0;
+  padding: 0;
+  cursor: pointer;
+  font: inherit;
+  color: var(--fg-2);
+}
+.target-card-portrait {
+  position: relative;
+  aspect-ratio: 1 / 1;
+  border-radius: 6px;
+  background: var(--persona-body);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  border: 1px solid transparent;
+  transition:
+    border-color .15s ease,
+    transform .15s ease,
+    box-shadow .15s ease;
+}
+.target-card:hover .target-card-portrait {
+  transform: translateY(-2px);
+  border-color: var(--persona-accent);
+  box-shadow: 0 10px 28px -14px var(--persona-body);
+}
+.target-card.active .target-card-portrait {
+  border-color: var(--persona-accent);
+  box-shadow:
+    0 0 0 2px var(--persona-accent),
+    0 14px 36px -16px var(--persona-body);
+}
+.target-card:focus-visible { outline: none; }
+.target-card:focus-visible .target-card-portrait {
+  outline: 2px solid var(--persona-accent);
+  outline-offset: 3px;
+}
+.target-card-logo {
+  width: 58%;
+  height: 58%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.target-card-logo svg {
+  width: 100%;
+  height: 100%;
+  fill: var(--persona-accent);
+  color: var(--persona-accent);
+}
+.target-card-name {
+  text-align: center;
+  font-size: var(--type-close-size);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--tr-snug);
+  text-transform: lowercase;
+  line-height: 1;
+  color: var(--fg-2);
+  transition: color .15s ease;
+}
+.target-card:hover .target-card-name,
+.target-card.active .target-card-name { color: var(--fg); }
+

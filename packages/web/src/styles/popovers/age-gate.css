@@ -1,0 +1,132 @@
+/* ---------- age-gate modal ----------
+   First-run 13+ attestation. Sits above EVERYTHING (var(--z-guard)), the
+   game is intentionally inert until this resolves. This is intentionally
+   bare HUD typography, not a card: same "floating text over stage" language
+   as the top-right token readout.
+   Copy lives in packages/shared/src/age-gate.ts and is shared with the TUI. */
+.age-gate-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 6000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    radial-gradient(circle at 50% 45%,
+      color-mix(in srgb, var(--char-accent) 8%, transparent) 0%,
+      transparent 34%),
+    var(--bg);
+  animation: age-gate-fade .18s ease-out;
+}
+.age-gate-backdrop.age-gate-fade-out {
+  animation: age-gate-fade-out .16s ease-in forwards;
+}
+@keyframes age-gate-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes age-gate-fade-out { from { opacity: 1; } to { opacity: 0; } }
+.age-gate-modal {
+  width: min(390px, calc(100vw - 48px));
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+  box-shadow: none;
+  animation: age-gate-rise .18s var(--ease-spring);
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 16px;
+  text-align: left;
+}
+@keyframes age-gate-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.age-gate-kicker {
+  font-size: var(--type-micro-size);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-eyebrow);
+  color: var(--fg-3);
+  line-height: 1;
+  text-transform: lowercase;
+}
+.age-gate-title {
+  font-family: var(--sans-display);
+  font-size: var(--type-age-title-size);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  color: var(--fg);
+  text-transform: none;
+  line-height: 0.98;
+  -webkit-font-smoothing: antialiased;
+}
+.age-gate-buttons {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: stretch;
+  gap: 10px;
+  margin-top: 8px;
+}
+.age-gate-confirm,
+.age-gate-decline {
+  flex: 1 1 0;
+  min-height: 42px;
+  padding: 0 16px;
+  font-size: var(--t-base);
+  font-weight: var(--w-bold);
+  letter-spacing: var(--tr-snug);
+  text-transform: lowercase;
+  border-radius: 10px;
+  cursor: pointer;
+  border: 1px solid var(--border-2);
+  line-height: 1;
+  transition: background .12s ease, border-color .12s ease, color .12s ease, transform .08s ease;
+}
+.age-gate-confirm {
+  background: var(--fg);
+  border-color: var(--fg);
+  color: var(--bg);
+}
+.age-gate-confirm:hover {
+  background: color-mix(in srgb, var(--fg) 90%, var(--bg));
+  border-color: color-mix(in srgb, var(--fg) 90%, var(--bg));
+  transform: translateY(-1px);
+}
+.age-gate-confirm:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--fg) 42%, transparent);
+  outline-offset: 3px;
+}
+.age-gate-decline {
+  background: transparent;
+  color: var(--fg-2);
+}
+.age-gate-decline:hover {
+  border-color: var(--fg-2);
+  color: var(--fg);
+  transform: translateY(-1px);
+}
+.age-gate-decline:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--fg) 24%, transparent);
+  outline-offset: 3px;
+}
+.age-gate-tos {
+  max-width: 360px;
+  font-size: var(--type-micro-size);
+  color: var(--fg-2);
+  letter-spacing: var(--tr-snug);
+  line-height: 1.45;
+  opacity: 0.78;
+}
+.age-gate-tos a {
+  color: var(--fg);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--fg) 34%, transparent);
+}
+.age-gate-tos a:hover { color: var(--fg); border-bottom-color: var(--fg); }
+.age-gate-goodbye {
+  font-size: var(--t-xs);
+  color: var(--fg-3);
+  letter-spacing: var(--tr-loose);
+  text-transform: uppercase;
+}
+

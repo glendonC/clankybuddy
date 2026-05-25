@@ -1,0 +1,282 @@
+/* ============================================================
+   SHOP SLOT, fixed system slot pinned to the right of the hotbar.
+   Uses the .slot base styling but is never bound to a tool, never
+   unequippable, and reads as a system entry via slot-system tokens.
+   ============================================================ */
+.slot.slot-system {
+  background: var(--slot-bg);
+  border: 1px solid var(--border-2);
+  color: var(--char-accent);
+  margin-left: 4px;
+}
+.slot.slot-system:hover {
+  border-color: var(--char-accent);
+  color: var(--char-accent);
+  box-shadow:
+    var(--slot-shadow-hover),
+    0 0 12px var(--char-accent-soft);
+}
+.slot.slot-system.active {
+  background: linear-gradient(180deg,
+    var(--char-accent-soft) 0%,
+    rgba(0, 0, 0, 0.08) 100%);
+  /* Same single-cue treatment as .slot.active. */
+  border: 1.5px solid var(--char-accent);
+  color: var(--char-accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* ============================================================
+   CHAT PANEL (LEFT RAIL BODY), fills the rail under identity. Persistent
+   surface, default expanded; the bottom-left no longer reads as wasted
+   space.
+   ============================================================ */
+.chat-panel {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+/* ============================================================
+   HOTBAR (BOTTOM-CENTER), floating ability slots. No backing panel,
+   no mood meter (mood moved to identity card). Slots carry the depth.
+   ============================================================ */
+.hotbar-stack {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+#hotbar {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.hotbar-row {
+  position: relative;
+  display: flex;
+  gap: 4px;
+}
+.slot {
+  position: relative;
+  width: var(--slot-size);
+  height: var(--slot-size);
+  background: var(--slot-bg);
+  border: 1px solid var(--border-2);
+  border-radius: 7px;
+  box-shadow: var(--slot-shadow);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: var(--fg-2);
+  transition: color .12s ease, border-color .14s ease, box-shadow .14s ease, transform .08s ease;
+  overflow: visible;
+  font: inherit;
+  padding: 0;
+}
+.slot:hover {
+  color: var(--fg);
+  border-color: var(--fg-3);
+  box-shadow: var(--slot-shadow-hover);
+}
+.slot:active { transform: translateY(1px); }
+.slot:focus-visible {
+  outline: 2px solid var(--char-accent);
+  outline-offset: 2px;
+}
+.slot.active {
+  color: var(--char-accent);
+  /* One strong cue (accent border) + one light cue (accent text). The
+     soft accent-tinted bg gradient stays so the active slot reads from
+     across the screen, but the outer glow + inner ring (5-cue stack)
+     are gone, redundant signaling per design-language. */
+  border: 1.5px solid var(--char-accent);
+  background: linear-gradient(180deg,
+    var(--char-accent-soft) 0%,
+    rgba(0, 0, 0, 0.08) 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+/* In light mode the prior active style (accent icon on accent-tinted-white)
+   had abysmal contrast, the icon basically disappeared. Invert: dark slot
+   with bright accent icon, like Diablo's active highlight against the rest
+   of the bar. Works for every character accent including grok's near-white. */
+body.theme-light .slot.active {
+  background: linear-gradient(180deg, #18181b 0%, #0c0c0f 100%);
+  /* Light theme: dark slot with accent border is already a strong contrast
+     against the rest of the bar, drop the glow + inner ring. */
+  border: 1.5px solid var(--char-accent);
+  color: var(--char-accent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 12px rgba(20, 20, 30, 0.18);
+}
+
+.slot-key {
+  position: absolute;
+  top: 2px;
+  left: 3px;
+  z-index: 2;
+  font-size: var(--type-badge-size);
+  font-weight: var(--w-bold);
+  font-variant-numeric: tabular-nums;
+  color: var(--fg-3);
+  line-height: 1;
+  letter-spacing: var(--type-track-flat);
+  pointer-events: none;
+  opacity: 0.7;
+}
+
+/* Swap chip, top-right corner of every filled slot. Hidden until the
+   user hovers the slot, then fades in. Clicking it opens the picker
+   anchored to that slot so the player can swap without unequipping
+   first. Discoverability fix for the previously-invisible shift+click
+   swap gesture. */
+.slot-swap {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  z-index: 3;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 1px solid var(--border-2);
+  background: var(--surface-2);
+  color: var(--fg-2);
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: var(--w-bold);
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(-1px);
+  transition: opacity .12s ease, transform .12s ease, color .12s ease, background .12s ease, border-color .12s ease;
+}
+.slot:hover .slot-swap,
+.slot:focus-within .slot-swap {
+  opacity: 1;
+  transform: translateY(0);
+}
+.slot-swap:hover {
+  color: var(--fg);
+  background: var(--char-accent-soft);
+  border-color: var(--char-accent);
+}
+/* Hide the chip on system/empty slots, they don't carry a tool. */
+.slot.empty .slot-swap,
+.slot.slot-system .slot-swap { display: none; }
+/* On cooldown, the chip still functions but tucks behind the cooldown wash. */
+.slot.on-cooldown .slot-swap { opacity: 0.6; }
+.slot:hover .slot-key { color: var(--fg-2); opacity: 1; }
+.slot.active .slot-key { color: var(--char-accent); opacity: 0.85; }
+
+.slot-icon {
+  width: 70%;
+  height: 70%;
+  color: currentColor;
+}
+.slot-icon .icon-stroke {
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.slot-icon .icon-fill {
+  fill: currentColor;
+  stroke: none;
+}
+.slot-glyph {
+  font-size: var(--type-icon-size);
+  font-weight: var(--w-bold);
+  text-transform: lowercase;
+  color: currentColor;
+}
+
+@property --slot-cd-deg {
+  syntax: '<angle>';
+  initial-value: 0deg;
+  inherits: false;
+}
+.slot-cd-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  opacity: 0;
+}
+.slot.on-cooldown .slot-cd-overlay {
+  opacity: 1;
+  background: conic-gradient(from 0deg,
+    rgba(0, 0, 0, 0.65) 0deg,
+    rgba(0, 0, 0, 0.65) var(--slot-cd-deg, 360deg),
+    transparent var(--slot-cd-deg, 360deg)
+  );
+  animation: slot-cd var(--cd-time, 1s) linear forwards;
+}
+@keyframes slot-cd {
+  from { --slot-cd-deg: 360deg; }
+  to   { --slot-cd-deg: 0deg; }
+}
+.slot.on-cooldown .slot-icon { opacity: 0.55; }
+
+.slot.empty {
+  background: var(--slot-bg-empty);
+  border-style: dashed;
+  border-color: var(--border);
+  color: var(--fg-3);
+  box-shadow: none;
+}
+.slot.empty .slot-plus {
+  font-size: var(--type-icon-size);
+  line-height: 1;
+  color: var(--fg-3);
+  opacity: 0.4;
+  transition: opacity .12s ease;
+}
+.slot.empty:hover {
+  border-color: var(--border-2);
+  background: var(--slot-bg);
+  box-shadow: var(--slot-shadow);
+}
+.slot.empty:hover .slot-plus { opacity: 1; }
+
+/* Drag-and-drop affordances. Source slot dims while held; any slot under
+   the cursor brightens its rim so the drop target is obvious. */
+.slot.dragging {
+  opacity: 0.45;
+  cursor: grabbing;
+}
+.slot.drop-target {
+  border-color: var(--char-accent);
+  box-shadow: var(--slot-shadow-hover), 0 0 0 2px var(--char-accent-soft);
+}
+
+
+/* Slot group chroma lives in ../primitives/tool-tile.css and is shared with the slot picker. */
+/* Active slot wins over the shared group wash. The player's selected ability
+   gets the character accent above category color. */
+.slot[data-group].active {
+  background: linear-gradient(180deg,
+    var(--char-accent-soft) 0%,
+    rgba(0, 0, 0, 0.08) 100%);
+  /* Active wins over the group wash via accent border + accent text only.
+     Same restraint as .slot.active, no glow, no inner ring. */
+  border: 1.5px solid var(--char-accent);
+  color: var(--char-accent);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+body.theme-light .slot[data-group].active {
+  background: linear-gradient(180deg, #18181b 0%, #0c0c0f 100%);
+  border: 1.5px solid var(--char-accent);
+  color: var(--char-accent);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.08),
+    0 4px 12px rgba(20, 20, 30, 0.18);
+}

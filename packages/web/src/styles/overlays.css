@@ -1,0 +1,117 @@
+/* ---------- stage overlays (chaos effects) ---------- */
+.overlay { position: absolute; pointer-events: none; }
+
+/* Server rack, 4U chassis falls from above, lands on cursor, fades.
+   (Renamed from anvil in Phase 2 of the 2026-05-02 ability redesign;
+   CSS class name kept as `.anvil` for back-compat with the
+   `showAnvilDrop` overlay shim, see ui/overlays.js. The physics
+   body's `partType` likewise stays `anvil`.) */
+.anvil {
+  width: 96px; height: 72px;
+  background:
+    /* horizontal 1U slot bands */
+    repeating-linear-gradient(
+      180deg,
+      rgba(255,255,255,0.06) 0px,
+      rgba(255,255,255,0.06) 1px,
+      transparent 1px,
+      transparent 16px),
+    /* chassis fade */
+    linear-gradient(180deg, #25252a 0%, #0a0a0c 55%, #18181c 100%);
+  border-radius: 4px;
+  box-shadow:
+    inset 0 -3px 0 rgba(0,0,0,0.8),
+    inset 0 2px 0 rgba(255,255,255,0.05),
+    0 24px 48px var(--floor-shadow);
+  transform: translate(-50%, -50%);
+  animation: anvil-drop 0.7s cubic-bezier(.5,.0,.65,1) forwards;
+}
+.anvil::before {
+  /* status LED stack on the right edge, green link, amber activity */
+  content: '';
+  position: absolute;
+  top: 10px; right: 6px;
+  width: 4px; height: 4px;
+  background: #5cf08a;
+  border-radius: 50%;
+  box-shadow:
+    0 8px 0 #f0c95c,
+    0 0 6px rgba(92, 240, 138, 0.6);
+}
+@keyframes anvil-drop {
+  0%  { opacity: 1; transform: translate(-50%, calc(-50% - 100vh)); }
+  72% { opacity: 1; transform: translate(-50%, -50%); }
+  76% { transform: translate(-50%, -42%) scaleY(0.78) scaleX(1.12); }
+  88% { transform: translate(-50%, -50%) scaleY(1) scaleX(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1); }
+}
+
+/* Black hole, spinning purple/blue vortex with dark core. */
+.blackhole {
+  width: 240px; height: 240px;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  background:
+    radial-gradient(circle, #000 22%, transparent 58%),
+    conic-gradient(from 0deg,
+      rgba(167, 139, 250, 0.5),
+      rgba(96, 165, 250, 0.7),
+      rgba(167, 139, 250, 0.5),
+      rgba(96, 165, 250, 0.7),
+      rgba(167, 139, 250, 0.5));
+  filter: blur(6px);
+  animation: bh-spin var(--bh-time, 3000ms) linear forwards;
+  box-shadow: 0 0 80px rgba(167, 139, 250, 0.5);
+}
+body.theme-light .blackhole {
+  background:
+    radial-gradient(circle, #1a1233 22%, transparent 58%),
+    conic-gradient(from 0deg,
+      rgba(124, 58, 237, 0.85),
+      rgba(37, 99, 235, 0.95),
+      rgba(124, 58, 237, 0.85),
+      rgba(37, 99, 235, 0.95),
+      rgba(124, 58, 237, 0.85));
+  box-shadow: 0 0 80px rgba(124, 58, 237, 0.6);
+}
+@keyframes bh-spin {
+  0%   { opacity: 0; transform: translate(-50%, -50%) rotate(0deg) scale(0.1); }
+  10%  { opacity: 1; transform: translate(-50%, -50%) rotate(180deg) scale(1); }
+  85%  { opacity: 1; transform: translate(-50%, -50%) rotate(1620deg) scale(1); }
+  100% { opacity: 0; transform: translate(-50%, -50%) rotate(1800deg) scale(0.2); }
+}
+
+/* Lightning / generic flash, short white burst that fades. Used for the
+   sky-bolt strike feedback (Agent R §4 "char silhouette flash-burned"). */
+.flash {
+  inset: 0;
+  pointer-events: none;
+  opacity: 0;
+  animation: flash-pop var(--flash-dur, 90ms) ease-out forwards;
+}
+@keyframes flash-pop {
+  0%   { opacity: 0; }
+  20%  { opacity: var(--flash-peak, 0.85); }
+  100% { opacity: 0; }
+}
+
+/* Nuke, full screen white flash, hold, fade. */
+.nuke-flash {
+  inset: 0;
+  background: #fff;
+  animation: nuke-flash 1.6s ease-out forwards;
+}
+@keyframes nuke-flash {
+  0%   { opacity: 0; }
+  3%   { opacity: 1; }
+  20%  { opacity: 1; background: #fff; }
+  60%  { opacity: 0.5; background: radial-gradient(ellipse at center, #ffae3c, #ff6b1a 60%, #1a0a05 100%); }
+  100% { opacity: 0; background: radial-gradient(ellipse at center, #ffae3c, #ff6b1a 60%, transparent 100%); }
+}
+
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-2); }
+

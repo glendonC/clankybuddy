@@ -1,0 +1,340 @@
+:root {
+  --bg: #08080a;
+  --surface: #101013;
+  --surface-2: #16161a;
+  --border: #1c1c22;
+  --border-2: #2a2a31;
+  --fg: #ededf0;
+  --fg-2: #888892;
+  --fg-3: #5a5a63;
+  --mood-positive: #34d399;
+  --mood-negative: #f87171;
+
+  --char-accent: #ededf0;
+  --char-accent-soft: rgba(237, 237, 240, 0.08);
+  /* Stage spotlight, bigger glow than accent-soft, used for the atmosphere
+     wash behind the buddy. Re-set per-character in character-picker.js so
+     the spotlight follows the active buddy. */
+  --char-accent-glow: rgba(237, 237, 240, 0.22);
+
+  /* Theme-aware surface variants. Popovers, log, modal backdrops, and stage
+     decorations all reference these so swapping themes paints everything in
+     one shot. */
+  --surface-overlay:     rgba(10, 10, 14, 0.96);   /* popovers, modals */
+  --surface-translucent: rgba(10, 10, 14, 0.78);   /* log window, semi-transparent panels */
+  --stage-vignette:      rgba(0, 0, 0, 0.55);      /* radial vignette around the buddy */
+  --floor-shadow:        rgba(0, 0, 0, 0.42);      /* gradient at stage bottom */
+  --modal-backdrop-1:    rgba(8, 12, 18, 0.55);
+  --modal-backdrop-2:    rgba(4, 5, 8, 0.92);
+
+  /* HUD floor, the gradient that fades down through the bottom of the stage
+     and continues as the action bar's bg, so there is no visible boundary.
+     Pure-black overlays so they actually darken the (already dark) bg.
+     Light mode redefines these with cool-grey overlays. */
+  --hud-fade-1: rgba(0, 0, 0, 0);
+  --hud-fade-2: rgba(0, 0, 0, 0.32);
+  --hud-fade-3: rgba(0, 0, 0, 0.62);
+
+  /* Slot tokens, driven by theme so a single slot rule covers light + dark.
+     Rest gradient implies depth (lit from above); active glow uses the
+     character accent. */
+  --slot-bg: linear-gradient(180deg,
+                rgba(255, 255, 255, 0.05) 0%,
+                rgba(255, 255, 255, 0.01) 45%,
+                rgba(0, 0, 0, 0.18) 100%);
+  --slot-bg-empty: linear-gradient(180deg,
+                rgba(255, 255, 255, 0.012) 0%,
+                rgba(0, 0, 0, 0.06) 100%);
+  --slot-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 1px 2px rgba(0, 0, 0, 0.4);
+  --slot-shadow-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.35),
+    0 2px 6px rgba(0, 0, 0, 0.5);
+
+  /* Mood track, inset-shadow trough so the bar sits in a slot, not on top. */
+  --mood-track-bg: rgba(255, 255, 255, 0.04);
+  --mood-track-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.35),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.03);
+
+  /* Stacking, promote any cross-file layer here so restyles don't fight
+     invisibly. Stage-local layers (z 0/4 in stage.css) stay literal because
+     they're scoped to one stacking context. */
+  --z-stage:     1;
+  --z-stage-fx:  3;
+  --z-overlays:  5;
+  --z-modal:     1000;
+  --z-dev:       1100;
+  --z-popover:   1200;
+  --z-target:    1500;
+  --z-guard:     5000;
+
+  --sans: "Inter", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
+  /* Apex tier (≥20px). Inter's UI cut closes its apertures and tightens
+     spacing for 11–15px legibility, pushed to 26–44px it reads anemic.
+     InterDisplay is the same family with optical sizing for display use:
+     opened apertures, tuned tracking. Used for boss nameplate + wallet num. */
+  --sans-display: "InterDisplay", "Inter", -apple-system, BlinkMacSystemFont, system-ui, "Segoe UI", sans-serif;
+  --mono: "SF Mono", ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+
+  /* Type scale, five sizes, two weights. Used everywhere; do not introduce
+     new sizes ad-hoc. Tracking gets tighter as size grows. */
+  --t-xs:   11px;   /* eyebrows, hints, kbd badges, dividers */
+  --t-sm:   12px;   /* meta, tooltips, leaderboard rows */
+  --t-base: 13px;   /* body, buttons, tool labels */
+  --t-md:   15px;   /* section heads, modal headers, currency */
+  --t-lg:   20px;   /* secondary heroes (stats, leaderboard counts) */
+  --t-xl:   30px;   /* the apex, buddy nameplate over the stage. ONE thing. */
+  --w-reg:  400;
+  --w-bold: 600;
+
+  /* Semantic type roles. Raw --t-* tokens remain the scale; UI surfaces should
+     consume these roles so typography changes happen by intent, not by hunting
+     random pixel values. */
+  --type-badge-size:      9px;
+  --type-micro-size:      10px;
+  --type-caption-size:    var(--t-xs);
+  --type-label-size:      var(--t-sm);
+  --type-body-size:       var(--t-base);
+  --type-control-size:    var(--t-base);
+  --type-icon-size:       14px;
+  --type-dismiss-size:    16px;
+  --type-close-size:      18px;
+  --type-title-sm-size:   20px;
+  --type-title-size:      22px;
+  --type-age-title-size:  28px;
+  --type-display-xs-size: 24px;
+  --type-display-sm-size: 26px;
+  --type-display-size:    var(--t-xl);
+  --type-display-lg-size: 32px;
+  --type-display-xl-size: 34px;
+  --type-display-2xl-size: 36px;
+  --type-display-3xl-size: 38px;
+  --type-display-4xl-size: 44px;
+  --type-stat-hero-size: clamp(28px, 3vw, 40px);
+
+  --type-track-flat:      0;
+  --type-track-ui:        0.04em;
+  --type-track-cta:       0.08em;
+  --type-track-eyebrow:   0.14em;
+  --type-track-section:   0.16em;
+  --type-track-wide:      0.18em;
+  --type-track-display:  -0.035em;
+  --type-track-hero:     -0.045em;
+  --type-track-apex:      0.22em;
+  --type-track-apex-in:   0.5em;
+  --type-track-apex-sub:  0.32em;
+
+  /* Mastery role, a fourth color is intentionally introduced ONLY for
+     the cross-tool mastery surface (slot-picker mastery section + tooltip
+     mastery state). Tokenized so a future cleanup has one place to act;
+     do not consume outside the mastery context. */
+  --mastery-hue: #facc15;
+  --mastery-hue-soft: color-mix(in srgb, #facc15 45%, transparent);
+  --tr-tight: -0.02em;
+  --tr-snug:  -0.01em;
+  --tr-loose: 0.06em;
+
+  --slot-size: 42px;
+  --rail-w: 260px;
+  --log-width: var(--rail-w);
+  --log-height: 280px;
+  --hud-edge: 20px;
+
+  /* ============================================================
+     Visualization design-brief vocabulary. Aliases over the existing
+     palette so stats / dashboard / chart code can speak in semantic
+     names ("--ink", "--soft", "--ghost") without coupling to the
+     game-side --fg ladder. Components consume these, never hardcode
+     hex, never invent --blue-500.
+     ============================================================ */
+  /* Foreground ladder against --ink. Used for hierarchy BEFORE chroma. */
+  --ink:      var(--fg);
+  --muted:    var(--fg-2);
+  --soft:     var(--fg-3);
+  --faint:    color-mix(in srgb, var(--fg) 10%, transparent);
+  --ghost:    color-mix(in srgb, var(--fg) 3.5%, transparent);
+  --hairline: color-mix(in srgb, var(--fg) 8%, transparent);
+
+  /* Semantic palette. Categorical chart palettes alias these, never
+     introduce --chart-color-3, alias the role instead. */
+  --success:  var(--mood-positive);
+  --danger:   var(--mood-negative);
+  --warn:     #f5b942;
+  --info:     #6ea8fe;
+  --accent:   var(--char-accent);
+
+  /* Exponential spacing scale. No 7px, no 22px, pick the closest stop. */
+  --sp-1: 4px;
+  --sp-2: 8px;
+  --sp-3: 12px;
+  --sp-4: 18px;
+  --sp-5: 28px;
+  --sp-6: 34px;
+
+  /* One easing, three durations. Spring is the Apple-style overshoot used
+     by popovers, tooltips, and the boss nameplate, distinct from the
+     standard --ease curve. */
+  --ease:        cubic-bezier(0.25, 0.1, 0.25, 1);
+  --ease-spring: cubic-bezier(0.16, 1, 0.3, 1);
+  --dur-fast:  140ms;
+  --dur-base:  220ms;
+  --dur-slow:  320ms;
+
+  /* Popover / tooltip shadow stacks. Theme-aware so a single var swap
+     covers both modes. --shadow-popover carries the inset top highlight
+     (used by full sheets); --shadow-tooltip is a flat drop shadow for
+     smaller floats and the dev panel. */
+  --shadow-popover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    0 18px 48px rgba(0, 0, 0, 0.42);
+  --shadow-tooltip: 0 12px 32px rgba(0, 0, 0, 0.5);
+}
+
+/* Group hues, category color system shared across the hotbar slots and
+   the slot-picker tiles so the picker reads as a true preview of the bar.
+   Scoped via [data-group="X"] so any element with the attribute consumes
+   the pair (--group-hue / --group-hue-bright). Pastels tuned for vivid
+   reads on dark surfaces while staying readable in light theme. */
+[data-group="affection"]    { --group-hue: #f4a07a; --group-hue-bright: #ffb98f; }
+[data-group="provision"]    { --group-hue: #f5c542; --group-hue-bright: #ffd966; }
+[data-group="recognition"]  { --group-hue: #7ec8ff; --group-hue-bright: #a8dcff; }
+[data-group="kinetic"]      { --group-hue: #cbd5e1; --group-hue-bright: #e2e8f0; }
+[data-group="ordnance"]     { --group-hue: #b08968; --group-hue-bright: #d4a574; }
+[data-group="injection"]    { --group-hue: #ec4899; --group-hue-bright: #f472b6; }
+[data-group="corruption"]   { --group-hue: #ef4444; --group-hue-bright: #f87171; }
+[data-group="cataclysm"]    { --group-hue: #a78bfa; --group-hue-bright: #c4b5fd; }
+[data-group="manipulation"] { --group-hue: #22d3ee; --group-hue-bright: #67e8f9; }
+
+/* Chat handle palette, per-theme so each VALID_COLORS name stays legible
+   against the chat background. Dark-theme values mirror @clankybuddy/shared
+   COLOR_HEX (which is tuned for the dark log surface). Light-theme values
+   are darkened so handles don't dissolve into the white wash, "white"
+   becomes a slate-gray on light, because a white handle on white can't
+   be rescued. The chat row reads these via var(--handle-color-NAME). */
+:root {
+  --handle-color-red:      #ff5c5c;
+  --handle-color-cyan:     #22d3ee;
+  --handle-color-yellow:   #facc15;
+  --handle-color-green:    #4ade80;
+  --handle-color-magenta:  #e879f9;
+  --handle-color-blue:     #60a5fa;
+  --handle-color-orange:   #fb923c;
+  --handle-color-lime:     #a3e635;
+  --handle-color-pink:     #f472b6;
+  --handle-color-sky:      #7dd3fc;
+  --handle-color-lavender: #c8a2f9;
+  --handle-color-white:    #f5f5f5;
+
+  /* Real brand tones for the seeded persona chatter. These bypass the
+     palette because we control both ends, there's no server-stored color
+     name to negotiate. xAI's identity is monochrome, so Grok flips per
+     theme: white on dark, near-black on light. */
+  --handle-persona-claude:   #d97757;
+  --handle-persona-gpt:      #10a37f;
+  --handle-persona-gemini:   #3370ff;
+  --handle-persona-grok:     #ffffff;
+  --handle-persona-llama:    #0866ff;
+  --handle-persona-deepseek: #4d6bfe;
+}
+
+/* Light theme, applied via body.theme-light. Inverts the surface stack and
+   tones down the accent-soft tint so the HUD widgets stay calm against a
+   bright stage. Character accents stay color-true (per-character branding
+   shouldn't change with theme). */
+body.theme-light {
+  --bg: #f6f6f8;
+  --surface: #ffffff;
+  --surface-2: #eef0f3;
+  --border: #d8d8df;
+  --border-2: #b8b8c2;
+  --fg: #18181b;
+  --fg-2: #3f3f46;
+  --fg-3: #6b6b75;
+  --char-accent-soft: rgba(0, 0, 0, 0.05);
+  --char-accent-glow: rgba(0, 0, 0, 0.10);
+  --surface-overlay:     rgba(255, 255, 255, 0.97);
+  --surface-translucent: rgba(255, 255, 255, 0.82);
+  --stage-vignette:      rgba(20, 20, 30, 0.10);
+  --floor-shadow:        rgba(20, 20, 30, 0.18);
+  --modal-backdrop-1:    rgba(220, 220, 230, 0.55);
+  --modal-backdrop-2:    rgba(245, 245, 248, 0.92);
+
+  /* Light HUD: barely-there cool-grey wash at the floor. */
+  --hud-fade-1: rgba(20, 20, 30, 0);
+  --hud-fade-2: rgba(20, 20, 30, 0.04);
+  --hud-fade-3: rgba(20, 20, 30, 0.09);
+
+  /* Light slot: bright top, subtle gradient down. Crisp ring instead of glow. */
+  --slot-bg: linear-gradient(180deg,
+                rgba(255, 255, 255, 1) 0%,
+                rgba(245, 245, 248, 1) 100%);
+  --slot-bg-empty: linear-gradient(180deg,
+                rgba(255, 255, 255, 0.6) 0%,
+                rgba(0, 0, 0, 0.02) 100%);
+  --slot-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.04),
+    0 1px 2px rgba(20, 20, 30, 0.08);
+  --slot-shadow-hover:
+    inset 0 1px 0 rgba(255, 255, 255, 1),
+    inset 0 -1px 0 rgba(0, 0, 0, 0.06),
+    0 3px 8px rgba(20, 20, 30, 0.12);
+
+  --mood-track-bg: rgba(0, 0, 0, 0.06);
+  --mood-track-shadow:
+    inset 0 1px 2px rgba(0, 0, 0, 0.08),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.4);
+
+  --shadow-popover:
+    inset 0 1px 0 rgba(255, 255, 255, 0.92),
+    0 18px 48px rgba(20, 20, 30, 0.14);
+  --shadow-tooltip: 0 12px 32px rgba(20, 20, 30, 0.18);
+
+  /* Handle palette darkened for ≈4.5:1 contrast on the white chat wash.
+     Yellow and white have no high-contrast bright variant, yellow drops
+     to amber, white drops to slate. Identity is approximate; legibility
+     is the load-bearing constraint. */
+  --handle-color-red:      #dc2626;
+  --handle-color-cyan:     #0e7490;
+  --handle-color-yellow:   #a16207;
+  --handle-color-green:    #16a34a;
+  --handle-color-magenta:  #a21caf;
+  --handle-color-blue:     #2563eb;
+  --handle-color-orange:   #c2410c;
+  --handle-color-lime:     #4d7c0f;
+  --handle-color-pink:     #be185d;
+  --handle-color-sky:      #0369a1;
+  --handle-color-lavender: #6d28d9;
+  --handle-color-white:    #52525b;
+
+  /* Persona brand tones, kept true to brand where contrast survives.
+     Claude coral / GPT teal / Gemini blue / Llama Meta-blue / DeepSeek
+     indigo all pass on white. Grok flips to xAI black on light. */
+  --handle-persona-claude:   #c2410c;
+  --handle-persona-gpt:      #10a37f;
+  --handle-persona-gemini:   #1d4ed8;
+  --handle-persona-grok:     #1a1a1a;
+  --handle-persona-llama:    #0353d4;
+  --handle-persona-deepseek: #3a52d4;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body, #app { height: 100%; width: 100%; overflow: hidden; }
+
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: var(--sans);
+  font-size: var(--t-base);
+  font-weight: var(--w-reg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  letter-spacing: var(--tr-snug);
+}
+
+button { font: inherit; color: inherit; cursor: pointer; }

@@ -1,0 +1,30 @@
+/* ============================================================
+   HUD CORNERS, Boss nameplate flashes top-center (pure-aesthetic),
+   chat cluster anchors bottom-left, token readout sits top-right,
+   hotbar floats bottom-center with a fixed shop slot to its right.
+   ============================================================ */
+/* Bottom-left chat cluster, chat panel + action row stacked vertically,
+   anchored to the viewport bottom. Grows UPWARD as the chat panel expands;
+   the action row stays glued to the corner. */
+.hud-bl.chat-cluster {
+  width: var(--rail-w);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  pointer-events: auto;
+}
+
+/* Bottom-center hotbar cluster, floats above the stage between the corners.
+   The hotbar-stack and the fixed shop slot sit side-by-side, bottom-aligned,
+   so the shop always reads as the right-hand cap of the action row. */
+.hud-bc {
+  position: absolute;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end;
+  gap: 12px;
+  pointer-events: auto;
+}

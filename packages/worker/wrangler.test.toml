@@ -1,0 +1,47 @@
+name = "clankybuddy-worker-test"
+main = "src/index.ts"
+compatibility_date = "2026-04-28"
+
+# Test-only wrangler config used by vitest-pool-workers / Miniflare.
+# Mirrors wrangler.toml but strips bindings that require live Cloudflare
+# connectivity (`[ai]`, `[[analytics_engine_datasets]]`) so the pool can boot
+# fully-locally without `wrangler login`. Worker code that touches those
+# bindings either skips when absent or trips the existing graceful-degrade
+# paths (observability.logEvent guards on the ANALYTICS binding being set;
+# AI is only used by moderation, which the smoke harness doesn't exercise).
+
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "RoomDO"
+
+[[durable_objects.bindings]]
+name = "DATABASE"
+class_name = "DatabaseDO"
+
+[[durable_objects.bindings]]
+name = "ACTION_SHARD"
+class_name = "ActionShardDO"
+
+[[durable_objects.bindings]]
+name = "LEADERBOARD"
+class_name = "LeaderboardDO"
+
+[[kv_namespaces]]
+binding = "AUTH_KV"
+# Miniflare ignores the id and uses an in-memory KV — placeholder is fine.
+id = "0000000000000000000000000000aaaa"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RoomDO", "DatabaseDO"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["ActionShardDO", "LeaderboardDO"]
+
+[vars]
+ENVIRONMENT = "test"
+PROTOCOL_VERSION = "1"
+MODERATION_MODE = "regex_only"
+MODERATION_DAILY_BUDGET_USD = "0"
+MODERATION_USER_DAILY_CALLS = "0"

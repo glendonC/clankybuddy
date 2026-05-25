@@ -1,0 +1,115 @@
+/* ============================================================
+   BOSS NAMEPLATE, top-center, PURE-AESTHETIC transient. Apple-keynote
+   reveal: brand mark fades in above the name; the name tracks in from
+   wide letter-spacing with a subtle blur clear; subtitle fades; a thin
+   accent line sweeps in from center underneath. Holds briefly, then
+   everything fades out. Plays on boot and on every character switch.
+   No text-shadow, no scale pop, the accent lives in the bar, not the text.
+   ============================================================ */
+#boss-nameplate {
+  position: absolute;
+  top: 22px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--z-stage-fx);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  pointer-events: none;
+  width: clamp(280px, 28vw, 420px);
+  opacity: 0;
+}
+#boss-nameplate.boss-anim {
+  animation: boss-cycle 2800ms linear forwards;
+}
+
+/* Brand mark, sits above the name, neutral white so the bar carries
+   the character accent and the chrome stays calm. Gemini's color SVG
+   keeps its native gradient (no currentColor in its source). */
+.boss-logo {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--fg);
+  margin-bottom: 6px;
+}
+.boss-logo svg { width: 100%; height: 100%; display: block; }
+
+.boss-name {
+  font-family: var(--sans-display);
+  font-size: var(--type-display-sm-size);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-apex);
+  text-transform: uppercase;
+  color: var(--fg);
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+}
+.boss-subtitle {
+  font-size: var(--type-badge-size);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-apex-sub);
+  text-transform: uppercase;
+  color: var(--fg-3);
+  line-height: 1;
+  margin-top: 2px;
+}
+
+/* Thin accent underline, sole carrier of character color in this
+   composition. Scales in from center under the name. */
+.boss-bar {
+  width: 60%;
+  height: 1.5px;
+  margin-top: 10px;
+  /* --char-accent-strong falls back to --char-accent except when the raw
+     accent is near-white AND we're on light theme, then it darkens to ink
+     so the bar stays visible. Without this Grok's #ffffff vanishes here. */
+  background: var(--char-accent-strong, var(--char-accent));
+  box-shadow: 0 0 10px var(--char-accent-soft);
+  transform-origin: center center;
+  transform: scaleX(0);
+  opacity: 0;
+}
+
+/* Animation timeline, Apple ease-out-expo curve everywhere. Logo lands
+   first as a soft anchor; name tracks in from wide spacing + blur to
+   settled; subtitle fades; bar sweeps. All settle by ~1.05s, hold to
+   ~2.24s, outro handled by the parent boss-cycle fade. */
+#boss-nameplate.boss-anim .boss-logo {
+  animation: boss-logo-in 0.5s 0.05s var(--ease-spring) backwards;
+}
+#boss-nameplate.boss-anim .boss-name {
+  animation: boss-name-track-in 0.75s 0.15s var(--ease-spring) backwards;
+}
+#boss-nameplate.boss-anim .boss-subtitle {
+  animation: boss-sub-fade 0.5s 0.45s var(--ease-spring) backwards;
+}
+#boss-nameplate.boss-anim .boss-bar {
+  animation: boss-bar-sweep 0.65s 0.55s var(--ease-spring) forwards;
+}
+
+@keyframes boss-cycle {
+  0%   { opacity: 0; }
+  10%  { opacity: 1; }
+  80%  { opacity: 1; }
+  100% { opacity: 0; }
+}
+@keyframes boss-logo-in {
+  0%   { opacity: 0; transform: translateY(2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+@keyframes boss-name-track-in {
+  0%   { opacity: 0; letter-spacing: var(--type-track-apex-in); filter: blur(6px); }
+  100% { opacity: 1; letter-spacing: var(--type-track-apex); filter: blur(0); }
+}
+@keyframes boss-sub-fade {
+  0%   { opacity: 0; }
+  100% { opacity: 1; }
+}
+@keyframes boss-bar-sweep {
+  0%   { opacity: 0; transform: scaleX(0); }
+  100% { opacity: 1; transform: scaleX(1); }
+}

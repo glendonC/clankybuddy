@@ -1,0 +1,560 @@
+/* Analytics dashboard (stats-dashboard.js).
+ *
+ * Apple Health / Stocks / Vercel-Analytics aesthetic. The tokens this file
+ * consumes (--ink, --hairline, --muted, --soft, --success, --danger, --info,
+ * --sans-display) are defined in tokens.css.
+ *
+ * Design rules baked in here:
+ *   • No card backgrounds. The grid is implied by 1px hairlines and gutters.
+ *   • Hero numerals use --sans-display, regular weight, tracking -0.035em.
+ *   • Cleveland & McGill: position/length over color/area.
+ *   • Empty states keep section height stable so the layout doesn't jump.
+ */
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Tokens local to the dashboard. Surface + ink follow theme; layouts here.
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-root {
+  /* Full-screen overlay. The .sd-panel takes the whole viewport; content
+     inside .sd-main / .sd-bottom-footer is constrained to --sd-content-max
+     and centered, so a 4K monitor doesn't get a 3000px chart row. */
+  --sd-content-max: 1280px;
+  --sd-pad: clamp(28px, 4vw, 64px);
+  --sd-tile-pad-x: 22px;
+  --sd-section-gap: 44px;
+  --sd-hero-num: 64px;
+  --sd-section-num: 26px;
+  --sd-eyebrow: 11px;
+  --sd-body: 13px;
+  --sd-track-display: -0.035em;
+  --sd-track-section: -0.022em;
+  --sd-track-eyebrow: 0.06em;
+
+  /* Surface and ink. Both themes resolve through the global tokens. */
+  --sd-surface: var(--surface);
+  --sd-ink: var(--ink);
+  --sd-muted: var(--muted);
+  --sd-soft: var(--soft);
+  --sd-route-active: var(--ink);
+  --sd-route-inactive: var(--soft);
+  --sd-hairline: var(--hairline);
+  --sd-faint: var(--faint);
+
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-modal);
+  pointer-events: none;
+}
+body.theme-light .sd-root {
+  /* Dashboard overlays live on document.body; pin the light ink ladder here so
+     the analytics surface cannot inherit stage/HUD accent wash as text color. */
+  --sd-surface: #ffffff;
+  --sd-ink: #18181b;
+  --sd-muted: #4b4b55;
+  --sd-soft: #6b6b75;
+  --sd-route-active: var(--sd-ink);
+  --sd-route-inactive: #9a9aa3;
+  --sd-faint: rgba(24, 24, 27, 0.055);
+  --sd-hairline: rgba(24, 24, 27, 0.12);
+}
+.sd-backdrop {
+  position: absolute;
+  inset: 0;
+  background: var(--modal-backdrop-2);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  pointer-events: auto;
+  animation: sd-fade .26s var(--ease) both;
+}
+@keyframes sd-fade { from { opacity: 0; } to { opacity: 1; } }
+@keyframes sd-rise {
+  from { opacity: 0; transform: translateY(14px) scale(0.992); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes sd-content-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: none; }
+}
+
+.sd-panel {
+  position: absolute;
+  inset: 0;
+  pointer-events: auto;
+  width: 100%;
+  height: 100vh;
+  background: var(--sd-surface);
+  color: var(--sd-ink);
+  font-family: var(--sans);
+  font-size: var(--sd-body);
+  letter-spacing: -0.01em;
+  display: flex;
+  flex-direction: column;
+  animation: sd-rise .3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  overflow: hidden;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Header, clean, light, no gradient. Big title + subtitle on the left,
+ * audience/range controls on the right; persona pill strip sits as a
+ * second row below. Generous whitespace, single ink color, no chrome
+ * effects. The bento grid below carries all the chromatic energy.
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-head {
+  flex: 0 0 auto;
+  position: relative;
+  padding: 14px 0 8px;
+  background: var(--sd-surface);
+}
+.sd-head-inner {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 32px;
+  max-width: var(--sd-content-max);
+  margin: 0 auto;
+  padding: 0 var(--sd-pad);
+  width: 100%;
+  box-sizing: border-box;
+}
+.sd-head-title {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+.sd-eyebrow {
+  font-size: var(--sd-eyebrow);
+  letter-spacing: var(--sd-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--sd-muted);
+  font-weight: var(--w-reg);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+}
+.sd-eyebrow-pill {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--sd-hairline);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  color: var(--sd-muted);
+  text-transform: uppercase;
+}
+.sd-h1 {
+  font-family: var(--sans-display);
+  font-size: 64px;
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  color: var(--sd-ink);
+  line-height: 1.08;
+  margin: 0;
+  padding-bottom: 0.03em;
+}
+.sd-title-route {
+  display: flex;
+  align-items: baseline;
+  gap: 0.22em;
+  min-width: 0;
+}
+.sd-title-route .sd-title-link {
+  border: 0;
+  background: transparent;
+  padding: 0;
+  margin: 0;
+  font: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  color: var(--sd-route-inactive);
+  cursor: pointer;
+  transition: color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.sd-title-route .sd-title-link:hover {
+  color: var(--sd-ink);
+  transform: translateY(-1px);
+}
+.sd-title-route .sd-title-sep {
+  color: var(--sd-route-inactive);
+  transition: color var(--dur-fast) var(--ease);
+}
+.sd-title-route .sd-title-current {
+  color: var(--sd-route-active);
+  min-width: 0;
+  overflow: visible;
+  text-overflow: ellipsis;
+  transition: color var(--dur-fast) var(--ease);
+}
+
+.sd-head-controls {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.sd-filter-label {
+  color: var(--sd-muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: var(--w-reg);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+/* Filter trigger, single squircle pill in the top-right of the header.
+   Resting: hairline border on surface. With selections: filled subtly to
+   show the filter is engaged; expanded: outlined dark to read as "active". */
+.sd-filter-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 11px;
+  border-radius: 12px;
+  border: 1px solid var(--sd-hairline);
+  background: color-mix(in srgb, var(--sd-ink) 3%, var(--sd-surface));
+  color: var(--sd-ink);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), border-color var(--dur-fast) var(--ease);
+  white-space: nowrap;
+}
+.sd-filter-trigger:hover {
+  color: var(--sd-ink);
+  border-color: color-mix(in srgb, var(--sd-ink) 30%, var(--sd-hairline));
+  background: color-mix(in srgb, var(--sd-ink) 5%, var(--sd-surface));
+}
+.sd-filter-trigger.has-active {
+  color: var(--sd-ink);
+  background: color-mix(in srgb, var(--sd-ink) 7%, var(--sd-surface));
+  border-color: color-mix(in srgb, var(--sd-ink) 24%, var(--sd-hairline));
+}
+.sd-filter-trigger.is-open {
+  color: var(--sd-ink);
+  border-color: var(--sd-ink);
+}
+.sd-filter-trigger svg { display: block; opacity: 0.75; }
+.sd-filter-trigger:hover svg,
+.sd-filter-trigger.is-open svg,
+.sd-filter-trigger.has-active svg { opacity: 1; }
+.sd-filter-trigger-count {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  color: var(--sd-muted);
+  font-size: 11px;
+}
+.sd-filter-trigger.has-active .sd-filter-trigger-count { color: var(--sd-ink); }
+.sd-filter-trigger-count:empty { display: none; }
+
+/* Filter popover, anchored beneath the header right edge. The grid of
+   per-persona toggles lives inside, plus a "Show all" affordance. */
+.sd-filter-popover {
+  position: absolute;
+  top: calc(100% - 6px);
+  right: max(var(--sd-pad), calc((100vw - var(--sd-content-max)) / 2 + var(--sd-pad)));
+  z-index: 5;
+  min-width: 320px;
+  background: var(--sd-surface);
+  border: 1px solid var(--sd-hairline);
+  border-radius: 14px;
+  box-shadow: 0 18px 40px -16px rgba(15, 17, 21, 0.18);
+  padding: 14px;
+  animation: sd-rise 0.18s var(--ease) both;
+}
+.sd-filter-popover[hidden] { display: none; }
+.sd-filter-popover-inner { display: flex; flex-direction: column; gap: 10px; }
+.sd-filter-popover-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--sd-hairline);
+}
+.sd-filter-popover-title {
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--sd-muted);
+  font-weight: var(--w-reg);
+}
+.sd-filter-clear {
+  background: transparent;
+  border: 0;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--sd-ink);
+  cursor: pointer;
+}
+.sd-filter-clear:hover { background: var(--sd-faint); }
+.sd-filter-clear.is-disabled { color: var(--sd-soft); cursor: default; }
+.sd-filter-clear.is-disabled:hover { background: transparent; }
+.sd-filter-popover-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 6px;
+}
+
+/* Persona toggle chips inside the filter popover. Borderless. Selection is
+   encoded by accent saturation: muted (color-mixed toward neutral) when off,
+   full accent when on. Icon + label share that color via `currentColor`. */
+.sd-pchip {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 10px;
+  border-radius: 10px;
+  border: 0;
+  background: transparent;
+  color: color-mix(in srgb, var(--chip-accent, var(--sd-ink)) 32%, var(--sd-soft));
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease);
+  white-space: nowrap;
+  text-align: left;
+}
+.sd-pchip:hover {
+  background: var(--sd-faint);
+  color: color-mix(in srgb, var(--chip-accent, var(--sd-ink)) 60%, var(--sd-soft));
+}
+.sd-pchip.active {
+  background: color-mix(in srgb, var(--chip-accent, var(--sd-ink)) 10%, transparent);
+  color: var(--chip-accent, var(--sd-ink));
+}
+.sd-pchip.active:hover {
+  background: color-mix(in srgb, var(--chip-accent, var(--sd-ink)) 16%, transparent);
+}
+.sd-pchip-icon {
+  width: var(--icon-size, 14px);
+  height: var(--icon-size, 14px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  color: currentColor;
+}
+.sd-pchip-icon > svg {
+  width: 100%;
+  height: 100%;
+  fill: currentColor;
+}
+.sd-pchip-icon-fallback {
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.7;
+}
+.sd-pchip-label {
+  flex: 1 1 auto;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sd-range {
+  position: relative;
+  display: inline-flex;
+  gap: 0;
+  background: color-mix(in srgb, var(--sd-ink) 7%, var(--sd-surface));
+  border: 1px solid var(--sd-hairline);
+  border-radius: 12px;
+  padding: 3px;
+}
+.sd-range-btn {
+  position: relative;
+  z-index: 1;
+  background: transparent;
+  border: 0;
+  min-width: 38px;
+  padding: 6px 10px;
+  border-radius: 9px;
+  font-size: 12px;
+  font-weight: var(--w-reg);
+  color: var(--sd-ink);
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.sd-range-btn:hover { color: var(--sd-ink); transform: translateY(-1px); }
+.sd-range-btn.active {
+  background: var(--sd-ink);
+  color: var(--sd-surface);
+  box-shadow: none;
+}
+body.theme-light .sd-filter-label,
+body.theme-light .sd-filter-trigger-count,
+body.theme-light .sd-command:not(.sd-command-button) {
+  color: var(--sd-muted);
+}
+body.theme-light .sd-filter-trigger,
+body.theme-light .sd-range-btn,
+body.theme-light .sd-command-button {
+  color: var(--sd-ink);
+}
+body.theme-light .sd-range-btn.active {
+  background: var(--sd-ink);
+  color: #fff;
+}
+
+
+/* Bottom command bar, a single squircle aligned to the bento content rhythm,
+   with explicit keyboard commands instead of a status caption. */
+.sd-bottom-footer {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 8;
+  padding: 8px var(--sd-pad) max(14px, env(safe-area-inset-bottom));
+  background: transparent;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+.sd-command-bar {
+  position: relative;
+  min-height: 34px;
+  border: 1px solid var(--sd-hairline);
+  border-radius: 14px;
+  background: color-mix(in srgb, var(--sd-surface) 88%, transparent);
+  box-shadow: 0 18px 42px -26px rgba(15, 17, 21, 0.55);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  padding: 4px;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  pointer-events: auto;
+}
+.sd-command-list {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+}
+.sd-command {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: transparent;
+  border: 0;
+  border-radius: 13px;
+  padding: 6px 9px;
+  color: var(--sd-ink);
+  font-family: var(--sans);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background var(--dur-fast) var(--ease), color var(--dur-fast) var(--ease), transform var(--dur-fast) var(--ease);
+}
+.sd-command:not(.sd-command-button) {
+  cursor: default;
+}
+.sd-command-button:hover {
+  color: var(--sd-ink);
+  background: var(--sd-surface);
+  transform: translateY(-1px);
+}
+.sd-command kbd {
+  font-family: var(--mono);
+  font-size: 10px;
+  background: var(--sd-ink);
+  color: var(--sd-surface);
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid color-mix(in srgb, var(--sd-surface) 24%, transparent);
+  line-height: 1;
+  min-width: 20px;
+  text-align: center;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Body / scroll
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  position: relative;
+  scrollbar-gutter: stable;
+}
+.sd-body::before,
+.sd-body::after {
+  content: "";
+  position: sticky;
+  left: 0;
+  right: 0;
+  z-index: 7;
+  flex: 0 0 34px;
+  height: 34px;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+.sd-body::before {
+  top: 0;
+  margin-bottom: -34px;
+  background: linear-gradient(to bottom, var(--sd-surface), color-mix(in srgb, var(--sd-surface) 0%, transparent));
+}
+.sd-body::after {
+  bottom: 0;
+  margin-top: -34px;
+  background: linear-gradient(to top, var(--sd-surface), color-mix(in srgb, var(--sd-surface) 0%, transparent));
+}
+.sd-body.has-overflow:not(.at-top)::before,
+.sd-body.has-overflow:not(.at-bottom)::after {
+  opacity: 0.88;
+}
+.sd-body[data-state="loading"]::before,
+.sd-body[data-state="loading"]::after,
+.sd-body[data-state="error"]::before,
+.sd-body[data-state="error"]::after {
+  display: none;
+}
+.sd-body[data-state="loading"],
+.sd-body[data-state="error"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.sd-loading {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--sd-muted);
+  font-size: 13px;
+  letter-spacing: -0.005em;
+}
+.sd-loading-pulse {
+  width: 8px; height: 8px; border-radius: 999px;
+  background: var(--sd-ink); opacity: 0.5;
+  animation: sd-pulse 1.2s var(--ease) infinite;
+}
+@keyframes sd-pulse { 50% { opacity: 0.18; transform: scale(0.85); } }
+
+.sd-error {
+  text-align: center;
+  max-width: 360px;
+  padding: 24px;
+  border: 1px solid var(--sd-hairline);
+  border-radius: 10px;
+  background: var(--sd-surface);
+}
+.sd-error-title { font-weight: var(--w-reg); font-size: 14px; }
+.sd-error-msg { font-size: 12px; color: var(--sd-muted); margin-top: 6px; line-height: 1.5; }
+.sd-error code {
+  font-family: var(--mono);
+  font-size: 11px;
+  background: var(--sd-faint);
+  padding: 1px 4px;
+  border-radius: 3px;
+}
+

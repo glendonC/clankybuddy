@@ -1,0 +1,203 @@
+name = "clankybuddy-worker"
+main = "src/index.ts"
+# Bumped per docs/backend.md decision-log; pairs with the "ship a worker change"
+# canary loop in docs/operations.md. Bumping again is a deploy-gated change —
+# verify Workers runtime release notes for breaking changes before moving.
+compatibility_date = "2026-04-28"
+
+[dev]
+port = 8788
+
+# ROOM is the chat RoomDO binding. WS upgrades route to
+# `idFromName(chatRoomNameFor(user.id))` (one of CHAT_ROOM_SHARD_IDS · 16
+# buckets keyed by hash(user_id), see packages/worker/src/util/shard.ts).
+# `room-global` is deprecated but still resolvable so pre-shard DO storage
+# is not orphaned · idle DOs cost nothing.
+[[durable_objects.bindings]]
+name = "ROOM"
+class_name = "RoomDO"
+
+[[durable_objects.bindings]]
+name = "DATABASE"
+class_name = "DatabaseDO"
+
+[[durable_objects.bindings]]
+name = "ACTION_SHARD"
+class_name = "ActionShardDO"
+
+[[durable_objects.bindings]]
+name = "LEADERBOARD"
+class_name = "LeaderboardDO"
+
+[[kv_namespaces]]
+binding = "AUTH_KV"
+# Local-dev placeholder. Replace with the id returned by:
+#   npx wrangler kv:namespace create AUTH_KV
+# TODO: real KV id — placeholder is only valid against `wrangler dev` /
+# Miniflare; deploys against this id will 500 once they hit AUTH_KV.
+id = "0000000000000000000000000000aaaa"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["RoomDO", "DatabaseDO"]
+
+[[migrations]]
+tag = "v2"
+new_sqlite_classes = ["ActionShardDO", "LeaderboardDO"]
+
+[triggers]
+crons = ["*/1 * * * *"]
+
+[vars]
+ENVIRONMENT = "development"
+PROTOCOL_VERSION = "1"
+MODERATION_MODE = "full"
+MODERATION_DAILY_BUDGET_USD = "200"
+MODERATION_USER_DAILY_CALLS = "200"
+# Hostname used by /auth/init to mint the verify_url returned with a
+# captcha_required response. Public (no secret material).
+# Default is TURNSTILE_HOSTNAME_DEFAULT in packages/shared/src/urls.ts;
+# uncomment + override here only if dev needs a different host than prod.
+# TURNSTILE_HOSTNAME = "dev.clankybuddy.com"
+# Turnstile secret is sensitive — set out-of-band:
+#   wrangler secret put TURNSTILE_SECRET
+#
+# Public Turnstile sitekey used by /verify HTML page to embed the widget.
+# Public (not a secret). Pairs with TURNSTILE_SECRET (the matching
+# siteverify secret). Uncomment + set per-environment:
+# TURNSTILE_SITEKEY = "0x4AAAAAAA..."
+#
+# Admin bearer token for /admin/preserve. Sensitive — set out-of-band:
+#   wrangler secret put ADMIN_TOKEN
+# Production module-load asserts ADMIN_TOKEN is set; the route fails-closed
+# (503) when unset in non-production environments.
+
+[ai]
+binding = "AI"
+
+[[analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "clankybuddy_events"
+
+# Logpush is configured via Cloudflare dashboard, not wrangler. This block is a
+# doc anchor — see docs/operations.md for the full setup runbook.
+# Required jobs (configure manually before public launch):
+#   - "chat_content"     -> R2 bucket clankybuddy-logs/chat-content/, retention 90d,
+#                            fields: ip, user_agent, host, request_id, ws_message_payload (sampled)
+#   - "connection_logs"  -> R2 bucket clankybuddy-logs/connections/, retention 30d,
+#                            fields: cf-connecting-ip, user_agent, asn, country, request_id, response_status
+#   - "auth_events"      -> R2 bucket clankybuddy-logs/auth/, retention 30d,
+#                            fields: ip, asn, country, request_id, response_status, route_match
+
+# ---------------------------------------------------------------------------
+# Stratified environments (Phase A backend hardening). The top-level config
+# above defines the shared base; each [env.*] block re-declares the bindings
+# the runtime requires per-environment (DOs, KV, AI, AnalyticsEngine, vars,
+# triggers) so `wrangler deploy --env <name>` produces a self-contained
+# deployment. Wrangler does NOT inherit `[[durable_objects.bindings]]`,
+# `[[kv_namespaces]]`, `[[migrations]]`, `[ai]`, `[[analytics_engine_datasets]]`,
+# `[triggers]`, or `[vars]` into named environments — they must be repeated.
+#
+# `name` is overridden so `wrangler deploy --env staging` produces a worker
+# called `clankybuddy-worker-staging`; routes/zones are owned by the dashboard
+# (Cloudflare custom-domain config) per docs/operations.md and intentionally
+# not hard-coded here.
+# ---------------------------------------------------------------------------
+
+[env.staging]
+name = "clankybuddy-worker-staging"
+
+[env.staging.ai]
+binding = "AI"
+
+[[env.staging.durable_objects.bindings]]
+name = "ROOM"
+class_name = "RoomDO"
+
+[[env.staging.durable_objects.bindings]]
+name = "DATABASE"
+class_name = "DatabaseDO"
+
+[[env.staging.durable_objects.bindings]]
+name = "ACTION_SHARD"
+class_name = "ActionShardDO"
+
+[[env.staging.durable_objects.bindings]]
+name = "LEADERBOARD"
+class_name = "LeaderboardDO"
+
+[[env.staging.kv_namespaces]]
+binding = "AUTH_KV"
+# TODO: real KV id — provision via `wrangler kv:namespace create AUTH_KV --env staging`.
+id = "0000000000000000000000000000aaaa"
+
+[[env.staging.migrations]]
+tag = "v1"
+new_sqlite_classes = ["RoomDO", "DatabaseDO"]
+
+[[env.staging.migrations]]
+tag = "v2"
+new_sqlite_classes = ["ActionShardDO", "LeaderboardDO"]
+
+[env.staging.triggers]
+crons = ["*/1 * * * *"]
+
+[env.staging.vars]
+ENVIRONMENT = "staging"
+PROTOCOL_VERSION = "1"
+MODERATION_MODE = "full"
+MODERATION_DAILY_BUDGET_USD = "50"
+MODERATION_USER_DAILY_CALLS = "200"
+
+[[env.staging.analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "clankybuddy_events_staging"
+
+[env.production]
+name = "clankybuddy-worker"
+
+[env.production.ai]
+binding = "AI"
+
+[[env.production.durable_objects.bindings]]
+name = "ROOM"
+class_name = "RoomDO"
+
+[[env.production.durable_objects.bindings]]
+name = "DATABASE"
+class_name = "DatabaseDO"
+
+[[env.production.durable_objects.bindings]]
+name = "ACTION_SHARD"
+class_name = "ActionShardDO"
+
+[[env.production.durable_objects.bindings]]
+name = "LEADERBOARD"
+class_name = "LeaderboardDO"
+
+[[env.production.kv_namespaces]]
+binding = "AUTH_KV"
+# TODO: real KV id — provision via `wrangler kv:namespace create AUTH_KV --env production`.
+id = "0000000000000000000000000000aaaa"
+
+[[env.production.migrations]]
+tag = "v1"
+new_sqlite_classes = ["RoomDO", "DatabaseDO"]
+
+[[env.production.migrations]]
+tag = "v2"
+new_sqlite_classes = ["ActionShardDO", "LeaderboardDO"]
+
+[env.production.triggers]
+crons = ["*/1 * * * *"]
+
+[env.production.vars]
+ENVIRONMENT = "production"
+PROTOCOL_VERSION = "1"
+MODERATION_MODE = "full"
+MODERATION_DAILY_BUDGET_USD = "200"
+MODERATION_USER_DAILY_CALLS = "200"
+
+[[env.production.analytics_engine_datasets]]
+binding = "ANALYTICS"
+dataset = "clankybuddy_events"

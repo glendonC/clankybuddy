@@ -1,0 +1,167 @@
+/* ──────────────────────────────────────────────────────────────────────
+ * Sections (no card backgrounds, only hairlines + gutters). One section
+ * is visible at a time inside .sd-page; the per-section border-bottom is
+ * gone since stacking is gone.
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-section {
+  flex: 1 1 auto;
+  padding: 28px var(--sd-pad);
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+.sd-section-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+.sd-section-eyebrow {
+  font-size: var(--sd-eyebrow);
+  letter-spacing: var(--sd-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--sd-muted);
+  font-weight: var(--w-reg);
+}
+.sd-section-title {
+  font-family: var(--sans-display);
+  font-size: var(--sd-section-num);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--sd-track-section);
+  margin-top: 4px;
+}
+.sd-section-body {
+  font-size: var(--sd-body);
+}
+
+/* Inline note appended to a section body when the persona filter is engaged
+   but this section's data is aggregate-only (verb table, calendar, pareto)
+   or partially honored (KPI mood sparklines). Footnote-quiet, never
+   competes with the section title or the chart, just makes the limitation
+   visible so a "Claude only" filter doesn't silently lie about what's
+   shown. Bullet uses --sd-soft to stay below the active chip's accent. */
+.sd-filter-note {
+  margin-top: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 11px;
+  letter-spacing: -0.005em;
+  color: var(--sd-muted);
+}
+.sd-filter-note-bullet {
+  width: 4px;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--sd-soft);
+  flex: 0 0 auto;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * KPI tiles (section A)
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-kpi-row {
+  display: flex;
+  gap: 0;
+}
+
+/* "vs global" benchmark strip, renders directly under the KPI row when the
+   toggle is on. Compact single line: a global help-ratio pill, a delta
+   against personal, and the most-targeted persona globally. Hidden when
+   not on personal audience or when global data is missing. */
+.sd-bench-strip {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 18px;
+  padding-top: 14px;
+  border-top: 1px dashed var(--sd-hairline);
+  font-size: 12px;
+  color: var(--sd-muted);
+  letter-spacing: -0.005em;
+  flex-wrap: wrap;
+}
+.sd-bench-pill {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--sd-ink) 6%, transparent);
+  color: var(--sd-ink);
+}
+.sd-bench-pill-eyebrow {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: var(--sd-track-eyebrow);
+  color: var(--sd-muted);
+}
+.sd-bench-pill-value {
+  font-family: var(--sans-display);
+  font-feature-settings: "tnum";
+  font-weight: 500;
+  font-size: 13px;
+}
+.sd-bench-delta {
+  font-family: var(--sans);
+  font-weight: 500;
+  font-size: 12px;
+}
+.sd-bench-delta.pos { color: var(--success); }
+.sd-bench-delta.neg { color: var(--danger); }
+.sd-bench-fact { color: var(--sd-muted); }
+.sd-bench-fact strong { color: var(--sd-ink); font-weight: 500; }
+.sd-kpi {
+  flex: 1 1 0;
+  padding: 6px 28px;
+  border-right: 1px solid var(--sd-hairline);
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  cursor: default;
+  min-width: 0;
+}
+.sd-kpi:first-child { padding-left: 0; }
+.sd-kpi:last-child  { padding-right: 0; border-right: 0; }
+.sd-kpi-eyebrow {
+  font-size: var(--sd-eyebrow);
+  letter-spacing: var(--sd-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--sd-muted);
+  font-weight: var(--w-reg);
+}
+.sd-kpi-row-2 {
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+  margin-top: 4px;
+}
+.sd-kpi-num {
+  font-family: var(--sans-display);
+  font-size: var(--sd-hero-num);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  font-feature-settings: "tnum";
+  line-height: 1.0;
+}
+.sd-kpi-delta {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+}
+.sd-delta {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  font-feature-settings: "tnum";
+}
+.sd-delta-up { color: var(--success); }
+.sd-delta-down { color: var(--danger); }
+.sd-delta-zero { color: var(--sd-soft); }
+.sd-kpi-spark {
+  margin-top: 4px;
+  height: 56px;
+}
+.sd-kpi-spark .sd-spark { width: 100%; height: 100%; display: block; }
+

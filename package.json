@@ -1,0 +1,28 @@
+{
+  "name": "clankybuddy-monorepo",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev -w @clankybuddy/web",
+    "build": "npm run build -w @clankybuddy/web",
+    "preview": "npm run preview -w @clankybuddy/web",
+    "ext": "code --extensionDevelopmentPath=./packages/extension",
+    "ext:cursor": "cursor --extensionDevelopmentPath=./packages/extension"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/glendonC/clankybuddy.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/glendonC/clankybuddy/issues"
+  },
+  "homepage": "https://github.com/glendonC/clankybuddy#readme",
+  "description": ""
+}

@@ -1,0 +1,38 @@
+/* ============================================================
+   TOKEN READOUT (TOP-RIGHT), bare floating display. No card chrome,
+   just the currency number + unit + a thin session-XP strip. The number
+   carries its own accent text-shadow for legibility against the stage.
+   ============================================================ */
+.token-readout {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  pointer-events: none;
+  width: var(--rail-w);
+}
+.wallet {
+  display: inline-flex;
+  align-items: baseline;
+  justify-content: flex-end;
+  gap: 6px;
+  pointer-events: auto;
+}
+.wallet-num {
+  font-family: var(--sans-display);
+  font-size: var(--type-display-size);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-display);
+  color: var(--fg);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  -webkit-font-smoothing: antialiased;
+}
+.wallet-unit {
+  font-size: var(--type-caption-size);
+  font-weight: var(--w-reg);
+  letter-spacing: var(--type-track-ui);
+  text-transform: lowercase;
+  color: var(--fg-3);
+  line-height: 1;
+}

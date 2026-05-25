@@ -1,0 +1,312 @@
+/* ──────────────────────────────────────────────────────────────────────
+ * Verb table (section E)
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-verb-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.sd-verb-table thead {
+  font-size: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--sd-soft);
+}
+.sd-verb-table th {
+  text-align: left;
+  font-weight: var(--w-reg);
+  padding: 0 12px 8px;
+  border-bottom: 1px solid var(--sd-hairline);
+}
+.sd-verb-table th.sd-verb-th-num { text-align: right; }
+.sd-verb-table tbody tr { transition: background var(--dur-fast) var(--ease); }
+.sd-verb-table tbody tr:hover { background: var(--sd-faint); }
+.sd-verb-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid var(--sd-hairline);
+  vertical-align: middle;
+}
+.sd-verb-table tbody tr:last-child td { border-bottom: 0; }
+.sd-verb-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  color: var(--sd-ink);
+}
+.sd-verb-dot {
+  width: 6px; height: 6px; border-radius: 999px; display: inline-block;
+}
+.sd-verb-spark { width: 80px; }
+.sd-verb-spark .sd-spark { width: 80px; height: 24px; display: block; }
+.sd-verb-num {
+  text-align: right;
+  font-family: var(--sans-display);
+  font-feature-settings: "tnum";
+  color: var(--sd-ink);
+}
+.sd-verb-bar {
+  width: 80px;
+  position: relative;
+  background: transparent;
+}
+.sd-verb-bar i {
+  display: block;
+  height: 4px;
+  border-radius: 999px;
+  background: var(--sd-ink);
+  width: var(--pct, 0%);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Persona ladder (section F)
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-ladder { display: flex; flex-direction: column; gap: 10px; }
+.sd-ladder-row {
+  display: grid;
+  grid-template-columns: 160px 1fr 80px 140px;
+  align-items: center;
+  gap: 18px;
+  font-size: 13px;
+  letter-spacing: -0.005em;
+  cursor: pointer;
+  padding: 6px 0;
+  transition: opacity var(--dur-fast) var(--ease);
+}
+/* Benchmark mode adds a "vs global" delta column between the total and the
+   favorite-tool cell. Only present when the benchmark toggle is on AND
+   global data is loaded. */
+.sd-ladder-row.has-delta {
+  grid-template-columns: 160px 1fr 80px 84px 140px;
+}
+.sd-ladder-row[data-dim="1"] { opacity: 0.32; }
+.sd-ladder-row:hover { opacity: 1; }
+.sd-ladder-name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--sd-ink);
+  font-weight: 500;
+}
+.sd-ladder-dot {
+  width: 8px; height: 8px; border-radius: 999px;
+}
+.sd-ladder-bar {
+  height: 8px;
+  background: var(--sd-faint);
+  border-radius: 999px;
+  position: relative;
+  overflow: hidden;
+  min-width: 8px;
+}
+.sd-ladder-bar-help, .sd-ladder-bar-hurt {
+  position: absolute;
+  top: 0; bottom: 0;
+  background: var(--success);
+  border-radius: 999px;
+}
+.sd-ladder-bar-hurt { background: var(--danger); }
+.sd-ladder-num {
+  text-align: right;
+  font-family: var(--sans-display);
+  font-feature-settings: "tnum";
+  color: var(--sd-ink);
+}
+/* "vs global" delta. Above-average shares pop in ink + soft tint background;
+   below-average shares fade to muted ink. The pp suffix keeps the unit
+   honest, percentage-points is a different unit than percent. */
+.sd-ladder-delta {
+  text-align: right;
+  font-family: var(--sans-display);
+  font-feature-settings: "tnum";
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: -0.005em;
+  padding: 3px 8px;
+  border-radius: 999px;
+  justify-self: end;
+  white-space: nowrap;
+}
+.sd-ladder-delta.pos {
+  color: var(--sd-ink);
+  background: color-mix(in srgb, var(--sd-ink) 8%, transparent);
+}
+.sd-ladder-delta.neg {
+  color: var(--sd-soft);
+  background: transparent;
+}
+.sd-ladder-delta.zero {
+  color: var(--sd-muted);
+  background: transparent;
+}
+.sd-ladder-fav {
+  font-size: 11px;
+  color: var(--sd-muted);
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Sessions distribution (section G)
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-sessions {
+  width: 100%;
+  height: 240px;
+  display: block;
+}
+.sd-dot { transition: r var(--dur-fast) var(--ease); }
+.sd-dot:hover { r: 5; }
+.sd-box-whisker { stroke: var(--sd-soft); stroke-width: 1; stroke-dasharray: 2 3; vector-effect: non-scaling-stroke; }
+.sd-box-iqr { fill: var(--sd-faint); stroke: var(--sd-soft); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.sd-box-median { stroke: var(--sd-ink); stroke-width: 1.5; vector-effect: non-scaling-stroke; }
+.sd-sessions-legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 12px;
+  font-size: 10px;
+  color: var(--sd-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  font-weight: var(--w-reg);
+}
+.sd-sessions-legend i {
+  width: 6px; height: 6px; border-radius: 999px; display: inline-block;
+  background: var(--accent);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Records (section H)
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-records-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0;
+  margin-bottom: 22px;
+}
+.sd-record {
+  padding: 0 16px;
+  border-right: 1px solid var(--sd-hairline);
+}
+.sd-record:first-child { padding-left: 0; }
+.sd-record:last-child  { padding-right: 0; border-right: 0; }
+.sd-record-label {
+  font-size: var(--sd-eyebrow);
+  letter-spacing: var(--sd-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--sd-muted);
+  font-weight: var(--w-reg);
+}
+.sd-record-value {
+  font-family: var(--sans-display);
+  font-size: 28px;
+  letter-spacing: var(--type-track-display);
+  font-weight: var(--w-reg);
+  font-feature-settings: "tnum";
+  color: var(--sd-ink);
+  margin-top: 6px;
+}
+.sd-firsts-head {
+  font-size: var(--sd-eyebrow);
+  letter-spacing: var(--sd-track-eyebrow);
+  text-transform: uppercase;
+  color: var(--sd-muted);
+  font-weight: var(--w-reg);
+  margin-bottom: 10px;
+}
+.sd-firsts {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+.sd-firsts-row {
+  display: grid;
+  grid-template-columns: 130px 1fr;
+  align-items: center;
+  gap: 12px;
+  font-size: 11px;
+  color: var(--sd-muted);
+}
+.sd-firsts-name {
+  display: flex; align-items: center; gap: 6px;
+  letter-spacing: -0.005em;
+}
+.sd-firsts-accent {
+  width: 6px; height: 6px; border-radius: 999px; display: inline-block;
+}
+.sd-firsts-dots {
+  display: inline-flex; gap: 4px;
+}
+.sd-firsts-dot {
+  width: 12px; height: 12px;
+  border-radius: 999px;
+  border: 1px solid var(--sd-hairline);
+  background: transparent;
+  cursor: pointer;
+}
+.sd-firsts-dot.seen {
+  background: var(--sd-ink);
+  border-color: var(--sd-ink);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Pareto (section I)
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-pareto { display: flex; flex-direction: column; gap: 10px; }
+.sd-pareto-row {
+  display: grid;
+  grid-template-columns: 110px 1fr;
+  align-items: center;
+  gap: 12px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.sd-pareto-label {
+  font-weight: 500;
+  color: var(--sd-ink);
+  letter-spacing: -0.005em;
+}
+.sd-pareto-bar {
+  position: relative;
+  height: 12px;
+  background: var(--sd-faint);
+  border-radius: 999px;
+  overflow: hidden;
+}
+.sd-pareto-bar i {
+  position: absolute;
+  left: 0; top: 0; bottom: 0;
+  width: var(--pct, 0%);
+  background: var(--sd-ink);
+  border-radius: 999px;
+}
+.sd-pareto-num {
+  position: absolute;
+  right: 8px; top: 50%; transform: translateY(-50%);
+  font-family: var(--sans-display);
+  font-feature-settings: "tnum";
+  font-size: 10px;
+  color: var(--sd-ink);
+}
+
+/* ──────────────────────────────────────────────────────────────────────
+ * Empty states + footer
+ * ────────────────────────────────────────────────────────────────────── */
+.sd-empty {
+  padding: 24px 0;
+  text-align: center;
+  color: var(--sd-muted);
+}
+.sd-empty svg {
+  width: 60%;
+  max-width: 320px;
+  height: 60px;
+  display: block;
+  margin: 0 auto 8px;
+}
+.sd-empty p {
+  font-size: 12px;
+  letter-spacing: -0.005em;
+}

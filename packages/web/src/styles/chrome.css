@@ -1,0 +1,11 @@
+/* HUD chrome manifest.
+ *
+ * These partials own the floating game chrome: boss nameplate, HUD anchors,
+ * wallet, hotbar, and protocol-outdated overlay.
+ */
+
+@import url('./hud/boss-nameplate.css');
+@import url('./hud/layout.css');
+@import url('./hud/wallet.css');
+@import url('./hud/hotbar.css');
+@import url('./hud/outdated-overlay.css');

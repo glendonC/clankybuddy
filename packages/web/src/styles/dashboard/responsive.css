@@ -1,0 +1,75 @@
+/* ──────────────────────────────────────────────────────────────────────
+ * Responsive, full-screen overlay scales down through breakpoints.
+ *
+ * 1100px: KPI row collapses to 2×2 (4 fixed columns get cramped); anatomy
+ *         drops the fixed figure column and reflows; persona ladder uses
+ *         narrower columns; multi-grid drops to 2-up.
+ * 720px:  Single-column everywhere; padding shrinks; hero numerals shrink.
+ * ────────────────────────────────────────────────────────────────────── */
+@media (max-width: 1100px) {
+  .sd-root { --sd-pad: 28px; --sd-hero-num: 52px; }
+  .sd-h1 { font-size: 56px; }
+  .sd-bento-wrap {
+    padding-bottom: max(132px, calc(var(--sd-pad) + 72px));
+  }
+  .sd-bento {
+    grid-auto-rows: auto;
+  }
+  .sd-tile {
+    min-height: clamp(230px, 30vh, 300px);
+  }
+  .sd-focused-stack { grid-template-rows: minmax(280px, 42vh) auto; }
+  .sd-focused-text { grid-template-columns: minmax(min-content, 0.42fr) minmax(0, 1fr); }
+  .sd-audience-action { grid-column: 1 / -1; justify-self: start; }
+  .sd-focused-title { font-size: 32px; }
+  .sd-focused-big { font-size: clamp(48px, 7.2vw, 80px); }
+  .sd-filter-popover { right: 24px; }
+  .sd-kpi-row { display: grid; grid-template-columns: repeat(2, 1fr); }
+  .sd-kpi { padding: 6px 18px; border-right: 1px solid var(--sd-hairline); }
+  .sd-kpi:nth-child(2n)     { border-right: 0; padding-right: 0; }
+  .sd-kpi:first-child       { padding-left: 0; }
+  .sd-kpi:nth-child(2)      { padding-left: 18px; }
+  .sd-kpi:nth-child(n + 3)  { padding-top: 18px; margin-top: 12px; border-top: 1px solid var(--sd-hairline); }
+  .sd-anatomy { grid-template-columns: minmax(220px, 280px) minmax(260px, 1fr); gap: 32px; }
+  .sd-multi-grid { grid-template-columns: repeat(2, 1fr); }
+  .sd-ladder-row { grid-template-columns: 130px 1fr 60px 100px; gap: 12px; }
+  .sd-ladder-row.has-delta { grid-template-columns: 130px 1fr 60px 72px 100px; }
+}
+@media (max-width: 720px) {
+  .sd-root { --sd-pad: 20px; --sd-hero-num: 42px; }
+  .sd-head-inner { align-items: flex-start; flex-direction: column; gap: 14px; }
+  .sd-head-controls { width: 100%; margin-bottom: 0; }
+  .sd-filter-label { margin-right: auto; }
+  .sd-h1 { font-size: 44px; }
+  .sd-bento {
+    grid-auto-rows: auto;
+  }
+  .sd-tile {
+    min-height: 0;
+  }
+  .sd-tile[data-col="2"] {
+    min-height: 0;
+  }
+  .sd-focused-stack { grid-template-rows: minmax(240px, 38vh) auto; gap: 22px; }
+  .sd-focused-text { grid-template-columns: 1fr; gap: 16px; }
+  .sd-audience-action { grid-column: auto; justify-self: start; }
+  .sd-focused-title { font-size: 28px; }
+  .sd-focused-big { font-size: clamp(42px, 13vw, 64px); }
+  .sd-filter-popover { left: 20px; right: 20px; min-width: 0; }
+  .sd-filter-popover-grid { grid-template-columns: 1fr; }
+  .sd-anatomy { grid-template-columns: 1fr; }
+  .sd-records-grid { grid-template-columns: repeat(2, 1fr); row-gap: 16px; }
+  .sd-record:nth-child(2)  { border-right: 0; padding-right: 0; }
+  .sd-record:nth-child(3)  { padding-left: 0; }
+  .sd-multi-grid { grid-template-columns: 1fr; }
+  .sd-ladder-row { grid-template-columns: 1fr 60px; gap: 8px; }
+  .sd-ladder-row.has-delta { grid-template-columns: 1fr 64px; }
+  .sd-ladder-bar, .sd-ladder-fav { grid-column: 1 / -1; }
+  .sd-ladder-delta { grid-column: 1 / -1; justify-self: start; }
+  .sd-command-bar {
+    width: auto;
+    max-width: 100%;
+  }
+  .sd-command-list { justify-content: center; }
+  .sd-command { justify-content: center; }
+}

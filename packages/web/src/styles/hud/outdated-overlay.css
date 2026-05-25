@@ -1,0 +1,93 @@
+/* ============================================================
+   OUTDATED OVERLAY, non-dismissable. Rendered by ui/log.js when
+   chat status flips to 'outdated' (worker rejected our protocol
+   version, surface 426 from /auth/ws-ticket or `welcome.accepted=false`).
+   The CTA is a real anchor with href="" so the browser does the
+   reload, no JS, no opportunity for the page to swallow the click.
+   z-index sits above target picker (1500) but below dev (1100?, actually
+   `--z-target` is 1500 and `--z-guard` is 5000); we use z-guard so
+   nothing in the existing UI can paint over it.
+   ============================================================ */
+.outdated-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: var(--z-guard);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* Solid dark surface, glassmorphism reserved for .popover-sheet. */
+  background: rgba(0, 0, 0, 0.92);
+  animation: outdated-fade .18s ease-out;
+}
+body.theme-light .outdated-overlay {
+  background: rgba(20, 20, 30, 0.78);
+}
+@keyframes outdated-fade { from { opacity: 0; } to { opacity: 1; } }
+.outdated-overlay-card {
+  width: min(420px, calc(100vw - 32px));
+  padding: 28px 30px 24px;
+  background: var(--surface-overlay);
+  border: 1px solid var(--border-2);
+  border-radius: 14px;
+  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+  text-align: left;
+  animation: outdated-rise .2s var(--ease-spring);
+}
+body.theme-light .outdated-overlay-card {
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 24px 64px rgba(20, 20, 30, 0.2);
+}
+@keyframes outdated-rise {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.outdated-overlay-eyebrow {
+  font-size: var(--type-micro-size);
+  text-transform: uppercase;
+  letter-spacing: var(--type-track-section);
+  color: var(--mood-negative);
+  font-weight: var(--w-bold);
+  margin-bottom: 10px;
+}
+.outdated-overlay-title {
+  margin: 0 0 8px;
+  font-family: var(--sans-display);
+  font-size: var(--type-title-size);
+  /* Modal title, bold. */
+  font-weight: var(--w-bold);
+  letter-spacing: var(--tr-tight);
+  color: var(--fg);
+  text-transform: lowercase;
+  line-height: 1.15;
+}
+.outdated-overlay-body {
+  margin: 0 0 18px;
+  font-size: var(--t-sm);
+  color: var(--fg-2);
+  line-height: 1.45;
+}
+.outdated-overlay-cta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 110px;
+  padding: 10px 18px;
+  border-radius: 8px;
+  border: 1px solid var(--char-accent);
+  background: color-mix(in srgb, var(--char-accent) 14%, var(--surface-2));
+  color: var(--fg);
+  text-decoration: none;
+  font-size: var(--t-sm);
+  font-weight: var(--w-bold);
+  text-transform: lowercase;
+  letter-spacing: var(--tr-snug);
+  transition: background .12s ease, transform .08s ease;
+}
+.outdated-overlay-cta:hover {
+  background: color-mix(in srgb, var(--char-accent) 28%, var(--surface-2));
+  transform: translateY(-1px);
+}
+.outdated-overlay-cta:focus-visible {
+  outline: 2px solid var(--char-accent);
+  outline-offset: 2px;
+}
