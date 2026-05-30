@@ -3,7 +3,7 @@
 // root; everything else branches off it (machinegun + shotgun + rocket
 // + grenade).
 
-import { toolNode, statNode } from './_shared.js';
+import { toolNode, statNode, sharedNode } from './_shared.js';
 
 export default [
   // Root: pistol
@@ -25,11 +25,81 @@ export default [
     effect: (s) => { s.speed = 30; },
   }),
 
+  // Revolver, six heavy shots + forced reload (branches off pistol).
+  toolNode({
+    id: 'g.ordnance.revolver', parents: ['g.ordnance.gun'], cost: 140, toolId: 'revolver',
+    label: 'revolver',
+    blurb: 'Six heavy magnum shots with big stun, then a forced reload.',
+  }),
+
+  // SHARED (cross-tool, family: firearms). Targeting computer turns auto-aim
+  // from the old always-on default into a paid unlock: every firearm now aims
+  // MANUALLY (fires at the buddy's centroid, no lock) until you buy this, at
+  // which point they snap to the nearest part + show the lock-on reticle.
+  // Behavior flag only — no scalar — per the sharedNode guard.
+  sharedNode({
+    id: 'g.ordnance.aimbot', parents: ['g.ordnance.gun'], cost: 250,
+    family: 'firearms', flag: 'aimbot',
+    label: 'Targeting computer',
+    iconHint: '◎',
+    blurb: 'Every firearm auto-locks the nearest part (aimbot). Without it, you aim by hand.',
+    effect: (fam) => { fam.aimbot = true; },
+  }),
+
+  // SHARED ammo mods (cross-tool, family: firearms). Each flips a behavior
+  // flag the bullet handler reads, so it upgrades EVERY firearm's rounds at
+  // once. Behavior flags only — no scalars — per the sharedNode guard.
+  sharedNode({
+    id: 'g.ordnance.hollowpoint_rounds', parents: ['g.ordnance.gun'], cost: 350,
+    family: 'firearms', flag: 'hollowPoint',
+    label: 'Hollow-point rounds',
+    blurb: 'Every firearm round opens a BLEED on hit.',
+    effect: (fam) => { fam.hollowPoint = true; },
+  }),
+  sharedNode({
+    id: 'g.ordnance.incendiary_rounds', parents: ['g.ordnance.gun'], cost: 350,
+    family: 'firearms', flag: 'incendiary',
+    label: 'Incendiary rounds',
+    blurb: 'Every firearm round sets the struck part ON FIRE.',
+    effect: (fam) => { fam.incendiary = true; },
+  }),
+  sharedNode({
+    id: 'g.ordnance.he_rounds', parents: ['g.ordnance.gun'], cost: 500,
+    family: 'firearms', flag: 'he',
+    label: 'HE rounds',
+    blurb: 'Every firearm round detonates a small high-explosive burst on impact.',
+    effect: (fam) => { fam.he = true; },
+  }),
+
   // Machinegun branch (sustained DPS)
   toolNode({
     id: 'g.ordnance.machinegun', parents: ['g.ordnance.gun'], cost: 100, toolId: 'machinegun',
     label: 'machine gun',
     blurb: 'Spray bullets, sustained DPS.',
+  }),
+  // SMG, mobile bullet-hose with a blooming cone (branches off machine gun).
+  toolNode({
+    id: 'g.ordnance.smg', parents: ['g.ordnance.machinegun'], cost: 130, toolId: 'smg',
+    label: 'smg',
+    blurb: 'Faster, lighter rounds; accuracy blooms wider the longer you hold.',
+  }),
+  // Assault rifle, recoil-climbing auto (branches off machine gun).
+  toolNode({
+    id: 'g.ordnance.assault_rifle', parents: ['g.ordnance.machinegun'], cost: 180, toolId: 'assault_rifle',
+    label: 'assault rifle',
+    blurb: 'Higher-damage auto; the cone climbs with recoil, reward burst discipline.',
+  }),
+  // LMG, belt-fed spin-up suppression (branches off machine gun).
+  toolNode({
+    id: 'g.ordnance.lmg', parents: ['g.ordnance.machinegun'], cost: 260, toolId: 'lmg',
+    label: 'lmg',
+    blurb: 'Spins up from weak to a wall of lead the longer you hold.',
+  }),
+  // Minigun, locked-barrel evolve of the LMG.
+  toolNode({
+    id: 'g.ordnance.minigun', parents: ['g.ordnance.lmg'], cost: 400, toolId: 'minigun',
+    label: 'minigun',
+    blurb: 'Fastest fire rate in the game; the barrel locks where you opened up.',
   }),
   statNode({
     id: 'g.ordnance.machinegun.rate', parents: ['g.ordnance.machinegun'], cost: 300, toolId: 'machinegun',
@@ -45,9 +115,9 @@ export default [
   }),
   statNode({
     id: 'g.ordnance.machinegun.minigun', parents: ['g.ordnance.machinegun.rate', 'g.ordnance.machinegun.choke'], cost: 1200, toolId: 'machinegun',
-    label: 'Minigun mode',
+    label: 'Overspin',
     iconHint: '⚡',
-    blurb: 'Damage +60%, speed 26 → 36. The bar takes notes.',
+    blurb: 'Machine-gun damage +60%, speed 26 → 36. (Node id kept for save compat; the standalone minigun is its own tool now.)',
     effect: (s) => { s.damage *= 1.6; s.speed = 36; },
   }),
 
@@ -74,9 +144,16 @@ export default [
     effect: (s) => { s.pellets = 1; s.force *= 4; s.mood *= 3; s.coneRad = 0.05; },
   }),
 
-  // Grenade branch (lobbed)
+  // Explosives sub-tree (lobbed). Frag is the root; molotov is the
+  // lingering-fire variant. (Phase 3 re-roots this under a mortar; for now
+  // frag is its own independent entry, parallel to the pistol chain.)
   toolNode({
-    id: 'g.ordnance.grenade', parents: ['g.ordnance.gun'], cost: 120, toolId: 'grenade',
+    id: 'g.ordnance.frag_grenade', parents: [], cost: 150, toolId: 'frag_grenade',
+    label: 'frag grenade',
+    blurb: 'Drag to lob, 2s fuse, dry blast + a radial spray of shrapnel.',
+  }),
+  toolNode({
+    id: 'g.ordnance.grenade', parents: ['g.ordnance.frag_grenade'], cost: 120, toolId: 'grenade',
     label: 'molotov',
     blurb: 'Drag to lob, 2s fuse, area boom + lingering fire pool.',
   }),

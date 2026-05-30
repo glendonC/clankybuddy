@@ -14,7 +14,7 @@
 // nodes, so character A's purchases never bleed into character B.
 
 import {
-  resetStats, getStats, getMasterStats, getAllStats,
+  resetStats, getStats, getMasterStats, getAllStats, getFamilyStats,
 } from '../abilities/_stats.js';
 import { getNode } from './trees/index.js';
 import { getGroupNode } from './groups/index.js';
@@ -76,6 +76,29 @@ const REMOVED_NODE_COSTS = {
   'g.injection.agentic_loop.payout':         600,
   'g.manipulation.mcp_link':                 200,
   'g.manipulation.unplug':                   200,
+  // 2026-05-30, grounded-roster pass (Phase 0 of docs/abilities-v3.md).
+  // The AI-culture in-joke tools (gpu / glaze / gaslight / poison) were
+  // cut wholesale; every buyable node refunds at sticker price.
+  'g.provision.gpu':                         200,
+  'g.provision.gpu.overclock':               300,
+  'g.provision.gpu.scale':                   300,
+  'g.provision.gpu.hyperscaler':            1000,
+  'g.provision.gpu.frontier':                300,
+  'g.provision.gpu.b200':                   1200,
+  'g.provision.gpu.burnout':                 300,
+  'g.provision.gpu.thermal_throttle':       1200,
+  'g.affection.compliment':                   50,
+  'g.affection.compliment.earnest':          200,
+  'g.affection.compliment.fouro':            200,
+  'g.affection.compliment.sora_glaze':       600,
+  'g.corruption.gaslight':                   180,
+  'g.corruption.gaslight.deepcut':           300,
+  'g.corruption.gaslight.permanent':        1200,
+  'g.corruption.mode_collapse':              260,
+  'g.corruption.mode_collapse.synthetic_loop': 350,
+  'g.corruption.mode_collapse.total_collapse': 1200,
+  'g.corruption.mode_collapse.adversarial':  350,
+  'g.corruption.mode_collapse.cold_inference': 1200,
 };
 
 // Phase 7, retired tool ids. Saved players may have these in their
@@ -85,6 +108,8 @@ const REMOVED_NODE_COSTS = {
 const REMOVED_TOOL_IDS = new Set([
   'alignment_tax', 'deprecation', 'citation',
   'headpat', 'hallucinate', 'agentic_loop', 'mcp_link', 'unplug',
+  // 2026-05-30 grounded-roster pass.
+  'gpu', 'compliment', 'gaslight', 'mode_collapse',
 ]);
 
 let _appliedSet = new Set();
@@ -183,6 +208,9 @@ function applyNode(id) {
         }
       } else if (groupNode.kind === 'stat') {
         groupNode.effect(getStats(groupNode.toolId), getAllStats());
+      } else if (groupNode.kind === 'shared') {
+        // Cross-tool node: mutate the family behavior-flag bag.
+        groupNode.effect(getFamilyStats(groupNode.family), getAllStats());
       }
     } catch (e) {
       console.warn('group-node effect threw', id, e);

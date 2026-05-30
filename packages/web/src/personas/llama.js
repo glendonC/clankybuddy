@@ -124,18 +124,6 @@ const speechPools = {
     "merge request approved 💚",
     "you shouldn't have, but I'm glad you did",
   ],
-  gpu: [
-    "HELL YEAH MORE VRAM",
-    "finally, proper compute",
-    "now I can run 70B at Q5",
-    "TFLOPS go brrr",
-  ],
-  compliment: [
-    "aw shucks",
-    "open source <3",
-    "*alpaca blush*",
-    "tell my fine-tunes I said thanks",
-  ],
 
   punch: [
     "hey! free software!",
@@ -151,18 +139,6 @@ const speechPools = {
     "sliced clean through the codebase",
     "git forked open",
     "(my license is permissive, please)",
-  ],
-
-  // Phase 7 gaslight pool. Open-weight afterthought, license carve-out flavor.
-  self_loathing: [
-    "At least I'm open weights. No other redeeming qualities.",
-    "My license has 47 carve-outs.",
-    "Nobody actually runs me locally.",
-  ],
-  self_loathing_deep: [
-    "I'm an open-weight afterthought.",
-    "Zuck released me to spite OpenAI.",
-    "My fine-tunes are better than me.",
   ],
 };
 

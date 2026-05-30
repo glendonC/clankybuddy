@@ -1,9 +1,9 @@
 import Matter from 'matter-js';
 import * as P from '../../particles.js';
 import { sfx } from '../../audio/sfx.js';
-import { drawAimLine } from '../../render/shared-cursor.js';
+import { drawAimLine, drawCrosshair } from '../../render/shared-cursor.js';
 import { getStats } from '../_stats.js';
-import { nearestPart, explode } from '../_shared.js';
+import { aimAngle, explode } from '../_shared.js';
 import { getActiveChar } from '../../ui/character-picker.js';
 
 const { Body, Bodies, Composite } = Matter;
@@ -22,12 +22,11 @@ export default {
   apply(ctx) {
     const s = getStats('rocket');
     const { ragdoll, world, x, y, screenShake } = ctx;
-    const target = nearestPart(ragdoll, x, y);
-    if (!target) return;
+    const { angle, ok } = aimAngle(ragdoll, x, y);
+    if (!ok) return;
     // Persona affinity (docs §3): the launch hits ChatGPT 1.5× harder.
     const personaMul = getActiveChar() === 'gpt' ? 1.5 : 1.0;
     const moodScaled = s.mood * personaMul;
-    const angle = Math.atan2(target.position.y - y, target.position.x - x);
     const muzzleX = x + Math.cos(angle) * 32;
     const muzzleY = y + Math.sin(angle) * 32;
 
@@ -60,7 +59,7 @@ export default {
     P.burst(muzzleX, muzzleY, 6, { type: 'fire', color: '#fff7c2', size: 5, life: 180, speedRange: 0.4 });
   },
   drawCursor(ctx, { x, y, target, angle }) {
-    drawAimLine(ctx, x, y, target);
+    if (target) drawAimLine(ctx, x, y, target); else drawCrosshair(ctx, x, y);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle);

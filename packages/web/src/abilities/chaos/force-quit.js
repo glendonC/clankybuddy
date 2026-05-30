@@ -1,12 +1,14 @@
-// Force Quit (kill -9), Cataclysm group. Click ability, cd:60. Finisher:
-// only fires when buddy mood is HURT or BROKEN; refuses (no cooldown burn)
-// otherwise. This makes it categorically distinct from nuke, nuke starts
-// the chaos, force_quit ends them when they're already breaking. Sends the
-// buddy into a 1.5s intangible "force-quit-active" window during which
-// damage is voided and they're rendered at 12% alpha. On expiry: massive
-// mood drop (wipes to BROKEN), popBubble "kernel panic", screen flash.
-// Avoids the KO/lightning-revive race the audit flagged, no ragdoll
-// despawn, just a status-driven outage. Phase 7 visceral-redirect.
+// Coup de grâce, Cataclysm group. Click ability, cd:60. Finisher: only fires
+// when buddy mood is HURT or BROKEN; refuses (no cooldown burn) otherwise.
+// This makes it categorically distinct from nuke, nuke starts the chaos, the
+// coup ends them when they're already breaking. Sends the buddy into a 1.5s
+// "finishing" window during which damage is voided and they're rendered at
+// ~12% alpha. On expiry: massive mood drop (wipes to BROKEN), screen flash.
+// Avoids the KO/lightning-revive race the audit flagged, no ragdoll despawn,
+// just a status-driven outage.
+//
+// Tool id stays 'force_quit' (legacy internal id, baked into the save / node
+// ids); only the player-facing flavor changed.
 
 import { moodState } from '../../mood.js';
 // big mood drop routed through ctx.reactTo.
@@ -31,13 +33,13 @@ export default {
       sfx.gun?.();           // dry click, nothing happens
       return;
     }
-    // Apply the intangibility status, damageMul will read this and return 0
-    // for the duration so anything in flight just whiffs.
-    applyStatus(status, ragdoll.head, 'force_quit_active', {
+    // Apply the finishing status, damageMul reads this and returns 0 for the
+    // duration so anything in flight just whiffs.
+    applyStatus(status, ragdoll.head, 'finishing', {
       duration: 1500,
       source: 'force_quit',
     });
-    popBubble?.(ragdoll.head, 'kernel panic');
+    popBubble?.(ragdoll.head, 'no— wait');
     sfx.bomb?.();
     showFlash?.('#ff3838', 220, 0.6);
     screenShake?.(18, 220);
@@ -52,26 +54,34 @@ export default {
       if (!ctx._epochValid?.(epoch)) return;
       // Wipe to BROKEN, drop happiness to the floor with a single delta.
       // applyMoodDelta clamps to the legal range; we overshoot so any
-      // intermediate moodMul (Sycophant 2×, etc.) can't keep the buddy alive.
-      // Suppress pool speech; "<process killed>" below is the canonical line.
+      // intermediate moodMul can't keep the buddy alive. Suppress pool
+      // speech; "lights out" below is the canonical line.
       ctx.reactTo?.({ source: 'force_quit', part: ragdoll.head, moodDelta: -300, speakMs: 99999 });
       sfx.shatter?.();
       showFlash?.('#ffffff', 160, 0.9);
-      popBubble?.(ragdoll.head, '<process killed>');
+      popBubble?.(ragdoll.head, 'lights out');
     }, 1500);
   },
   drawCursor(rctx, { x, y }) {
     rctx.save();
     rctx.translate(x, y);
-    // Terminal-style red X-in-square.
-    rctx.strokeStyle = '#ff3838';
-    rctx.fillStyle   = 'rgba(255, 56, 56, 0.15)';
-    rctx.lineWidth = 1.6;
-    rctx.beginPath(); rctx.rect(-9, -9, 18, 18); rctx.fill(); rctx.stroke();
+    // Downward finisher dagger over a faint target ring.
+    rctx.strokeStyle = 'rgba(255, 56, 56, 0.5)';
+    rctx.lineWidth = 1.4;
+    rctx.beginPath(); rctx.arc(0, 0, 10, 0, Math.PI * 2); rctx.stroke();
+    // Blade pointing down at the cursor.
+    rctx.fillStyle = '#d7dde3';
     rctx.beginPath();
-    rctx.moveTo(-5, -5); rctx.lineTo(5, 5);
-    rctx.moveTo( 5, -5); rctx.lineTo(-5, 5);
-    rctx.stroke();
+    rctx.moveTo(0, 9);            // point
+    rctx.lineTo(-2.5, -4);
+    rctx.lineTo(2.5, -4);
+    rctx.closePath();
+    rctx.fill();
+    // Crossguard + pommel.
+    rctx.fillStyle = '#888';
+    rctx.fillRect(-5, -6, 10, 2);
+    rctx.fillStyle = '#3a2b1c';
+    rctx.fillRect(-1.5, -10, 3, 4);
     rctx.restore();
   },
 };

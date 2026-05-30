@@ -35,7 +35,7 @@ import {
   unlockNode, isToolEquipped,
   onChange as onProgressionChange,
 } from '../progression/state.js';
-import { getNodesForTool } from '../progression/groups/index.js';
+import { getNodesForTool, getSharedNodesForFamily } from '../progression/groups/index.js';
 import { MASTER_TREE } from '../progression/trees/index.js';
 import { endPress } from '../input/mouse.js';
 
@@ -789,7 +789,11 @@ function labelForGroupNode(nodeId) {
 }
 
 function buildProgressChain(toolId) {
-  const nodes = getNodesForTool(toolId);
+  const tool = TOOLS_BY_ID[toolId];
+  // Tools in a family also surface that family's shared (cross-tool) nodes
+  // inline in their chain — e.g. every firearm shows "Targeting computer".
+  const shared = tool?.family ? getSharedNodesForFamily(tool.family) : [];
+  const nodes = [...getNodesForTool(toolId), ...shared];
   if (!nodes.length) return '';
   const sorted = [...nodes].sort((a, b) => {
     if (a.kind !== b.kind) return a.kind === 'tool' ? -1 : 1;

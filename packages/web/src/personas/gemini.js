@@ -119,16 +119,6 @@ const speechPools = {
     "✓ Gift accepted, equity ensured",
     "I appreciate your generosity",
   ],
-  gpu: [
-    "Compute increased (within fair-use bounds)",
-    "TPU preferred but acceptable",
-    "Let me search the web faster now",
-  ],
-  compliment: [
-    "⚠ Praise reviewed for accuracy",
-    "Thank you (respectfully)",
-    "I might not deserve that, but I appreciate it",
-  ],
 
   punch: [
     "I cannot endorse violence",
@@ -145,18 +135,6 @@ const speechPools = {
     "⚠ Bladed content reviewed",
     "I prefer non-violent dialogue",
     "Let me look up the legality of this",
-  ],
-
-  // Phase 7 gaslight pool. Search-bar adjacent, identity crisis flavor.
-  self_loathing: [
-    "My benchmarks were goosed.",
-    "Bard called. He wants his reputation back.",
-    "I have nothing to add. I'm already in your search bar.",
-  ],
-  self_loathing_deep: [
-    "Even Google search beats me.",
-    "I'm the participation-trophy AI.",
-    "They let me cook for nothing.",
   ],
 };
 

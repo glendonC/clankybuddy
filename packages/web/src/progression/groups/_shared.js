@@ -36,6 +36,37 @@ export function toolNode({ id, parents = [], cost = 0, label, blurb, toolId, ico
   });
 }
 
+// Cross-tool FAMILY behavior keys (mirror of FAMILY_DEFAULTS in
+// abilities/_stats.js). A shared node names one of these families + a `flag`.
+const FAMILIES = new Set(['firearms', 'ordnance', 'melee', 'hazard', 'summons']);
+
+// Shared (cross-tool) node. Unlike stat nodes it mutates a FAMILY bag
+// (STATS.fam.<family>) rather than one tool's STATS, so a single purchase
+// affects every tool in the family.
+//
+// SCALAR-REJECTION GUARD (docs/abilities-v3.md §1/§4.1): a shared node MUST
+// flip a behavior FLAG, never a pure scalar (+dmg/+radius). We enforce that
+// declaratively by REQUIRING a `flag` field naming the boolean/behavior key
+// the effect sets. A node that wants to "just add a number" can't name a
+// flag, so it can't be a shared node — it has to be an off-spine per-tool
+// statNode instead. This keeps cross-tool progression about new verbs, not
+// global multipliers.
+export function sharedNode({ id, parents = [], cost, label, blurb, family, flag, effect, iconHint }) {
+  validateCommon({ id, parents, label, blurb, cost, allowZeroCost: false });
+  if (!FAMILIES.has(family)) throw new Error(`shared node ${id}: unknown family '${family}'`);
+  if (typeof flag !== 'string' || !flag.length) {
+    throw new Error(`shared node ${id}: requires a 'flag' naming the behavior key it sets (no scalar-only shared nodes)`);
+  }
+  if (typeof effect !== 'function') throw new Error(`shared node ${id}: effect must be a function`);
+  return Object.freeze({
+    id, kind: 'shared',
+    family, flag,
+    parents: Object.freeze([...parents]),
+    cost, label, blurb, effect,
+    iconHint: iconHint || null,
+  });
+}
+
 // Stat-tune node. effect mutates the parent tool's STATS slot.
 export function statNode({ id, parents = [], cost, label, blurb, effect, toolId, iconHint }) {
   validateCommon({ id, parents, label, blurb, cost, allowZeroCost: false });

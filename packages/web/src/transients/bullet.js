@@ -2,8 +2,9 @@ import Matter from 'matter-js';
 import * as P from '../particles.js';
 // mood via ctx.reactTo (source taken from self._verb set by the spawning ability).
 import { stun } from '../physics/stand.js';
-import { isBrittle } from '../effects/registry.js';
-import { shatter } from '../abilities/_shared.js';
+import { isBrittle, hasStatus, applyStatus } from '../effects/registry.js';
+import { shatter, explode } from '../abilities/_shared.js';
+import { getFamilyStats } from '../abilities/_stats.js';
 
 const { Body } = Matter;
 
@@ -32,5 +33,24 @@ export default {
     P.burst(self.position.x, self.position.y, Math.min(20, 8 + dmg), { type: 'spark', color: '#f25c5c', size: 3, life: 380, speedRange: 0.9 });
     P.burst(self.position.x, self.position.y, 4, { type: 'smoke', color: '#666', size: 6, life: 400, speedRange: 0.3, gravity: -0.0002 });
     ctx.screenShake(Math.min(8, 2 + dmg * 0.3), 100);
+
+    // Firearms ammo mods (cross-tool shared flags from the firearms family
+    // bag). Owned once, they apply to EVERY firearm's rounds — that's the
+    // payoff of the `shared` node kind.
+    const ammo = getFamilyStats('firearms');
+    if (ammo.hollowPoint) {
+      applyStatus(ctx.status, target, 'bleed', { source: self._verb || 'bullet' });
+    }
+    if (ammo.incendiary && !hasStatus(ctx.status, target, 'frozen')) {
+      applyStatus(ctx.status, target, 'on_fire', { source: self._verb || 'bullet' });
+    }
+    if (ammo.he) {
+      // Small high-explosive pop on impact. Silent + low-shake so rapid fire
+      // doesn't turn into a screen-quake; the AOE is the point.
+      explode(ctx, self.position.x, self.position.y, {
+        radius: 60, baseVel: 6, upBias: 2, moodDelta: -3,
+        stunMs: 0, shake: 2, igniteMs: 0, sound: null, limpMs: 0,
+      });
+    }
   },
 };

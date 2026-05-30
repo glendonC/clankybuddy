@@ -15,9 +15,10 @@ import { markHit } from '../physics/secondary.js';
 import { getCurrentBuddy } from '../state/ragdoll-lifecycle.js';
 import { showCombo } from '../ui/overlays.js';
 import { getMasterMul } from '../progression/master-mults.js';
+import { getFamilyStats } from './_stats.js';
 import { HIT_STOP } from '../physics/constants.js';
 
-const { Body, Composite, Vector } = Matter;
+const { Body, Bodies, Composite, Vector } = Matter;
 
 // --- Vector helpers (consolidated from per-ability hand-rolls) ---
 
@@ -85,6 +86,32 @@ export function partInRange(ragdoll, x, y, range) {
   if (!part) return null;
   const d = Math.hypot(part.position.x - x, part.position.y - y);
   return d <= range ? part : null;
+}
+
+// Aimed-firearm tool ids. These route their cursor + apply through aimAngle()
+// so the auto-aim ("aimbot") is gated behind the firearms shared unlock
+// instead of being always-on. Everything else keeps cursor-faces-nearest-part.
+export const AIMED_FIREARMS = new Set(['gun', 'machinegun', 'smg', 'shotgun', 'rocket']);
+
+// Resolve the firing angle for an aimed weapon. With the `aimbot` family flag
+// unlocked, it locks onto the NEAREST part (returns that part as `target` so
+// the cursor can draw the aim-line + reticle). Without it — the manual
+// baseline — it fires along the ray to the ragdoll CENTROID and returns
+// `target: null` (the cursor shows a plain crosshair, no lock). `ok` is false
+// only when there's no buddy to aim at.
+export function aimAngle(ragdoll, x, y, family = 'firearms') {
+  const parts = ragdoll?.parts || [];
+  if (!parts.length) return { angle: 0, target: null, ok: false };
+  const fam = getFamilyStats(family);
+  if (fam?.aimbot) {
+    const target = nearestPart(ragdoll, x, y);
+    return { angle: Math.atan2(target.position.y - y, target.position.x - x), target, ok: true };
+  }
+  // Manual: aim at the centroid of the ragdoll (not the optimal nearest part).
+  let cx = 0, cy = 0;
+  for (const p of parts) { cx += p.position.x; cy += p.position.y; }
+  cx /= parts.length; cy /= parts.length;
+  return { angle: Math.atan2(cy - y, cx - x), target: null, ok: true };
 }
 
 export function applyImpulse(part, fx, fy) {
@@ -269,6 +296,97 @@ export function shatter(ctx, part) {
   hitStop?.(HIT_STOP.shatter.ms, HIT_STOP.shatter.scale);  // brief slow-mo so you SEE the shatter
   showCombo?.('SHATTER!', '#9be7ff');
   popBubble(part, '*kchhhhing*');
+}
+
+// Falling-object drop factory. Generalizes the anvil pattern (spawn a heavy
+// body offscreen-above, let gravity accelerate it, squash the nearest part +
+// splash neighbors on impact) so brick / bowling ball / piano / car / fridge
+// all share one code path. The body falls under real gravity (low initial
+// velocity → "wait for it" anticipation); `cfg` tunes mass, footprint, and
+// the impact response. Returns the spawned body so callers can attach an
+// overlay (anvil's drop reticle) before it lands.
+//
+// cfg knobs:
+//   partType, verb            transient key + telemetry/speech source
+//   shape 'rect'|'circle', w/h | radius
+//   density, restitution, friction
+//   dropHeight, initVel, lifeMs
+//   mood                      mood damage on impact (positive; subtracted)
+//   squashVel                 downward velocity slammed onto the struck part
+//   splashRadius, splashForce neighbor shove
+//   roll                      angular velocity kicked onto the struck part (bowling/fridge tumble)
+//   igniteMs                  >0 → ignite the struck part
+//   shake, shakeMs, hitStopTier ('light'|'heavy'|'explosion'|'mega'|null)
+//   sfxName                   played on spawn
+//   impactSfx                 played on impact
+//   particles(ctx2, bx, by)   optional impact particle override
+//   onImpact(b, world, ctx2, part)  optional extra impact hook
+export function spawnDrop(ctx, cfg) {
+  const {
+    partType, verb,
+    shape = 'rect', w = 80, h = 48, radius = 20,
+    density = 0.012, restitution = 0.05, friction = 0.9,
+    dropHeight = 640, initVel = 4, lifeMs = 2600,
+    mood = 16, squashVel = 16, splashRadius = 100, splashForce = 5,
+    roll = 0, igniteMs = 0,
+    shake = 12, shakeMs = 500, hitStopTier = 'heavy',
+    sfxName, impactSfx, particles, onImpact,
+  } = cfg;
+  const { world, x, y } = ctx;
+  const srcVerb = verb || ctx._verb || partType;
+  const opts = { density, restitution, friction, label: partType, render: { visible: false } };
+  const body = shape === 'circle'
+    ? Bodies.circle(x, y - dropHeight, radius, opts)
+    : Bodies.rectangle(x, y - dropHeight, w, h, opts);
+  body.partType = partType;
+  body._verb = srcVerb;
+  body.bornAt = performance.now();
+  body.lifeMs = lifeMs;
+  body.onHit = (b, _world, ctx2) => {
+    if (b._didDropHit) return; b._didDropHit = true;
+    const part = nearestPart(ctx2.ragdoll, b.position.x, b.position.y);
+    if (part) {
+      if (isBrittle(ctx2.status, part)) shatter(ctx2, part);
+      Body.setVelocity(part, { x: part.velocity.x, y: part.velocity.y + squashVel });
+      if (roll) Body.setAngularVelocity(part, part.angularVelocity + (Math.random() < 0.5 ? -roll : roll));
+      for (const other of ctx2.ragdoll.parts) {
+        if (other === part) continue;
+        const dx = other.position.x - part.position.x;
+        const dy = other.position.y - part.position.y;
+        const d = Math.hypot(dx, dy) || 1;
+        if (d < splashRadius) {
+          const f = (1 - d / splashRadius) * splashForce;
+          Body.setVelocity(other, {
+            x: other.velocity.x + (dx / d) * f,
+            y: other.velocity.y + (dy / d) * f * 0.4 + squashVel * 0.2,
+          });
+        }
+      }
+      if (igniteMs > 0 && !hasStatus(ctx2.status, part, 'frozen')) {
+        applyStatus(ctx2.status, part, 'on_fire', { source: srcVerb });
+      }
+      ctx2.reactTo?.({ source: srcVerb, part, moodDelta: -mood, impulse: squashVel, speakMs: 700 });
+    } else {
+      ctx2.reactTo?.({ source: srcVerb, moodDelta: -mood, speakMs: 99999 });
+    }
+    stun(ctx2.ragdoll, 1000);
+    goLimp(ctx2.ragdoll, 600);
+    ctx2.screenShake(shake, shakeMs);
+    if (hitStopTier && ctx2.hitStop?.[hitStopTier]) ctx2.hitStop[hitStopTier]();
+    if (particles) {
+      particles(ctx2, b.position.x, b.position.y);
+    } else {
+      P.burst(b.position.x, b.position.y, 16, { type: 'smoke', color: '#333', size: 16, life: 800, speedRange: 0.6, gravity: -0.0004 });
+      P.burst(b.position.x, b.position.y,  8, { type: 'spark', color: '#fff', size: 3,  life: 240, speedRange: 1.2 });
+    }
+    if (impactSfx && sfx[impactSfx]) sfx[impactSfx]();
+    if (onImpact) onImpact(b, _world, ctx2, part);
+  };
+  Body.setVelocity(body, { x: 0, y: initVel });
+  Composite.add(world, body);
+  ctx.transientBodies.push(body);
+  if (sfxName && sfx[sfxName]) sfx[sfxName]();
+  return body;
 }
 
 // Lightning hits a burning part: small explosion, ignites neighbors.

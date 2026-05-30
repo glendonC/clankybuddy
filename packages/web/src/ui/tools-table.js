@@ -12,23 +12,23 @@ export const TOOLS = [
   // POSITIVE / affection
   { id: 'pet',         label: 'pet',          key: '1', kind: 'hold',      delta: '+1/t', spine: 'positive', group: 'affection',
     blurb: 'gentle continuous stroke, drag along the body' },
-  { id: 'compliment',  label: 'glaze',        key: '3', kind: 'click',     delta: '+6→',  spine: 'positive', group: 'affection', cost: 50,
-    blurb: 'spam praise, combo bonus. chain ×3 over-flatters them → next attack hits ×1.5.' },
 
   // POSITIVE / provision (folded `gifts` + `blessings` in Phase 1)
   { id: 'feed',        label: 'treat',        key: '2', kind: 'click',     delta: '+4',   spine: 'positive', group: 'provision',
     blurb: 'drops a cookie they bite' },
   { id: 'gift',        label: 'gift',         key: '4', kind: 'click',     delta: '+10',  spine: 'positive', group: 'provision', cost: 80,
     blurb: 'wrapped box, biggest standard boost' },
-  { id: 'gpu',         label: 'gpu',          key: '5', kind: 'click',     delta: '+60',  spine: 'positive', group: 'provision', cost: 200,
-    blurb: 'drops a graphics card, buddy glows for ~5s, big sustained boost. cleans bleed.' },
+  { id: 'first_aid',   label: 'first aid',    key: '3', kind: 'click',     delta: '+18',  spine: 'positive', group: 'provision', cost: 90,
+    blurb: 'patch them up: mood boost + clears BLEED and ON_FIRE off every part' },
 
   // NEGATIVE / kinetic (renamed from `melee`)
   { id: 'punch',       label: 'punch',        key: 'Q', kind: 'click',     delta: '−8',   spine: 'negative', group: 'kinetic',
     blurb: 'fast point impulse where you click' },
+  { id: 'brass_knuckles',label: 'brass knuckles',key: 'A', kind: 'click',  delta: '−9+concuss',spine: 'negative', group: 'kinetic', cost: 90,
+    blurb: 'a punch that leaves the part CONCUSSED → the next hit lands ×1.5. self-chains.' },
   { id: 'hammer',      label: 'hammer',       key: 'W', kind: 'click',     delta: '−16',  spine: 'negative', group: 'kinetic', cost: 75,
     blurb: 'heavy single strike, big knockback' },
-  { id: 'sword',       label: 'lightsaber',   key: 'E', kind: 'hold+drag', delta: '−2/t', spine: 'negative', group: 'kinetic', cost: 150,
+  { id: 'sword',       label: 'machete',      key: 'E', kind: 'hold+drag', delta: '−2/t', spine: 'negative', group: 'kinetic', cost: 150,
     blurb: 'hold and drag through them, slice continuously' },
   { id: 'whip',        label: 'whip',         key: 'K', kind: 'click',     delta: '−5+chain',spine: 'negative', group: 'kinetic', cost: 110,
     blurb: 'chain-hit. primary part takes a welt + 2 nearest take echoes. all four lashed for 4s.' },
@@ -37,32 +37,38 @@ export const TOOLS = [
 
   // NEGATIVE / ordnance (renamed from `ranged`; lightning joined this
   // group in Phase 2, it's a ranged-form damage tool, not a status DoT)
-  { id: 'gun',         label: 'pistol',       key: 'G', kind: 'click',     delta: '−10',  spine: 'negative', group: 'ordnance', cost: 75,
+  { id: 'gun',         label: 'pistol',       key: 'G', kind: 'click',     delta: '−10',  spine: 'negative', group: 'ordnance', family: 'firearms', cost: 75,
     blurb: 'one-shot pistol, fast aim, light damage' },
-  { id: 'machinegun',  label: 'machine gun',  key: 'R', kind: 'hold',      delta: '−1/r', spine: 'negative', group: 'ordnance', cost: 100,
+  { id: 'revolver',    label: 'revolver',     key: '6', kind: 'click',     delta: '−18',  spine: 'negative', group: 'ordnance', family: 'firearms', cost: 140,
+    blurb: 'six heavy magnum shots with big stun, then a forced reload' },
+  { id: 'machinegun',  label: 'machine gun',  key: 'R', kind: 'hold',      delta: '−1/r', spine: 'negative', group: 'ordnance', family: 'firearms', cost: 100,
     blurb: 'spray bullets, hold to fire, shells eject' },
-  { id: 'shotgun',     label: 'shotgun',      key: 'T', kind: 'click',     delta: '−20',  spine: 'negative', group: 'ordnance', cost: 120,
+  { id: 'smg',         label: 'smg',          key: 'S', kind: 'hold',      delta: '−1/r', spine: 'negative', group: 'ordnance', family: 'firearms', cost: 130,
+    blurb: 'mobile bullet-hose, fast fire. accuracy blooms wider the longer you hold.' },
+  { id: 'assault_rifle',label: 'assault rifle',key: '7', kind: 'hold',     delta: '−3/r', spine: 'negative', group: 'ordnance', family: 'firearms', cost: 180,
+    blurb: 'hold to spray; the cone climbs with recoil. control your bursts.' },
+  { id: 'lmg',         label: 'lmg',          key: '8', kind: 'hold',      delta: '−3/r', spine: 'negative', group: 'ordnance', family: 'firearms', cost: 260,
+    blurb: 'belt-fed: spins up from weak to a wall of lead, then keeps going' },
+  { id: 'minigun',     label: 'minigun',      key: '9', kind: 'hold',      delta: '−2/r', spine: 'negative', group: 'ordnance', family: 'firearms', cost: 400,
+    blurb: 'fastest fire rate, but the barrel locks where you opened up' },
+  { id: 'shotgun',     label: 'shotgun',      key: 'T', kind: 'click',     delta: '−20',  spine: 'negative', group: 'ordnance', family: 'firearms', cost: 120,
     blurb: 'close-range cone, massive knockback, falls off with distance' },
-  { id: 'rocket',      label: 'rocket',       key: 'Y', kind: 'click',     delta: '−35',  spine: 'negative', group: 'ordnance', cost: 200,
+  { id: 'rocket',      label: 'rocket',       key: 'Y', kind: 'click',     delta: '−35',  spine: 'negative', group: 'ordnance', family: 'firearms', cost: 200,
     blurb: 'straight-line projectile + huge splash' },
   { id: 'grenade',     label: 'molotov',      key: 'I', kind: 'drag',      delta: '−25',  spine: 'negative', group: 'ordnance', cost: 120,
     blurb: 'drag to lob, 2s fuse, area boom + lingering fire pool' },
+  { id: 'frag_grenade',label: 'frag grenade', key: 'J', kind: 'drag',      delta: '−22+shrapnel',spine: 'negative', group: 'ordnance', cost: 150,
+    blurb: 'drag to lob, 2s fuse, dry blast + a radial spray of shrapnel' },
   { id: 'lightning',   label: 'lightning',    key: 'P', kind: 'click',     delta: '−14',  spine: 'negative', group: 'ordnance', cost: 250,
     blurb: 'sky bolt + branching forks. pairs with ice (CONDUCT) and fire (COMBUST).' },
   { id: 'sawblade',    label: 'saw blade',    key: 'L', kind: 'click',     delta: '−12',  spine: 'negative', group: 'ordnance', cost: 180,
     blurb: 'spinning disc ricochets off walls, pure impact damage, no DoT.' },
 
-  // NEGATIVE / corruption (renamed from `elemental`). Gaslight folded in
-  // from the retired `injection` group, same family as poison (head-
-  // targeted persistent debuff), one-tool injection group was hollow.
-  { id: 'gaslight',    label: 'gaslight',     key: 'J', kind: 'click',     delta: '−3/t', spine: 'negative', group: 'corruption', cd: 8,  cost: 180,
-    blurb: 'hijacks the buddy\'s speech for 12s, they trash-talk themselves while you rack up mood damage. cancels glaze.' },
+  // NEGATIVE / corruption (renamed from `elemental`).
   { id: 'fireball',    label: 'fireball',     key: 'U', kind: 'click',     delta: '−22',  spine: 'negative', group: 'corruption', cost: 180,
     blurb: 'lobbed magic, splash + fire pool on impact' },
   { id: 'flamethrower',label: 'flamethrower', key: 'O', kind: 'hold',      delta: '−1/t', spine: 'negative', group: 'corruption', cost: 140,
     blurb: 'continuous flame stream' },
-  { id: 'mode_collapse',label: 'poison',      key: 'V', kind: 'drag',      delta: '−1.5×',spine: 'negative', group: 'corruption', cost: 260,
-    blurb: 'drag to drop a zone. 3 buddy passes through it → 12s POISONED (×1.5 damage taken).' },
 
   // NEGATIVE / cataclysm (renamed from `god`), gravity & screen-clearing drama buttons
   { id: 'anvil',       label: 'anvil',        key: 'Z', kind: 'click',     delta: '−30',  spine: 'negative', group: 'cataclysm', cd: 6,  cost: 300,
@@ -71,8 +77,16 @@ export const TOOLS = [
     blurb: 'singularity sucks them in 3s, then ejection.' },
   { id: 'nuke',        label: 'nuke',         key: 'C', kind: 'click',     delta: '−100', spine: 'negative', group: 'cataclysm', cd: 60, cost: 1000,
     blurb: 'full-screen white-out · total annihilation.' },
-  { id: 'force_quit',  label: 'execute',      key: 'B', kind: 'click',     delta: 'BROKEN',spine: 'negative', group: 'cataclysm', cd: 60, cost: 800,
-    blurb: 'finisher, only fires on HURT or BROKEN. 1.5s intangible window, then mood wipe.' },
+  { id: 'force_quit',  label: 'coup de grâce',key: 'B', kind: 'click',     delta: 'BROKEN',spine: 'negative', group: 'cataclysm', cd: 60, cost: 800,
+    blurb: 'finisher, only fires on HURT or BROKEN. 1.5s window, then the mood floor drops out.' },
+
+  // NEGATIVE / siege, heavy objects you drop from above to pancake the buddy
+  { id: 'brick',       label: 'brick',        key: 'V', kind: 'click',     delta: '−12',  spine: 'negative', group: 'siege', cost: 60,
+    blurb: 'drop a brick on your cursor, pancakes the nearest part' },
+  { id: 'bowling_ball',label: 'bowling ball', key: 'D', kind: 'click',     delta: '−16',  spine: 'negative', group: 'siege', cost: 120,
+    blurb: 'drops and rolls, scattering parts as it tumbles through' },
+  { id: 'piano',       label: 'piano',        key: '5', kind: 'click',     delta: '−26',  spine: 'negative', group: 'siege', cost: 220,
+    blurb: 'a wide upright piano lands across multiple parts at once' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It
@@ -108,6 +122,7 @@ export const TAXONOMY = [
     { id: 'ordnance',   label: 'ordnance' },
     { id: 'corruption', label: 'corruption' },
     { id: 'cataclysm',  label: 'cataclysm' },
+    { id: 'siege',      label: 'siege' },
   ]},
   { spine: 'utility', groups: [
     { id: 'manipulation', label: 'manipulation' },

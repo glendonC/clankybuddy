@@ -1,9 +1,9 @@
 import Matter from 'matter-js';
 import * as P from '../../particles.js';
 import { sfx } from '../../audio/sfx.js';
-import { drawAimLine } from '../../render/shared-cursor.js';
+import { drawAimLine, drawCrosshair } from '../../render/shared-cursor.js';
 import { getStats } from '../_stats.js';
-import { nearestPart } from '../_shared.js';
+import { aimAngle } from '../_shared.js';
 
 const { Body, Bodies, Composite } = Matter;
 
@@ -21,9 +21,8 @@ export default {
   apply(ctx) {
     const s = getStats('gun');
     const { ragdoll, world, x, y, screenShake } = ctx;
-    const target = nearestPart(ragdoll, x, y);
-    if (!target) return;
-    const angle = Math.atan2(target.position.y - y, target.position.x - x);
+    const { angle, ok } = aimAngle(ragdoll, x, y);
+    if (!ok) return;
     const muzzleX = x + Math.cos(angle) * 24;
     const muzzleY = y + Math.sin(angle) * 24;
     const vx = Math.cos(angle) * s.speed, vy = Math.sin(angle) * s.speed;
@@ -48,7 +47,7 @@ export default {
     P.burst(muzzleX, muzzleY,  4, { type: 'smoke', color: '#888',    size: 6, life: 350, speedRange: 0.3, gravity: -0.0002 });
   },
   drawCursor(ctx, { x, y, target, angle }) {
-    drawAimLine(ctx, x, y, target);
+    if (target) drawAimLine(ctx, x, y, target); else drawCrosshair(ctx, x, y);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle);

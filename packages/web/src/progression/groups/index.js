@@ -7,6 +7,7 @@ import kinetic      from './kinetic.js';
 import ordnance     from './ordnance.js';
 import corruption   from './corruption.js';
 import cataclysm    from './cataclysm.js';
+import siege        from './siege.js';
 import manipulation from './manipulation.js';
 
 import { TOOLS_BY_ID } from '../../ui/tools-table.js';
@@ -17,12 +18,13 @@ import { TOOLS_BY_ID } from '../../ui/tools-table.js';
 // retired in Phase 7's visceral kit redirect (citation folded out;
 // gaslight folded into corruption).
 export const GROUP_TREES = {
-  affection, provision, kinetic, ordnance, corruption, cataclysm, manipulation,
+  affection, provision, kinetic, ordnance, corruption, cataclysm, siege, manipulation,
 };
 
 const NODES_BY_ID = new Map();
 const NODES_BY_GROUP = new Map();
 const NODES_BY_TOOL = new Map();
+const NODES_BY_FAMILY = new Map();   // kind:'shared' nodes, keyed by family
 
 for (const [groupId, nodes] of Object.entries(GROUP_TREES)) {
   if (!Array.isArray(nodes)) throw new Error(`group ${groupId}: not an array`);
@@ -34,8 +36,14 @@ for (const [groupId, nodes] of Object.entries(GROUP_TREES)) {
       throw new Error(`group ${groupId}: tool node ${n.id} references unknown tool '${n.toolId}'`);
     }
     NODES_BY_ID.set(n.id, n);
-    if (!NODES_BY_TOOL.has(n.toolId)) NODES_BY_TOOL.set(n.toolId, []);
-    NODES_BY_TOOL.get(n.toolId).push(n);
+    // Shared nodes have no toolId — index them by family instead.
+    if (n.toolId) {
+      if (!NODES_BY_TOOL.has(n.toolId)) NODES_BY_TOOL.set(n.toolId, []);
+      NODES_BY_TOOL.get(n.toolId).push(n);
+    } else if (n.kind === 'shared') {
+      if (!NODES_BY_FAMILY.has(n.family)) NODES_BY_FAMILY.set(n.family, []);
+      NODES_BY_FAMILY.get(n.family).push(n);
+    }
   }
 }
 
@@ -85,6 +93,7 @@ export function getGroupNode(id)       { return NODES_BY_ID.get(id) || null; }
 export function getGroupTier(id)       { return TIER.get(id) || 1; }
 export function getGroupChildren(id)   { return CHILDREN.get(id) || []; }
 export function getNodesForTool(toolId) { return NODES_BY_TOOL.get(toolId) || []; }
+export function getSharedNodesForFamily(family) { return NODES_BY_FAMILY.get(family) || []; }
 export function getAllGroupNodes()     { return [...NODES_BY_ID.values()]; }
 
 // Default-unlocked tool nodes, those with cost: 0 are considered owned at

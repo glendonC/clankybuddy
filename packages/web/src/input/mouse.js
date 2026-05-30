@@ -22,8 +22,12 @@ const { Events } = Matter;
 const FIRE_INTERVAL = {
   pet: 30,
   flamethrower: 30,
-  sword: 50,                      // lightsaber sweep
+  sword: 50,                      // machete sweep
   machinegun: 70,
+  smg: 50,                        // faster than the MG
+  assault_rifle: 90,              // measured, semi-ish cadence
+  lmg: 70,                        // belt-fed
+  minigun: 40,                    // hose
 };
 
 let isDown = false;

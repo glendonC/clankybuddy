@@ -16,12 +16,9 @@ import electrified      from './electrified.js';
 import powered          from './powered.js';
 import inBlackhole      from './in-blackhole.js';
 import concussed        from './concussed.js';
-import sycophancyFed    from './sycophancy-fed.js';
 import aligned          from './aligned.js';
-import modeCollapse     from './mode-collapse.js';
-import selfLoathing     from './self-loathing.js';
 import lashed           from './lashed.js';
-import forceQuitActive  from './force-quit-active.js';
+import finishing        from './finishing.js';
 import antitrustSplit   from './antitrust-split.js';
 import bleed            from './bleed.js';
 import * as P from '../particles.js';
@@ -35,23 +32,12 @@ const EFFECTS = {
   powered,
   in_blackhole: inBlackhole,
   concussed,
-  // Phase 3 of the 2026-05-02 ability redesign, see docs/abilities.md.
-  // `aligned` retained as Compliance Theater event's producer; the
-  // `alignment_tax` ability that originally cast it retired in Phase 7.
-  // `deprecated` retired with the deprecation ability in Phase 7.
-  sycophancy_fed: sycophancyFed,
+  // `aligned` retained as Compliance Theater event's producer.
   aligned,
-  // `quantized` retired in Phase 7, its producer (the `quantize`
-  // ability) never shipped; the effect was dead surface area. Re-add
-  // here when the producer ships.
-  // Phase 4.
-  mode_collapse: modeCollapse,
-  // Phase 7, visceral kit redirect.
-  self_loathing: selfLoathing,
   lashed,
   bleed,
-  force_quit_active: forceQuitActive,
-  // Phase 7, mode events with teeth.
+  finishing,
+  // Mode events with teeth.
   antitrust_split: antitrustSplit,
 };
 
@@ -173,17 +159,15 @@ export function isBrittle(reg, part) {
 //   - ALIGNED checked FIRST. 30% chance to fully block (return 0). The
 //     model "refuses" the attack; concussed/etc. do not consume because
 //     mul never crossed > 1.
-//   - Concussed (×1.5), sycophancy_fed (×1.5), and mode_collapse (×1.5)
-//     stack multiplicatively when the hit lands.
-// Buddy-wide statuses (aligned/sycophancy_fed/mode_collapse) are stored
-// on the head canonically but checked via `buddyHas()` so the multiplier
-// fires regardless of which part takes the hit. Concussed stays per-part
+//   - Concussed (×1.5) and antitrust_split (×2) stack multiplicatively
+//     when the hit lands.
+// Buddy-wide statuses (aligned/antitrust_split) are stored on the head
+// canonically but checked via `buddyHas()` so the multiplier fires
+// regardless of which part takes the hit. Concussed stays per-part
 // (you can concuss the leg without affecting head hits).
 // Callers consume the *concussed* buff via consumeConcussed() once
 // they've applied the multiplied damage; for AOE callers (explode),
 // pass the part that owns the buff so we don't consume twice.
-// SYCOPHANCY-FED / QUANTIZED do NOT consume, they're duration-bound
-// debuffs and stay until they expire.
 export function buddyHas(reg, effect) {
   for (const slot of reg.map.values()) {
     if (slot.has(effect)) return true;
@@ -193,9 +177,9 @@ export function buddyHas(reg, effect) {
 
 export function damageMul(reg, part) {
   if (!part) return 1;
-  // FORCE_QUIT_ACTIVE, buddy is intangible during the kill -9 window.
-  // Voids damage entirely; the ability's own setTimeout pays the wipe.
-  if (buddyHas(reg, 'force_quit_active')) return 0;
+  // FINISHING, buddy is in the coup de grâce kill window. Voids damage
+  // entirely; the ability's own setTimeout pays the wipe.
+  if (buddyHas(reg, 'finishing')) return 0;
   if (buddyHas(reg, 'aligned') && Math.random() < 0.30) {
     for (const cb of _blockListeners) {
       try { cb(part); } catch (e) { console.warn('block listener threw', e); }
@@ -211,8 +195,6 @@ export function damageMul(reg, part) {
   }
   let mul = 1;
   if (hasStatus(reg, part, 'concussed'))      mul *= 1.5;
-  if (buddyHas(reg, 'sycophancy_fed'))        mul *= 1.5;
-  if (buddyHas(reg, 'mode_collapse'))         mul *= 1.5;
   if (buddyHas(reg, 'antitrust_split'))       mul *= 2;
   return mul;
 }

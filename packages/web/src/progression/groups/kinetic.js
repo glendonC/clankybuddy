@@ -17,6 +17,13 @@ export default [
     blurb: 'Fast point impulse. The fundamental.',
   }),
 
+  // Brass knuckles, punch that leaves CONCUSSED so hits self-chain (×1.5).
+  toolNode({
+    id: 'g.kinetic.brass_knuckles', parents: ['g.kinetic.punch'], cost: 90, toolId: 'brass_knuckles',
+    label: 'brass knuckles',
+    blurb: 'Punch that leaves the part CONCUSSED, the next hit lands ×1.5.',
+  }),
+
   // ── A: Haymaker (slow, heavy single, knockback) ─────────────────
   statNode({
     id: 'g.kinetic.punch.haymaker', parents: ['g.kinetic.punch'], cost: 150, toolId: 'punch',
@@ -108,16 +115,16 @@ export default [
   }),
   statNode({
     id: 'g.kinetic.hammer.thunder', parents: ['g.kinetic.hammer.swing', 'g.kinetic.hammer.heft'], cost: 1200, toolId: 'hammer',
-    label: 'Thunder Slam',
+    label: 'Sledgehammer',
     iconHint: '⚡',
     blurb: 'Each hit lands with mega-tier shake + concussed AOE.',
     effect: (s) => { s.shake = 22; s.concussedMs = 2400; s.brittleBonus = 1.8; },
   }),
 
-  // ── Sword branch (existing Phase 1 node + Phase 7 stat tunes) ───
+  // ── Machete branch (tool id 'sword', legacy internal id) ───────
   toolNode({
     id: 'g.kinetic.sword', parents: ['g.kinetic.punch'], cost: 150, toolId: 'sword',
-    label: 'lightsaber',
+    label: 'machete',
     blurb: 'Hold and drag through them, slice continuously.',
   }),
   statNode({

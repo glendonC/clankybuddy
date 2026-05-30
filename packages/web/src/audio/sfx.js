@@ -6,9 +6,9 @@ import { beep, noise, preTransientClick } from './core.js';
 export const sfx = {
   pet:   () => beep({ freq: 880, dur: 0.1, type: 'sine', vol: 0.08, sweep: 220 }),
   feed:  () => beep({ freq: 660, dur: 0.12, type: 'triangle', vol: 0.1, sweep: 200 }),
-  compliment: () => { beep({ freq: 700, dur: 0.08 }); setTimeout(()=>beep({ freq: 1040, dur: 0.1 }), 80); },
   gift:  () => { beep({ freq: 520, dur: 0.08 }); setTimeout(()=>beep({ freq: 780, dur: 0.08 }), 70); setTimeout(()=>beep({ freq: 1040, dur: 0.12 }), 140); },
-  gpu:   () => { beep({ freq: 1320, dur: 0.05, type: 'sine', vol: 0.08 }); setTimeout(()=>beep({ freq: 1760, dur: 0.06, type: 'sine', vol: 0.08 }), 60); setTimeout(()=>beep({ freq: 2640, dur: 0.18, type: 'sine', vol: 0.08, sweep: 200 }), 120); },
+  // Ascending three-note ding (used by the gift burst).
+  chime: () => { beep({ freq: 1320, dur: 0.05, type: 'sine', vol: 0.08 }); setTimeout(()=>beep({ freq: 1760, dur: 0.06, type: 'sine', vol: 0.08 }), 60); setTimeout(()=>beep({ freq: 2640, dur: 0.18, type: 'sine', vol: 0.08, sweep: 200 }), 120); },
   punch: () => { beep({ freq: 180, dur: 0.07, type: 'square', vol: 0.18, sweep: -120 }); noise({ dur: 0.06, vol: 0.1 }); },
   hammer:() => { beep({ freq: 90, dur: 0.16, type: 'sawtooth', vol: 0.22, sweep: -50 }); noise({ dur: 0.18, vol: 0.18, lpFreq: 600 }); },
   bomb:  () => { beep({ freq: 60, dur: 0.4, type: 'sawtooth', vol: 0.25, sweep: -40 }); noise({ dur: 0.5, vol: 0.3, lpFreq: 800 }); },
@@ -32,6 +32,8 @@ export const sfx = {
     setTimeout(() => noise({ dur: 0.03, vol: 0.10, lpFreq: 8000 }), 100);
   },
   gun:   () => { beep({ freq: 220, dur: 0.05, type: 'square', vol: 0.2, sweep: -160 }); noise({ dur: 0.05, vol: 0.16 }); },
+  // Deeper, louder than the pistol — magnum boom.
+  revolver: () => { beep({ freq: 140, dur: 0.1, type: 'square', vol: 0.26, sweep: -100 }); noise({ dur: 0.12, vol: 0.24, lpFreq: 1200 }); },
   freeze:() => { beep({ freq: 900, dur: 0.18, type: 'sine', vol: 0.12, sweep: -700 }); },
   sword: () => { beep({ freq: 2200, dur: 0.06, type: 'sine', vol: 0.1, sweep: -1600 }); noise({ dur: 0.08, vol: 0.06, lpFreq: 4000 }); },
   // pitch-randomized so spray doesn't feel sample-locked
@@ -53,4 +55,16 @@ export const sfx = {
   release: () => beep({ freq: 540, dur: 0.05, type: 'sine',   vol: 0.06, sweep: -280 }),
   // Phase 7, sharp crack: high-pitched whistle into a noise pop.
   whip:    () => { beep({ freq: 2400, dur: 0.04, type: 'triangle', vol: 0.10, sweep: -1800 }); noise({ dur: 0.06, vol: 0.18, lpFreq: 8000 }); },
+  // Dull heavy thud (brick / bowling ball landing).
+  thud:    () => { beep({ freq: 110, dur: 0.14, type: 'sine', vol: 0.22, sweep: -60 }); noise({ dur: 0.12, vol: 0.16, lpFreq: 500 }); },
+  // Dissonant piano crash: a clustered low chord + wood-splinter noise.
+  piano:   () => {
+    beep({ freq: 130, dur: 0.5, type: 'triangle', vol: 0.16, sweep: -20 });
+    beep({ freq: 138, dur: 0.5, type: 'triangle', vol: 0.12 });          // detuned for the clash
+    beep({ freq: 196, dur: 0.45, type: 'sine', vol: 0.10, sweep: -30 });
+    noise({ dur: 0.3, vol: 0.2, lpFreq: 900 });
+    beep({ freq: 70, dur: 0.3, type: 'sawtooth', vol: 0.24, sweep: -20 }); // cabinet thud
+  },
+  // Soft ascending two-note relief chime (first aid).
+  heal:    () => { beep({ freq: 740, dur: 0.12, type: 'sine', vol: 0.08, sweep: 120 }); setTimeout(()=>beep({ freq: 1110, dur: 0.16, type: 'sine', vol: 0.07, sweep: 80 }), 90); },
 };

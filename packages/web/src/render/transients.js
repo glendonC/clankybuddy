@@ -1,5 +1,5 @@
 // Transient body renderer. Pass A4 will split this into per-type modules
-// (transients/{treat,gift,bullet,gpu,rocket,fireball,grenade,anvil,firepool}.js)
+// (transients/{treat,gift,bullet,rocket,fireball,grenade,anvil,firepool}.js)
 // owning both their `onHit`/`onExpire` and their `render`. For now everything
 // is co-located here so the renderer split can ship independently.
 
@@ -45,20 +45,6 @@ export function renderTransients(ctx, bodies) {
       // hot core
       ctx.fillStyle = '#fff';
       ctx.beginPath(); ctx.arc(0, 0, 1.6, 0, Math.PI * 2); ctx.fill();
-      ctx.restore();
-    } else if (b.partType === 'gpu') {
-      // green PCB rectangle with two darker chip squares + gold pins
-      ctx.save();
-      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
-      ctx.fillStyle = '#0a3d2a';
-      ctx.fillRect(-28, -12, 56, 24);
-      ctx.fillStyle = '#5cf2a0';
-      ctx.fillRect(-26, -10, 52, 20);
-      ctx.fillStyle = '#0a3d2a';
-      ctx.fillRect(-20, -6, 14, 12);
-      ctx.fillRect(  6, -6, 14, 12);
-      ctx.fillStyle = '#f2c45c';
-      for (let i = -22; i <= 22; i += 4) ctx.fillRect(i, 10, 2, 2);
       ctx.restore();
     } else if (b.partType === 'rocket') {
       ctx.save();
@@ -135,28 +121,57 @@ export function renderTransients(ctx, bodies) {
       }
       ctx.restore();
     } else if (b.partType === 'anvil') {
-      // Server-rack visual (Phase 2 rename, partType key stays `anvil`).
+      // Real anvil: tapered horn, top face, narrow waist, splayed base.
       ctx.save();
       ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
-      // Chassis
-      ctx.fillStyle = '#1a1a1d';
-      ctx.fillRect(-48, -32, 96, 64);
-      // Top trim band
-      ctx.fillStyle = '#2a2a2e';
-      ctx.fillRect(-48, -32, 96, 4);
-      // 1U slot dividers, horizontal lines across the face
-      ctx.fillStyle = 'rgba(255,255,255,0.07)';
-      for (let i = 0; i < 4; i++) {
-        ctx.fillRect(-44, -22 + i * 14, 88, 1);
-      }
-      // Status LEDs (green link + amber activity)
-      ctx.fillStyle = '#5cf08a';
-      ctx.fillRect(38, -18, 3, 3);
-      ctx.fillStyle = '#f0c95c';
-      ctx.fillRect(38, -10, 3, 3);
-      // Subtle highlight along the very top edge
-      ctx.fillStyle = 'rgba(255,255,255,0.06)';
-      ctx.fillRect(-46, -30, 90, 2);
+      ctx.fillStyle = '#26262b';
+      // Top face + horn (point to the right).
+      ctx.beginPath();
+      ctx.moveTo(-46, -24); ctx.lineTo(34, -24); ctx.lineTo(48, -14);
+      ctx.lineTo(34, -8);  ctx.lineTo(20, -8);  ctx.lineTo(20, 0);
+      ctx.lineTo(-30, 0);  ctx.lineTo(-30, -8); ctx.lineTo(-46, -8);
+      ctx.closePath(); ctx.fill();
+      // Waist + base.
+      ctx.beginPath();
+      ctx.moveTo(-22, 0); ctx.lineTo(12, 0); ctx.lineTo(26, 26); ctx.lineTo(-36, 26);
+      ctx.closePath(); ctx.fill();
+      // Top-edge highlight.
+      ctx.fillStyle = 'rgba(255,255,255,0.10)';
+      ctx.fillRect(-46, -24, 80, 3);
+      ctx.restore();
+    } else if (b.partType === 'brick') {
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      ctx.fillStyle = '#9c4a32';
+      ctx.fillRect(-17, -10, 34, 20);
+      ctx.fillStyle = '#7a3826';
+      ctx.fillRect(-17, -1, 34, 1.6);
+      ctx.fillRect(-1, -10, 1.6, 9); ctx.fillRect(-9, 0.6, 1.6, 9); ctx.fillRect(7, 0.6, 1.6, 9);
+      ctx.restore();
+    } else if (b.partType === 'bowling_ball') {
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      ctx.fillStyle = '#16161a';
+      ctx.beginPath(); ctx.arc(0, 0, 16, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#3a3a42';
+      ctx.beginPath(); ctx.arc(-4, -3, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc( 2, -4, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc(-1,  2, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.22)';
+      ctx.beginPath(); ctx.arc(-6, -7, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    } else if (b.partType === 'piano') {
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      ctx.fillStyle = '#241a12';
+      ctx.fillRect(-75, -44, 150, 88);
+      ctx.fillStyle = '#3a2c1e';
+      ctx.fillRect(-75, -44, 150, 7);
+      // Ivory keybed near the bottom.
+      ctx.fillStyle = '#efe7d2';
+      ctx.fillRect(-70, 24, 140, 14);
+      ctx.fillStyle = '#1a1a1a';
+      for (let kx = -66; kx < 70; kx += 9) ctx.fillRect(kx, 24, 3, 8);
       ctx.restore();
     }
   }

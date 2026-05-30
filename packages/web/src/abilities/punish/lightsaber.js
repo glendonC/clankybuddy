@@ -4,7 +4,8 @@ import { sfx } from '../../audio/sfx.js';
 import { isBrittle, damageMul, consumeConcussed } from '../../effects/registry.js';
 import { applyImpulse, shatter } from '../_shared.js';
 
-// Tool id 'sword'. Called continuously while held (kind: 'hold+drag', 50ms throttle).
+// Machete. Tool id 'sword' (legacy internal id; player-facing label is
+// "machete"). Called continuously while held (kind: 'hold+drag', 50ms throttle).
 // Damage zone is the full visible blade segment, not a circle around the hilt.
 const BLADE_OFFSET   = 8;     // hilt → blade-base (matches drawCursor)
 const BLADE_LEN_IDLE = 100;
@@ -67,9 +68,9 @@ export default {
       // Sword ticks fast (hold+drag), speech is gated by an outer 6% roll
       // below. Suppress reactTo's pool lookup here so it doesn't double-speak.
       ctx.reactTo?.({ source: 'sword', part, moodDelta, impulse: Math.hypot(fx, fy), speakMs: 99999 });
-      // Slice particles along the blade
+      // Steel sparks along the blade.
       P.spawn({ x: part.position.x, y: part.position.y, vx: 0, vy: 0,
-        type: 'spark', color: '#9be7ff', size: 3, life: 220, gravity: 0, drag: 1 });
+        type: 'spark', color: '#dfe6ec', size: 3, life: 220, gravity: 0, drag: 1 });
       for (let i = 0; i < 4; i++) {
         const a2 = angle + (Math.random() - 0.5) * 0.6;
         P.spawn({
@@ -92,22 +93,34 @@ export default {
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle);
-    // hilt
-    ctx.fillStyle = '#1c1c20';
-    ctx.fillRect(-14, -3, 22, 6);
-    ctx.fillStyle = '#aaa';
-    ctx.fillRect(-2, -4, 3, 8);
-    ctx.fillStyle = '#666';
-    for (let i = -10; i < 8; i += 4) ctx.fillRect(i, -3, 1, 6);
-    // blade, additive glow
+    // Handle (wrapped grip).
+    ctx.fillStyle = '#3a2b1c';
+    ctx.fillRect(-15, -3, 16, 6);
+    ctx.fillStyle = '#5a4530';
+    for (let i = -13; i < -1; i += 3) ctx.fillRect(i, -3, 1, 6);
+    // Bolster.
+    ctx.fillStyle = '#888';
+    ctx.fillRect(0, -4, 3, 8);
+    // Steel blade: single-edged, slight taper to a point. Spine along the
+    // top, ground edge along the bottom, brighter strip where light catches.
     const bladeLen = isDown ? 110 : 100;
-    ctx.globalCompositeOperation = 'lighter';
-    ctx.fillStyle = 'rgba(155, 231, 255, 0.35)';
-    ctx.fillRect(8, -6, bladeLen, 12);
-    ctx.fillStyle = 'rgba(155, 231, 255, 0.75)';
-    ctx.fillRect(8, -3, bladeLen, 6);
-    ctx.fillStyle = '#fff';
-    ctx.fillRect(8, -1.5, bladeLen, 3);
+    const tip = 8 + bladeLen;
+    ctx.fillStyle = '#9aa3ac';            // blade body
+    ctx.beginPath();
+    ctx.moveTo(8, -4);
+    ctx.lineTo(tip - 14, -4);
+    ctx.lineTo(tip, 0);                   // point
+    ctx.lineTo(8, 5);
+    ctx.closePath();
+    ctx.fill();
+    ctx.fillStyle = '#d7dde3';            // edge highlight
+    ctx.beginPath();
+    ctx.moveTo(8, 2.5);
+    ctx.lineTo(tip - 12, 2.5);
+    ctx.lineTo(tip - 2, 0.5);
+    ctx.lineTo(8, 4.5);
+    ctx.closePath();
+    ctx.fill();
     ctx.restore();
   },
 };

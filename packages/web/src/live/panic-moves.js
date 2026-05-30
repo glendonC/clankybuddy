@@ -37,13 +37,10 @@ export function tickPanicMoves(ctx) {
 export function firePanicMove(ctx) {
   const { ragdoll, mood, status } = ctx;
   if (!ragdoll) return;
-  // Phase 7, panic-suppression gates. A buddy that's self-loathing or
-  // mid execute (force_quit) cannot summon a comeback move; mood damage
-  // continues to land but the persona's defensive flourish is muted.
-  if (status && (
-    hasStatus(status, ragdoll.head, 'self_loathing') ||
-    hasStatus(status, ragdoll.head, 'force_quit_active')
-  )) return;
+  // Panic-suppression gate. A buddy mid coup de grâce cannot summon a
+  // comeback move; mood damage continues to land but the persona's
+  // defensive flourish is muted.
+  if (status && hasStatus(status, ragdoll.head, 'finishing')) return;
   // Default invuln budget, handlers can override.
   mood.invulnUntil = performance.now() + 2200;
   const persona = getActivePersona();

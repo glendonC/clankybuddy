@@ -40,8 +40,9 @@
  * use head/torso/arm/leg; transients use their handler key.
  *
  * @typedef {'head'|'torso'|'arm'|'leg'
- *   |'treat'|'gift'|'gpu'|'bullet'|'firepool'
- *   |'grenade'|'rocket'|'fireball'|'anvil'} PartType
+ *   |'treat'|'gift'|'bullet'|'firepool'
+ *   |'grenade'|'rocket'|'fireball'|'anvil'
+ *   |'brick'|'bowling_ball'|'piano'} PartType
  */
 
 // ─── Ragdoll ──────────────────────────────────────────────────────────────
@@ -82,7 +83,6 @@
  *   lastJoyAt: number,
  *   shock: number,
  *   lastShockSpikeAt: number,
- *   glazeCombo?: { count: number, lastAt: number },
  * }} Mood
  */
 

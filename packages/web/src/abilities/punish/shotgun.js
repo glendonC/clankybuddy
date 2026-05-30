@@ -4,9 +4,9 @@ import { sfx } from '../../audio/sfx.js';
 // mood + speech routed through ctx.reactTo.
 import { stun } from '../../physics/stand.js';
 import { isBrittle, hasStatus, damageMul, consumeConcussed, findConcussedInRange } from '../../effects/registry.js';
-import { drawAimLine } from '../../render/shared-cursor.js';
+import { drawAimLine, drawCrosshair } from '../../render/shared-cursor.js';
 import { getStats } from '../_stats.js';
-import { nearestPart, applyImpulse, shatter } from '../_shared.js';
+import { aimAngle, applyImpulse, shatter } from '../_shared.js';
 
 const { Body, Bodies, Composite } = Matter;
 
@@ -25,10 +25,11 @@ export default {
   apply(ctx) {
     const s = getStats('shotgun');
     const { ragdoll, world, status, x, y, screenShake } = ctx;
-    const target = nearestPart(ragdoll, x, y);
-    if (!target) return;
+    const { angle: ang0, target, ok } = aimAngle(ragdoll, x, y);
+    if (!ok) return;
     const fromX = x, fromY = y;
-    const ang0 = Math.atan2(target.position.y - fromY, target.position.x - fromX);
+    // Whoever "speaks" the hit: the locked target if aimbot is on, else the head.
+    const speaker = target || ragdoll.head;
 
     let combo = false;
     const hitParts = [];
@@ -69,7 +70,7 @@ export default {
     // CONCUSSED consume, multi-pellet but flat mood damage. Pick any
     // concussed part within muzzle range, apply ×1.5 to the flat number,
     // and consume that one part's buff. Prefer the targeted part if it has it.
-    const concussedPart = (hasStatus(status, target, 'concussed') ? target : null)
+    const concussedPart = (target && hasStatus(status, target, 'concussed') ? target : null)
                        ?? findConcussedInRange(status, ragdoll, fromX, fromY, s.range);
     const mul = concussedPart ? damageMul(status, concussedPart) : 1;
     if (mul > 1) consumeConcussed(status, concussedPart);
@@ -82,13 +83,13 @@ export default {
           part: hit.part,
           moodDelta: perPartDelta,
           impulse: hit.impulse,
-          // Only the target part is allowed to speak, other pellet hits
-          // suppress to avoid throttle-thrash. Same pattern as bigImpact.
-          speakMs: hit.part === target ? 500 : 99999,
+          // Only the speaker part talks, other pellet hits suppress to avoid
+          // throttle-thrash. Same pattern as bigImpact.
+          speakMs: hit.part === speaker ? 500 : 99999,
         });
       }
     } else {
-      ctx.reactTo?.({ source: 'shotgun', part: target, moodDelta, speakMs: 500 });
+      ctx.reactTo?.({ source: 'shotgun', part: speaker, moodDelta, speakMs: 500 });
     }
     stun(ragdoll, s.stunMs);
     sfx.shotgun();
@@ -97,7 +98,7 @@ export default {
     P.burst(fromX, fromY,  8, { type: 'smoke', color: '#777',    size: 14, life: 700, speedRange: 0.4, gravity: -0.0003 });
   },
   drawCursor(ctx, { x, y, target, angle }) {
-    drawAimLine(ctx, x, y, target);
+    if (target) drawAimLine(ctx, x, y, target); else drawCrosshair(ctx, x, y);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle);

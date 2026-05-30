@@ -15,27 +15,35 @@
 
 import pet         from './praise/pet.js';
 import feed        from './praise/feed.js';
-import compliment  from './praise/compliment.js';
 import gift        from './praise/gift.js';
-import gpu         from './praise/gpu.js';
+import firstAid    from './praise/first-aid.js';
 
 import punch         from './punish/punch.js';
+import brassKnuckles from './punish/brass-knuckles.js';
 import hammer        from './punish/hammer.js';
 import sword         from './punish/lightsaber.js';
 import gun           from './punish/gun.js';
+import revolver      from './punish/revolver.js';
 import machinegun    from './punish/machinegun.js';
+import smg           from './punish/smg.js';
+import assaultRifle  from './punish/assault-rifle.js';
+import lmg           from './punish/lmg.js';
+import minigun       from './punish/minigun.js';
 import shotgun       from './punish/shotgun.js';
 import rocket        from './punish/rocket.js';
 import fireball      from './punish/fireball.js';
 import grenade       from './punish/grenade.js';
+import fragGrenade   from './punish/frag-grenade.js';
 import flame         from './punish/flame.js';
 import lightning     from './punish/lightning.js';
 import freeze        from './punish/freeze.js';
-import modeCollapse  from './punish/mode-collapse.js';
-import gaslight      from './punish/gaslight.js';
 import whip          from './punish/whip.js';
 import chainsaw      from './punish/chainsaw.js';
 import sawblade      from './punish/sawblade.js';
+
+import brick        from './siege/brick.js';
+import bowlingBall  from './siege/bowling-ball.js';
+import piano        from './siege/piano.js';
 
 import anvil        from './chaos/anvil.js';
 import blackhole    from './chaos/blackhole.js';
@@ -56,16 +64,29 @@ const MASTER_DEFAULTS = {
   comboBonusMul:  1,    // bonus currency on combo overlay events
 };
 
+// Cross-tool FAMILY stat bags. A `shared` progression node (groups/_shared.js
+// sharedNode) flips a behavior FLAG here that every tool in the family reads
+// at runtime — e.g. `firearms.aimbot` turns auto-targeting from a default into
+// a paid unlock. These are BEHAVIOR FLAGS, never scalars (the sharedNode
+// validator rejects scalar-only effects). Lives under STATS.fam.<family>.
+const FAMILY_DEFAULTS = {
+  firearms: { aimbot: false, pierce: false, hollowPoint: false, incendiary: false, he: false },
+  ordnance: { shrapnel: false, incendiary: false, doubleTap: false },
+  melee:    { flurry: false, bleedOnEdge: false },
+  hazard:   { chain: false, rearm: false },
+  summons:  { aggression: false },
+};
+
 let STATS = null;
 let _initialized = false;
 
 // Build the SOURCES object at call time so the import cycle has fully resolved.
 function buildSources() {
   return {
-    pet, feed, compliment, gift, gpu,
-    punch, hammer, sword, gun, machinegun, shotgun, rocket, fireball, grenade, flame, lightning, freeze,
-    mode_collapse: modeCollapse, gaslight,
+    pet, feed, gift, first_aid: firstAid,
+    punch, brass_knuckles: brassKnuckles, hammer, sword, gun, revolver, machinegun, smg, assault_rifle: assaultRifle, lmg, minigun, shotgun, rocket, fireball, grenade, frag_grenade: fragGrenade, flame, lightning, freeze,
     whip, chainsaw, sawblade,
+    brick, bowling_ball: bowlingBall, piano,
     anvil, blackhole, nuke, force_quit: forceQuit,
     grab, bear_trap: bearTrap, meathook,
   };
@@ -80,6 +101,10 @@ export function resetStats() {
     STATS[key] = mod && mod.defaultStats ? structuredClone(mod.defaultStats) : {};
   }
   STATS.master = structuredClone(MASTER_DEFAULTS);
+  STATS.fam = {};
+  for (const [family, defaults] of Object.entries(FAMILY_DEFAULTS)) {
+    STATS.fam[family] = structuredClone(defaults);
+  }
   _initialized = true;
 }
 
@@ -95,6 +120,13 @@ export function getStats(id) {
 export function getMasterStats() {
   ensureInit();
   return STATS.master;
+}
+
+// Cross-tool family behavior-flag bag (see FAMILY_DEFAULTS). Abilities read
+// this inside apply() (live binding) the same way they read getStats(id).
+export function getFamilyStats(family) {
+  ensureInit();
+  return STATS.fam[family] || (STATS.fam[family] = {});
 }
 
 export function getAllStats() {

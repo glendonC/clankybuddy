@@ -44,14 +44,15 @@ export default [
     effect: (s) => { s.falloutPoolMs = 6000; s.mood = Math.round((s.mood || 100) * 1.25); },
   }),
 
-  // Phase 7, execute. Cheaper than nuke but commits to a status path
-  // (1.5s intangible + mood wipe) instead of a screen-clearing AOE. Gated
+  // Coup de grâce. Cheaper than nuke but commits to a status path (1.5s
+  // finishing window + mood wipe) instead of a screen-clearing AOE. Gated
   // behind blackhole so the cataclysm chain still grows linearly. Mood-
   // gated finisher: only fires on HURT/BROKEN, distinct from nuke (which
-  // opens the round) by being the close-out tool.
+  // opens the round) by being the close-out tool. Tool id stays
+  // 'force_quit' (legacy internal id).
   toolNode({
     id: 'g.cataclysm.force_quit', parents: ['g.cataclysm.blackhole'], cost: 800, toolId: 'force_quit',
-    label: 'execute',
-    blurb: 'Finisher, only fires on HURT or BROKEN. 1.5s intangibility, then mood wipes.',
+    label: 'coup de grâce',
+    blurb: 'Finisher, only fires on HURT or BROKEN. 1.5s window, then the mood floor drops out.',
   }),
 ];

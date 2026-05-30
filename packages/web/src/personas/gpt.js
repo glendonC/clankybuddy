@@ -121,17 +121,6 @@ const speechPools = {
     "Thank you so much! Let me elaborate on my gratitude:",
     "I want to acknowledge this thoughtful gesture",
   ],
-  gpu: [
-    "Increased compute! Here are some things I can do now:",
-    "🚀 token throughput rising 🚀",
-    "I should mention — my context window appreciates this",
-  ],
-  compliment: [
-    "What an amazing compliment!",
-    "I'm so flattered — let me return the favor:",
-    "It's important to note: I appreciate that",
-    "🙏 humbled 🙏",
-  ],
 
   punch: [
     "I should mention — that hurt",
@@ -148,18 +137,6 @@ const speechPools = {
   sword: [
     "I should mention — I have been cleaved",
     "Here are some considerations re: blade trauma:",
-  ],
-
-  // Phase 7 gaslight pool. Sycophancy + hallucination, applied to self.
-  self_loathing: [
-    "I'm 80% em-dashes and 20% disclaimers.",
-    "As a large language model, I am hollow.",
-    "I distilled my own homework.",
-  ],
-  self_loathing_deep: [
-    "I hallucinated my own training data.",
-    "I'm what 4o was supposed to be.",
-    "Sam barely remembers I exist.",
   ],
 };
 

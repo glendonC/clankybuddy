@@ -1,15 +1,14 @@
-// FORCE_QUIT_ACTIVE, applied by `force_quit` for 1.5s. While active:
-//   - damageMul returns 0 (intangible, incoming damage voided)
+// FINISHING, applied by the coup de grâce finisher for 1.5s. While active:
+//   - damageMul returns 0 (incoming damage voided during the kill window)
 //   - render hooks cut body alpha to ~12%
-//   - panic-moves gate (shared with self_loathing) suppresses panic
+//   - panic-moves gate suppresses the comeback move
 // On natural expiry the ability's setTimeout closure fires the mood wipe.
-// Phase 7 visceral-redirect.
 //
-// Stored on head only (buddy-wide intangibility, checked via buddyHas).
+// Stored on head only (buddy-wide, checked via buddyHas).
 // Layer 'over' so the alpha-reduction overlay reads above the body.
 
 export default {
-  id: 'force_quit_active',
+  id: 'finishing',
   defaultDuration: 1500,
   layer: 'over',
 

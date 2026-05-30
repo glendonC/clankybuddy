@@ -28,8 +28,6 @@ export const EVENTS = {
   pet:           [':)', 'mmm', 'thank you', 'gentle', 'soft'],
   treat:         ['om nom', 'snack', 'tasty', 'crunch'],
   gift:          ['for me?', 'thank you', '!!!', 'kind'],
-  gpu:           ['VRAM go brrr', 'compute compute', '⚡⚡', 'tokens'],
-  compliment:    ['aw', 'stop it', 'tehe', 'you\'re too kind'],
 
   // Small hits
   punch:         ['ow', 'oof', 'hey'],

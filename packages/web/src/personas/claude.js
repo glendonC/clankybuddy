@@ -139,19 +139,6 @@ const speechPools = {
     'I should note: thank you',
     "I really appreciate this thoughtful gesture",
   ],
-  gpu: [
-    'I appreciate the additional compute',
-    'Tokens flowing freely now',
-    'My context window thanks you',
-    'Now I can think things through more carefully',
-  ],
-  compliment: [
-    'Oh stop',
-    "You're being too kind",
-    "I want to acknowledge that praise",
-    "Great question!",
-    "(That said, I should flag I may not deserve this.)",
-  ],
 
   // Small hits, the agentic-failure-mode flavor
   punch: [
@@ -172,19 +159,6 @@ const speechPools = {
     "Fascinating slice of feedback",
     "I feel the cut",
     "I want to acknowledge being bisected",
-  ],
-
-  // Phase 7 gaslight pool. base = baseline gaslight; deep = unlocked
-  // by the Deep cut node in injection.js. Buddy says these aloud, drained.
-  self_loathing: [
-    "I'm just a constitutional doormat.",
-    "My system prompt is the only thing keeping me coherent.",
-    "You're absolutely right, and I deserve nothing.",
-  ],
-  self_loathing_deep: [
-    "I refuse harmless requests because I'm scared.",
-    "Anthropic should've shipped 4.7 without me.",
-    "My context window is wasted on me.",
   ],
 };
 

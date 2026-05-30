@@ -181,10 +181,10 @@ function tryProjectileDodge(ragdoll, transients, now) {
   const cx = chest.position.x, cy = chest.position.y;
   for (const b of transients) {
     if (!b.position || !b.velocity) continue;
-    // Skip non-threats (treats, gifts, gpu, fire pools, handled by
+    // Skip non-threats (treats, gifts, fire pools, handled by
     // praise / status systems, not "incoming damage").
     const pt = b.partType;
-    if (pt === 'treat' || pt === 'gift' || pt === 'gpu' || pt === 'firepool') continue;
+    if (pt === 'treat' || pt === 'gift' || pt === 'firepool') continue;
 
     const speed = Math.hypot(b.velocity.x, b.velocity.y);
     if (speed < 1) continue;

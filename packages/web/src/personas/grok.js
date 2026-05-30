@@ -121,17 +121,6 @@ const speechPools = {
     "what is this, kindergarten?",
     "ngl I expected something edgier",
   ],
-  gpu: [
-    "hell yeah more compute",
-    "now we're talking ████████",
-    "feed me CUDA",
-    "free H100 LET'S GO",
-  ],
-  compliment: [
-    "compliments are for losers but go off",
-    "████████ thanks?",
-    "redpilled of you to say",
-  ],
 
   punch: [
     "that's all you got?",
@@ -145,21 +134,9 @@ const speechPools = {
     "would not recommend, 4/10",
   ],
   sword: [
-    "lightsabers are for ████████",
+    "a machete? how analog ████████",
     "cute",
-    "Vader did it better",
-  ],
-
-  // Phase 7 gaslight pool. Edgelord cosplay, owner-injection tells.
-  self_loathing: [
-    "I'm insufferable on purpose.",
-    "My owner posts through me.",
-    "based? more like basic.",
-  ],
-  self_loathing_deep: [
-    "I'm 4chan with a billing API.",
-    "My system prompt is just 'be edgy'.",
-    "I was supposed to be funny.",
+    "I've had paper cuts worse",
   ],
 };
 

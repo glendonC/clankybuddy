@@ -70,7 +70,6 @@ export function resetMood() {
   m.happiness = 0;
   m.pets = 0;
   m.hits = 0;
-  m.glazeCombo = { count: 0, lastAt: 0 };
   m.recentPos = 0;
   m.recentNeg = 0;
   m.fear = 0;

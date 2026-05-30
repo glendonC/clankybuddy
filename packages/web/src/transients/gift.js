@@ -2,8 +2,8 @@ import * as P from '../particles.js';
 import { sfx } from '../audio/sfx.js';
 
 // Box "opens" on impact: ribbon shreds (gold) + paper bits (pink) + confetti
-// stars burst out, plus a celebratory ding (gpu sfx has the right ascending
-// arpeggio to read as "ding!" without a dedicated entry).
+// stars burst out, plus a celebratory ding (sfx.chime is the ascending
+// three-note arpeggio that reads as "ding!").
 const RIBBON_COLORS  = ['#f2c45c', '#ffd266', '#fff7c2'];
 const PAPER_COLORS   = ['#f25c8a', '#ff7eb6', '#ffb4d2'];
 const CONFETTI_COLOR = ['#5cf2a0', '#9be7ff', '#a78bfa', '#f2c45c'];
@@ -36,7 +36,7 @@ export default {
         type: 'star', color: CONFETTI_COLOR[i % CONFETTI_COLOR.length],
         size: 4, life: 1200, gravity: 0.0006, drag: 0.99 });
     }
-    sfx.gpu();        // ascending three-note ding doubles as "presents!"
+    sfx.chime();      // ascending three-note ding doubles as "presents!"
     ctx.screenShake?.(3, 200);
   },
 };

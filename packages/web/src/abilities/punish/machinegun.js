@@ -1,9 +1,9 @@
 import Matter from 'matter-js';
 import * as P from '../../particles.js';
 import { sfx } from '../../audio/sfx.js';
-import { drawAimLine } from '../../render/shared-cursor.js';
+import { drawAimLine, drawCrosshair } from '../../render/shared-cursor.js';
 import { getStats } from '../_stats.js';
-import { nearestPart } from '../_shared.js';
+import { aimAngle } from '../_shared.js';
 
 const { Body, Bodies, Composite } = Matter;
 
@@ -20,9 +20,8 @@ export default {
   apply(ctx) {
     const s = getStats('machinegun');
     const { ragdoll, world, x, y, screenShake } = ctx;
-    const target = nearestPart(ragdoll, x, y);
-    if (!target) return;
-    const baseAngle = Math.atan2(target.position.y - y, target.position.x - x);
+    const { angle: baseAngle, ok } = aimAngle(ragdoll, x, y);
+    if (!ok) return;
     const ang = baseAngle + (Math.random() - 0.5) * s.spread;
     const muzzleX = x + Math.cos(ang) * 26;
     const muzzleY = y + Math.sin(ang) * 26;
@@ -56,7 +55,7 @@ export default {
     });
   },
   drawCursor(ctx, { x, y, target, angle, isDown }) {
-    drawAimLine(ctx, x, y, target);
+    if (target) drawAimLine(ctx, x, y, target); else drawCrosshair(ctx, x, y);
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(angle);

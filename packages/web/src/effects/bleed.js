@@ -4,7 +4,6 @@
 // physical-violence weapons.
 //
 // Cleared by:
-//   - gpu (heal, full clean of the buddy's bleeds, see abilities/praise/gpu.js)
 //   - ice / freeze (cauterize-by-cold, see abilities/punish/freeze.js)
 // Stack semantics: a second bleed application refreshes intensity but does
 // not double-tick (rec.expiresAt resets in registry.applyStatus).

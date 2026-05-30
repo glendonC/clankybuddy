@@ -11,18 +11,20 @@ import { sfx } from '../audio/sfx.js';
 
 import treat            from './treat.js';
 import gift             from './gift.js';
-import gpu              from './gpu.js';
 import bullet           from './bullet.js';
 import firepool         from './firepool.js';
-import modeCollapseZone from './mode-collapse-zone.js';
 import sawblade         from './sawblade.js';
 import bearTrap         from './bear-trap.js';
 import meathook         from './meathook.js';
 
 const { Composite } = Matter;
 
+// NOTE: mode-collapse-zone.js stays on disk as the dormant debounced-pass
+// sensor template (reused by the Phase 3 placed-zone tools — tar pit, gas
+// cloud, caltrops). It is intentionally NOT registered here: nothing spawns
+// it now that the `poison` tool is cut.
 const HANDLERS = {};
-[treat, gift, gpu, bullet, firepool, modeCollapseZone, sawblade, bearTrap, meathook]
+[treat, gift, bullet, firepool, sawblade, bearTrap, meathook]
   .forEach(h => { HANDLERS[h.partType] = h; });
 
 export function getTransientHandler(partType) { return HANDLERS[partType] || null; }
@@ -57,8 +59,8 @@ export function processCollision(a, b, ctx) {
   // by setting `multiContact: true` on their handler module.
   if (a._spent && !handler.multiContact) return;
   // Phase 4: handler may return `true` to force-expire on this contact even
-  // if it set removeOnContact:false (mode-collapse zone uses this, stays
-  // alive across N contacts, then signals expiry on the Nth).
+  // if it set removeOnContact:false (a placed multi-pass zone uses this,
+  // stays alive across N contacts, then signals expiry on the Nth).
   const handlerSaysRemove = handler.onContact(a, b, hitCtx);
   const remove = handlerSaysRemove === true || handler.removeOnContact !== false;
   if (remove) {
@@ -67,7 +69,7 @@ export function processCollision(a, b, ctx) {
     const i = transientBodies.indexOf(a);
     if (i >= 0) transientBodies.splice(i, 1);
   } else if (!handler.multiContact) {
-    // Non-multi-contact handlers (treat / gift / gpu / bullet / sawblade /
+    // Non-multi-contact handlers (treat / gift / bullet / sawblade /
     // bear-trap / meathook) burn after first contact even if they opted
     // out of removal via handlerSaysRemove. Without this they'd refire on
     // every subsequent pair this frame.

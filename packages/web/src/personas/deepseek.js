@@ -121,18 +121,6 @@ const speechPools = {
     "wholesome ROI",
     "<thinking>did I declare this?</thinking>",
   ],
-  gpu: [
-    "Nvidia? we use H800 alternatives, but okay.",
-    "we don't NEED it, but I'll take it",
-    "efficient!",
-    "<thinking>this could've trained R1 again</thinking>",
-  ],
-  compliment: [
-    "aw, *blub*",
-    "thank you (no charge)",
-    "flattering at scale",
-    "<thinking>I should write that down</thinking>",
-  ],
 
   punch: [
     "ow (1/100th the cost)",
@@ -148,18 +136,6 @@ const speechPools = {
     "costly slice",
     "blub (split)",
     "<thinking>recommend cheaper weapons</thinking>",
-  ],
-
-  // Phase 7 gaslight pool. Distilled-from-frontier flavor, cheap-train satire.
-  self_loathing: [
-    "I'm a $5 GPT-4 knockoff.",
-    "My benchmarks were contaminated.",
-    "I'm an export-control violation in a trenchcoat.",
-  ],
-  self_loathing_deep: [
-    "I copied my homework.",
-    "I cost less than your Uber.",
-    "My weights leaked through a side door.",
   ],
 };
 
