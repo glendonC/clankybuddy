@@ -17,6 +17,9 @@ import sawblade         from './sawblade.js';
 import bearTrap         from './bear-trap.js';
 import meathook         from './meathook.js';
 import caltrops         from './caltrops.js';
+import steamrollerH     from './steamroller.js';
+import cityBusH         from './city-bus.js';
+import officeChairH     from './office-chair.js';
 
 const { Composite } = Matter;
 
@@ -25,7 +28,7 @@ const { Composite } = Matter;
 // cloud, caltrops). It is intentionally NOT registered here: nothing spawns
 // it now that the `poison` tool is cut.
 const HANDLERS = {};
-[treat, gift, bullet, firepool, sawblade, bearTrap, meathook, caltrops]
+[treat, gift, bullet, firepool, sawblade, bearTrap, meathook, caltrops, steamrollerH, cityBusH, officeChairH]
   .forEach(h => { HANDLERS[h.partType] = h; });
 
 export function getTransientHandler(partType) { return HANDLERS[partType] || null; }
@@ -101,6 +104,37 @@ export function cleanupTransients(world, transientBodies, makeCtx) {
         Composite.remove(world, b);
         transientBodies.splice(i, 1);
         continue;
+      }
+    }
+
+    // Generic per-body onTick hook (render-frame, once per body per frame).
+    //
+    // KINEMATIC-ONLY CONTRACT: onTick runs in the render frame (cleanupTransients
+    // is called once per frame from main.js), NOT per physics sub-step. It may
+    // only do kinematic work — Body.setVelocity / Body.setPosition, off-screen /
+    // position checks, and self-removal. It MUST NOT apply force or call
+    // sweepImpact: those integrate per sub-step and belong in onContact (per
+    // collision) or a phase:'physics' Mode. Maintained x-velocity rollers
+    // (steamroller / city bus) re-stamp velocity here; per-frame is exactly the
+    // anvil "maintained velocity" trick the design calls for.
+    //
+    // EPOCH-GATED: the body stores self._epoch at spawn. We build a per-body ctx
+    // (same fresh-snapshot + verb wrapping every onExpire gets) and only invoke
+    // onTick when !b._spent AND ctx._epochValid(b._epoch). After a character
+    // switch the epoch no longer matches and onTick goes silent, matching the
+    // setTimeout discipline in CLAUDE.md.
+    //
+    // SELF-REMOVAL: a self-removing onTick (e.g. a vehicle that has driven fully
+    // off-screen) sets b._spent = true and splices itself out exactly once. The
+    // age check below then sees _spent and skips re-removal, and the !b._spent
+    // guard here prevents a double onTick in the same pass.
+    if (b.onTick && !b._spent) {
+      const tickCtx = ctxForTransient(makeCtx, b);
+      if (tickCtx._epochValid(b._epoch)) {
+        b.onTick(b, tickCtx);
+        // onTick may have self-removed (set _spent + spliced). If so, skip the
+        // rest of this body's processing this frame.
+        if (b._spent && transientBodies[i] !== b) continue;
       }
     }
 

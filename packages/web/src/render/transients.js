@@ -173,6 +173,66 @@ export function renderTransients(ctx, bodies) {
       ctx.fillStyle = '#1a1a1a';
       for (let kx = -66; kx < 70; kx += 9) ctx.fillRect(kx, 24, 3, 8);
       ctx.restore();
+    } else if (b.partType === 'crt') {
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      ctx.fillStyle = '#cbc4b0'; ctx.fillRect(-48, -42, 96, 84);          // beige case
+      ctx.fillStyle = '#11151a'; ctx.fillRect(-40, -34, 80, 60);          // bezel
+      ctx.fillStyle = 'rgba(127,233,255,0.30)'; ctx.fillRect(-36, -30, 72, 52); // phosphor screen
+      ctx.fillStyle = '#7fffa0'; ctx.fillRect(34, 30, 4, 4);              // power LED
+      ctx.restore();
+    } else if (b.partType === 'car') {
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      ctx.fillStyle = '#3a4654'; ctx.fillRect(-100, -22, 200, 44);        // chassis
+      ctx.fillStyle = '#4a5867'; ctx.fillRect(-52, -48, 96, 28);          // cabin
+      ctx.fillStyle = '#1c2730'; ctx.fillRect(-46, -44, 40, 20); ctx.fillRect(8, -44, 40, 20); // windows
+      ctx.fillStyle = '#141418';
+      ctx.beginPath(); ctx.arc(-58, 24, 18, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc( 58, 24, 18, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    } else if (b.partType === 'steamroller') {
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      ctx.fillStyle = '#3b3b40'; ctx.fillRect(-65, -37, 130, 50);         // frame
+      ctx.fillStyle = '#52525a'; ctx.fillRect(0, -55, 44, 24);            // cab
+      ctx.fillStyle = '#1f1f24';
+      ctx.beginPath(); ctx.arc(-40, 18, 30, 0, Math.PI * 2); ctx.fill();  // front drum
+      ctx.fillStyle = 'rgba(255,255,255,0.16)';
+      ctx.beginPath(); ctx.arc(-48, 8, 7, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#26262b';
+      ctx.beginPath(); ctx.arc(46, 24, 18, 0, Math.PI * 2); ctx.fill();   // rear wheel
+      ctx.restore();
+    } else if (b.partType === 'city_bus') {
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      ctx.fillStyle = '#e0a92b'; ctx.fillRect(-110, -43, 220, 86);        // body
+      ctx.fillStyle = '#9fd3e8';
+      for (let wx = -96; wx < 100; wx += 28) ctx.fillRect(wx, -30, 20, 22); // window strip
+      ctx.fillStyle = '#3a3a40'; ctx.fillRect(-118, 6, 12, 24);           // front scoop bumper
+      ctx.fillStyle = '#1f1f24';
+      ctx.beginPath(); ctx.arc(-64, 40, 18, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath(); ctx.arc( 70, 40, 18, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    } else if (b.partType === 'trebuchet') {
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      ctx.fillStyle = '#4a4036';
+      ctx.beginPath(); ctx.arc(0, 0, b.circleRadius || 20, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#5c5044';
+      ctx.beginPath(); ctx.moveTo(-9, -6); ctx.lineTo(3, -11); ctx.lineTo(0, 2); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.beginPath(); ctx.arc(-6, -8, 5, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+    } else if (b.partType === 'office_chair') {
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      ctx.fillStyle = '#2b2f36'; ctx.fillRect(-23, -4, 46, 12);           // seat
+      ctx.fillStyle = '#3a4049'; ctx.fillRect(-20, -26, 12, 24);          // backrest
+      ctx.fillStyle = '#1c1f24'; ctx.fillRect(-2, 8, 4, 10);              // gas column
+      ctx.beginPath(); ctx.arc(-12, 22, 3, 0, Math.PI * 2); ctx.fill();   // casters
+      ctx.beginPath(); ctx.arc(12, 22, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
     }
   }
 }

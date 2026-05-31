@@ -45,6 +45,13 @@ import caltrops      from './punish/caltrops.js';
 import brick        from './siege/brick.js';
 import bowlingBall  from './siege/bowling-ball.js';
 import piano        from './siege/piano.js';
+import crt          from './siege/crt.js';
+import car          from './siege/car.js';
+import steamroller  from './siege/steamroller.js';
+import cityBus      from './siege/city-bus.js';
+import trebuchet    from './siege/trebuchet.js';
+import officeChair  from './siege/office-chair.js';
+import batteringRam from './siege/battering-ram.js';
 
 import anvil        from './chaos/anvil.js';
 import blackhole    from './chaos/blackhole.js';
@@ -62,7 +69,7 @@ const ABILITIES = {
   punch, brass_knuckles: brassKnuckles, hammer, sword, gun, revolver, machinegun, smg, assault_rifle: assaultRifle, lmg, minigun, shotgun, rocket, fireball, grenade, frag_grenade: fragGrenade, flame, lightning, freeze,
   whip, chainsaw, sawblade,
   bat, battle_axe: battleAxe, fire_axe: fireAxe, hunting_knife: huntingKnife, cattle_prod: cattleProd, blowtorch, power_drill: powerDrill, nail_gun: nailGun, caltrops,
-  brick, bowling_ball: bowlingBall, piano,
+  brick, bowling_ball: bowlingBall, piano, crt, car, steamroller, city_bus: cityBus, trebuchet, office_chair: officeChair, battering_ram: batteringRam,
   anvil, blackhole, nuke, force_quit: forceQuit,
   grab, bear_trap: bearTrap, meathook,
 };

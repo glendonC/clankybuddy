@@ -111,6 +111,23 @@ export const TOOLS = [
     blurb: 'drops and rolls, scattering parts as it tumbles through' },
   { id: 'piano',       label: 'piano',        key: '5', kind: 'click',     delta: '−26',  spine: 'negative', group: 'siege', cost: 220,
     blurb: 'a wide upright piano lands across multiple parts at once' },
+  // Siege/vehicle batch. Input is hotbar-slot based and TOOLS_BY_KEY has no
+  // consumers, so these ship with key:'' (no display chip) — every bare key is
+  // taken. Equip to a hotbar slot to use.
+  { id: 'crt',         label: 'CRT monitor',  key: '', kind: 'click',     delta: '−30',  spine: 'negative', group: 'siege', cost: 260,
+    blurb: 'drop a CRT monitor on your cursor; the tube bursts and electrifies the struck part' },
+  { id: 'car',         label: 'car',          key: '', kind: 'click',     delta: '−34',  spine: 'negative', group: 'siege', cost: 360,
+    blurb: 'drop a sedan on the buddy: the chassis flattens whatever it lands on, then the fuel tank ruptures into a fireball and a lingering burn pool' },
+  { id: 'steamroller', label: 'steamroller',  key: '', kind: 'click',     delta: '−24',  spine: 'negative', group: 'siege', cost: 320,
+    blurb: 'a heavy drum rolls across the stage, flattening every part it runs over' },
+  { id: 'city_bus',    label: 'city bus',     key: '', kind: 'click',     delta: '−20',  spine: 'negative', group: 'siege', cost: 480,
+    blurb: 'a bus scoops the buddy and carries them clean off the stage' },
+  { id: 'trebuchet',   label: 'trebuchet',    key: '', kind: 'drag',      delta: '−30',  spine: 'negative', group: 'siege', cost: 320,
+    blurb: 'drag to aim, release to lob a boulder in a high arc, ground-shaking impact on landing' },
+  { id: 'office_chair',label: 'office chair', key: '', kind: 'drag',      delta: '−10',  spine: 'negative', group: 'siege', cost: 180,
+    blurb: 'drag to fling a rolling chair, ricochets and clatters into them' },
+  { id: 'battering_ram',label: 'battering ram',key: '', kind: 'hold+drag',delta: '−16/swing',spine: 'negative', group: 'siege', cost: 280,
+    blurb: 'swing an iron-shod oak log along the drag; one heavy directional shove per part, per swing' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It

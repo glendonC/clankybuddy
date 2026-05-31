@@ -11,6 +11,9 @@ import {
   applyStatus, removeStatus, hasStatus, isBrittle,
   damageMul, consumeConcussed, findConcussedInRange,
 } from '../effects/registry.js';
+// NOTE: 'concussed' and 'electrified' are applied via applyStatus(status, part,
+// '<id>', {duration}). They are registered effect ids; spawnDrop's optional
+// concussOnImpact / electrifyMs cfg fields route through the same applyStatus.
 import { markHit } from '../physics/secondary.js';
 import { getCurrentBuddy } from '../state/ragdoll-lifecycle.js';
 import { showCombo } from '../ui/overlays.js';
@@ -389,6 +392,33 @@ export function shatter(ctx, part) {
 //   impactSfx                 played on impact
 //   particles(ctx2, bx, by)   optional impact particle override
 //   onImpact(b, world, ctx2, part)  optional extra impact hook
+//
+// ADDITIVE optional knobs (default to current behavior; existing anvil/brick/
+// bowling/piano callers behave byte-for-byte identically because every default
+// below is a no-op):
+//   concussOnImpact (bool, default false)  apply 'concussed' to the struck
+//                                          part in the built-in onHit, BEFORE
+//                                          the optional onImpact seam runs.
+//   concussMs (number, default 5000)       duration for the above (only used
+//                                          when concussOnImpact is set).
+//   electrifyMs (number, default 0)        symmetric with igniteMs: >0 applies
+//                                          'electrified' for that many ms to the
+//                                          struck part (unless frozen-guarded
+//                                          like igniteMs? no — electrified is
+//                                          orthogonal to frozen, so it applies
+//                                          unconditionally), BEFORE onImpact.
+//   splashMul (number, default 1)          widens the EXISTING splash loop by
+//                                          multiplying splashRadius AND
+//                                          splashForce. Wide-body crush (car /
+//                                          CRT) cranks this instead of adding a
+//                                          second multi-squash loop, so reactTo
+//                                          stays single-fire on the nearest part
+//                                          (one mood reaction, bigImpact
+//                                          discipline preserved).
+//   squashMul (number, default 1)          multiplies the downward squashVel
+//                                          slammed onto the struck part (and the
+//                                          squashVel*0.2 component fed into the
+//                                          splash), for heavier wide-bodies.
 export function spawnDrop(ctx, cfg) {
   const {
     partType, verb,
@@ -399,7 +429,16 @@ export function spawnDrop(ctx, cfg) {
     roll = 0, igniteMs = 0,
     shake = 12, shakeMs = 500, hitStopTier = 'heavy',
     sfxName, impactSfx, particles, onImpact,
+    // Additive (defaults = current behavior).
+    concussOnImpact = false, concussMs = 5000,
+    electrifyMs = 0,
+    splashMul = 1, squashMul = 1,
   } = cfg;
+  // Resolve the wide-body multipliers once. With the defaults (all 1) these
+  // are identical to the raw cfg values, so existing callers are unchanged.
+  const effSquashVel    = squashVel * squashMul;
+  const effSplashRadius = splashRadius * splashMul;
+  const effSplashForce  = splashForce * splashMul;
   const { world, x, y } = ctx;
   const srcVerb = verb || ctx._verb || partType;
   const opts = { density, restitution, friction, label: partType, render: { visible: false } };
@@ -415,25 +454,35 @@ export function spawnDrop(ctx, cfg) {
     const part = nearestPart(ctx2.ragdoll, b.position.x, b.position.y);
     if (part) {
       if (isBrittle(ctx2.status, part)) shatter(ctx2, part);
-      Body.setVelocity(part, { x: part.velocity.x, y: part.velocity.y + squashVel });
+      Body.setVelocity(part, { x: part.velocity.x, y: part.velocity.y + effSquashVel });
       if (roll) Body.setAngularVelocity(part, part.angularVelocity + (Math.random() < 0.5 ? -roll : roll));
       for (const other of ctx2.ragdoll.parts) {
         if (other === part) continue;
         const dx = other.position.x - part.position.x;
         const dy = other.position.y - part.position.y;
         const d = Math.hypot(dx, dy) || 1;
-        if (d < splashRadius) {
-          const f = (1 - d / splashRadius) * splashForce;
+        if (d < effSplashRadius) {
+          const f = (1 - d / effSplashRadius) * effSplashForce;
           Body.setVelocity(other, {
             x: other.velocity.x + (dx / d) * f,
-            y: other.velocity.y + (dy / d) * f * 0.4 + squashVel * 0.2,
+            y: other.velocity.y + (dy / d) * f * 0.4 + effSquashVel * 0.2,
           });
         }
       }
       if (igniteMs > 0 && !hasStatus(ctx2.status, part, 'frozen')) {
         applyStatus(ctx2.status, part, 'on_fire', { source: srcVerb });
       }
-      ctx2.reactTo?.({ source: srcVerb, part, moodDelta: -mood, impulse: squashVel, speakMs: 700 });
+      // Additive status seam: CONCUSSED / ELECTRIFIED apply to the struck part
+      // BEFORE the onImpact hook (so a custom onImpact can read/extend them).
+      // Both default off (concussOnImpact:false, electrifyMs:0) → no-op for
+      // existing callers.
+      if (concussOnImpact) {
+        applyStatus(ctx2.status, part, 'concussed', { duration: concussMs, source: srcVerb });
+      }
+      if (electrifyMs > 0) {
+        applyStatus(ctx2.status, part, 'electrified', { duration: electrifyMs, source: srcVerb });
+      }
+      ctx2.reactTo?.({ source: srcVerb, part, moodDelta: -mood, impulse: effSquashVel, speakMs: 700 });
     } else {
       ctx2.reactTo?.({ source: srcVerb, moodDelta: -mood, speakMs: 99999 });
     }
