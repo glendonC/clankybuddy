@@ -13,6 +13,7 @@ import { setRestAngles } from '../physics/stand.js';
 import { createMood } from '../mood.js';
 import { createStatusRegistry, clearAll as clearAllStatus } from '../effects/registry.js';
 import { canvas, world } from './world.js';
+import { teardownAllConstraints } from './constraint-registry.js';
 import { FLOOR_INSET, RAGDOLL_RIG_HEIGHT } from '../physics/constants.js';
 
 const { Composite } = Matter;
@@ -44,6 +45,12 @@ export function epochValid(e) { return e === _buddy.epoch; }
 
 // Mutates _buddy in place; never replaces it (would break the _epoch guard).
 export function spawnRagdoll(charId) {
+  // Teardown FIRST, before the old ragdoll composite + transients are removed:
+  // any tracked Matter.Constraint (e.g. a mid-swing wrecking ball) must be gone
+  // before the bodies it references leave the world, or the solver reads a freed
+  // body next step → NaN. Runs under the OLD epoch (epoch++ is below) — correct,
+  // it clears the outgoing buddy's constraints.
+  teardownAllConstraints();
   if (_buddy.ragdoll) Composite.remove(world, _buddy.ragdoll.composite);
   clearAllStatus(_buddy.status);
   _buddy.epoch++;

@@ -125,4 +125,18 @@ export default [
     blurb: 'Heavier iron cap, force 0.22 → 0.30, mood 16 → 22.',
     effect: (s) => { s.force = 0.30; s.mood = 22; },
   }),
+
+  // Wrecking ball — chained steel ball that swings through the buddy. Forks off
+  // the brick drop/throwable root (doc §3); rides on the constraint registry (S3).
+  toolNode({
+    id: 'g.siege.wrecking_ball', parents: ['g.siege.brick'], cost: 400, toolId: 'wrecking_ball',
+    label: 'wrecking ball',
+    blurb: 'A chained steel ball swings down through the buddy for two or three demolition passes.',
+  }),
+  statNode({
+    id: 'g.siege.wrecking_ball.head', parents: ['g.siege.wrecking_ball'], cost: 360, toolId: 'wrecking_ball',
+    label: 'Demolition Head',
+    blurb: 'Heavier head: mood 22 → 30 per pass, force 0.16 → 0.20.',
+    effect: (s) => { s.ballRadius = 30; s.density = 0.03; s.mood = 30; s.force = 0.20; },
+  }),
 ];

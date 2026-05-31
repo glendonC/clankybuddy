@@ -24,6 +24,7 @@ import { abilityCtx, flushPendingHitCombo } from './state/ability-ctx.js';
 import {
   transientBodies, getRagdoll, getCurrentBuddy, spawnRagdoll, resetMood,
 } from './state/ragdoll-lifecycle.js';
+import { tickConstraintRegistry } from './state/constraint-registry.js';
 
 // UI / input
 import { buildCharacterPicker, getActiveChar, onCharChange } from './ui/character-picker.js';
@@ -154,6 +155,12 @@ function loop() {
   decayMood(mood, frameDt);
   tickEarn(mood, getActiveChar());
   cleanupTransients(world, transientBodies, abilityCtx);
+  // Constraint registry auto-release valve. Runs OUTSIDE the FIXED_DT loop
+  // (between Engine.updates) so a release never lands mid-solve. Right after
+  // cleanupTransients: a ball that expired this frame already released its
+  // constraint via onExpire, so the valve just confirms a clean table (+ catches
+  // any orphan whose owner left the world without firing onExpire).
+  tickConstraintRegistry(now);
 
   // Frame-phase modes (e.g. plumbing), runs once per render frame, not
   // per physics step. Cosmetic-only systems live here.

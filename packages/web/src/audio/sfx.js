@@ -287,4 +287,22 @@ export const sfx = {
     beep({ freq: 220, dur: 0.22, type: 'triangle', vol: 0.12, sweep: -120 });
     noise({ dur: 0.18, vol: 0.1, lpFreq: 400 });
   },
+
+  // ── constraint-registry batch ───────────────────────────────────
+  // Wrecking ball cast: heavy air-swoosh + a rattle of chain links as it's rigged.
+  wreckingBallSwoosh: () => {
+    noise({ dur: 0.32, vol: 0.10, lpFreq: 1400 });
+    beep({ freq: 140, dur: 0.26, type: 'sawtooth', vol: 0.10, sweep: 60 });
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => beep({ freq: 2200 + (Math.random() - 0.5) * 600, dur: 0.025, type: 'square', vol: 0.07, sweep: -400 }), i * (28 + Math.random() * 22));
+    }
+  },
+  // Per-pass demolition thud: deep iron body + mid whump + crush, chain clank on the tail.
+  wreckingBallThud: () => {
+    preTransientClick(0.7, 0);
+    beep({ freq: 58, dur: 0.30, type: 'sawtooth', vol: 0.30, sweep: -30 });
+    beep({ freq: 130, dur: 0.14, type: 'triangle', vol: 0.14, sweep: -70 });
+    noise({ dur: 0.24, vol: 0.20, lpFreq: 700 });
+    setTimeout(() => beep({ freq: 1900, dur: 0.03, type: 'square', vol: 0.07, sweep: -500 }), 26);
+  },
 };

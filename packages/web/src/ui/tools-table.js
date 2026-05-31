@@ -159,6 +159,8 @@ export const TOOLS = [
     blurb: 'drag to fling a rolling chair, ricochets and clatters into them' },
   { id: 'battering_ram',label: 'battering ram',key: '', kind: 'hold+drag',delta: '−16/swing',spine: 'negative', group: 'siege', cost: 280,
     blurb: 'swing an iron-shod oak log along the drag; one heavy directional shove per part, per swing' },
+  { id: 'wrecking_ball',label: 'wrecking ball',key: '', kind: 'click',    delta: '−22/pass', spine: 'negative', group: 'siege', cost: 400,
+    blurb: 'rig a chained steel ball that swings down through the buddy for two or three demolition passes' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It

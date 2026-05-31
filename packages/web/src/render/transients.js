@@ -368,6 +368,34 @@ export function renderTransients(ctx, bodies) {
       if (Math.random() < 0.6) {
         P.spawn({ x: tx, y: ty, vx: 0, vy: -0.04, type: 'smoke', color: '#999', size: 7, life: 500, gravity: -0.0004, drag: 0.99 });
       }
+
+    } else if (b.partType === 'wrecking_ball') {
+      // Chain FIRST (so the ball sits on top), from the fixed world anchor to the
+      // ball. Guard on _anchor (always set by the ability; defensive).
+      const r = b.circleRadius || 22;
+      if (b._anchor) {
+        ctx.save();
+        ctx.strokeStyle = '#2a2a30'; ctx.lineWidth = 4;
+        ctx.beginPath(); ctx.moveTo(b._anchor.x, b._anchor.y); ctx.lineTo(b.position.x, b.position.y); ctx.stroke();
+        ctx.strokeStyle = '#54555c'; ctx.lineWidth = 1.6; ctx.setLineDash([5, 4]);
+        ctx.beginPath(); ctx.moveTo(b._anchor.x, b._anchor.y); ctx.lineTo(b.position.x, b.position.y); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.fillStyle = '#3a3a40';
+        ctx.beginPath(); ctx.arc(b._anchor.x, b._anchor.y, 4, 0, Math.PI * 2); ctx.fill();   // anchor pin
+        ctx.restore();
+      }
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      const g = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.2, 0, 0, r);
+      g.addColorStop(0, '#6a6e76'); g.addColorStop(0.6, '#2c2f35'); g.addColorStop(1, '#141418');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#0c0d10'; ctx.lineWidth = 1.5; ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.20)';
+      ctx.beginPath(); ctx.arc(-r * 0.35, -r * 0.4, r * 0.30, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#3a3a40';
+      ctx.beginPath(); ctx.arc(0, -r, 3.5, 0, Math.PI * 2); ctx.fill();   // chain lug
+      ctx.restore();
     }
   }
 }
