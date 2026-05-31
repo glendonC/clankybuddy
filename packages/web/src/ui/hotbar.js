@@ -11,6 +11,7 @@ import {
   HOTBAR_SLOTS,
 } from '../progression/state.js';
 import { openSlotPicker, openPicker } from './slot-picker.js';
+import { setEnabled as setModeEnabled } from '../modes/bus.js';
 
 let activeTool = 'grab';
 const toolListeners = [];
@@ -37,6 +38,14 @@ export function setActiveTool(t) {
     openPicker({ toolId: t });
     return;
   }
+  // Generic force-Mode teardown on tool switch: the tool we're LEAVING may be
+  // driving a phase:'physics' force Mode (magnet → 'force.magnet'; gravity-well
+  // / flood later). Disable its Mode tag so switching weapons mid-beam doesn't
+  // leave the tractor field running. Reads activeTool.forceMode off the TOOLS
+  // row — never hardcodes the magnet id. setEnabled is a no-op if it was off.
+  const leavingForceMode = TOOLS_BY_ID[activeTool]?.forceMode;
+  if (leavingForceMode && t !== activeTool) setModeEnabled(leavingForceMode, false);
+
   activeTool = t;
   document.querySelectorAll('.slot').forEach(el => el.classList.toggle('active', el.dataset.tool === t));
   const kind = def.kind || 'click';

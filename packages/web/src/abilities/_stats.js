@@ -73,6 +73,12 @@ import forceQuit    from './chaos/force-quit.js';
 import grab        from './cursor/grab.js';
 import bearTrap    from './cursor/bear-trap.js';
 import meathook    from './cursor/meathook.js';
+import magnet      from './cursor/magnet.js';
+import landmine    from './cursor/landmine.js';
+import cryoMine    from './cursor/cryo-mine.js';
+
+import electrifiedPanel from './punish/electrified-panel.js';
+import buzzsawWall      from './punish/buzzsaw-wall.js';
 
 // Master "stats" slot, cross-tool multipliers live here. Master tree nodes
 // mutate this and individual abilities can opt-in to read e.g. masterStats.moodMul.
@@ -109,7 +115,8 @@ function buildSources() {
     bat, battle_axe: battleAxe, fire_axe: fireAxe, hunting_knife: huntingKnife, cattle_prod: cattleProd, blowtorch, power_drill: powerDrill, nail_gun: nailGun, caltrops,
     brick, bowling_ball: bowlingBall, piano, crt, car, steamroller, city_bus: cityBus, trebuchet, office_chair: officeChair, battering_ram: batteringRam,
     anvil, blackhole, nuke, force_quit: forceQuit,
-    grab, bear_trap: bearTrap, meathook,
+    grab, bear_trap: bearTrap, meathook, magnet,
+    landmine, electrified_panel: electrifiedPanel, buzzsaw_wall: buzzsawWall, cryo_mine: cryoMine,
   };
 }
 

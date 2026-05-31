@@ -11,6 +11,7 @@ import { getRagdoll } from '../state/ragdoll-lifecycle.js';
 import { applyAbility, applyDragRelease } from '../abilities/index.js';
 import { getActiveTool, getActiveToolKind } from '../ui/hotbar.js';
 import { TOOLS_BY_ID } from '../ui/tools-table.js';
+import { setEnabled } from '../modes/bus.js';
 import { getActiveChar } from '../ui/character-picker.js';
 import { earnFromFire } from '../progression/earn.js';
 import { emit as emitTelemetry } from '../telemetry/events.js';
@@ -69,6 +70,13 @@ export function endPress() {
   if (isDown) {
     const tool = getActiveTool();
     const kind = getActiveToolKind();
+    // Generic force-Mode teardown: a tool that drives a phase:'physics' force
+    // Mode (magnet → 'force.magnet'; gravity-well / flood later) declares the
+    // Mode tag on its TOOLS row as `forceMode`. Releasing the press kills the
+    // beam. Reads the tag — never hardcodes the magnet id — so new force tools
+    // reuse this seam for free. setEnabled is a no-op if it was never on.
+    const forceMode = TOOLS_BY_ID[tool]?.forceMode;
+    if (forceMode) setEnabled(forceMode, false);
     if (kind === 'drag' && tool !== 'grab' && dragStart) {
       const dx = lastX - dragStart.x;
       const dy = lastY - dragStart.y;

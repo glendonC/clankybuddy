@@ -8,6 +8,7 @@ import ordnance     from './ordnance.js';
 import corruption   from './corruption.js';
 import cataclysm    from './cataclysm.js';
 import siege        from './siege.js';
+import hazard       from './hazard.js';
 import manipulation from './manipulation.js';
 
 import { TOOLS_BY_ID } from '../../ui/tools-table.js';
@@ -18,7 +19,7 @@ import { TOOLS_BY_ID } from '../../ui/tools-table.js';
 // retired in Phase 7's visceral kit redirect (citation folded out;
 // gaslight folded into corruption).
 export const GROUP_TREES = {
-  affection, provision, kinetic, ordnance, corruption, cataclysm, siege, manipulation,
+  affection, provision, kinetic, ordnance, corruption, cataclysm, siege, hazard, manipulation,
 };
 
 const NODES_BY_ID = new Map();

@@ -34,4 +34,26 @@ export default [
     blurb: 'CONDUCT lockout 5000 → 7000ms, buddy locked longer for follow-up.',
     effect: (s) => { s.conductedMs = 7000; },
   }),
+
+  // Magnet — tractor-beam force tool. Forks off the grab root (both are
+  // cursor-driven manipulation verbs). The pull physics is a phase:'physics'
+  // force Mode; the tool just flips it ON. Off-spine stat leaves widen the
+  // reach and harden the pull.
+  toolNode({
+    id: 'g.manipulation.magnet', parents: ['g.manipulation.grab'], cost: 160, toolId: 'magnet',
+    label: 'magnet',
+    blurb: 'Tractor beam — hold to drag the buddy toward the cursor and suspend it in midair.',
+  }),
+  statNode({
+    id: 'g.manipulation.magnet.reach', parents: ['g.manipulation.magnet'], cost: 220, toolId: 'magnet',
+    label: 'Field coils',
+    blurb: 'Longer reach: range 240 → 340px.',
+    effect: (s) => { s.range = 340; },
+  }),
+  statNode({
+    id: 'g.manipulation.magnet.power', parents: ['g.manipulation.magnet'], cost: 280, toolId: 'magnet',
+    label: 'Overclocked windings',
+    blurb: 'Stronger pull: force-per-mass 0.006 → 0.009, ceiling 0.012 → 0.018.',
+    effect: (s) => { s.pull = 0.009; s.maxPull = 0.018; },
+  }),
 ];
