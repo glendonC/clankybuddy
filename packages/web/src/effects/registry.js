@@ -21,6 +21,8 @@ import lashed           from './lashed.js';
 import finishing        from './finishing.js';
 import antitrustSplit   from './antitrust-split.js';
 import bleed            from './bleed.js';
+import corroded         from './corroded.js';
+import wired            from './wired.js';
 import * as P from '../particles.js';
 import { getActiveChar } from '../ui/character-picker.js';
 import { emit as emitTelemetry } from '../telemetry/events.js';
@@ -36,6 +38,8 @@ const EFFECTS = {
   aligned,
   lashed,
   bleed,
+  corroded,
+  wired,
   finishing,
   // Mode events with teeth.
   antitrust_split: antitrustSplit,
@@ -195,7 +199,9 @@ export function damageMul(reg, part) {
   }
   let mul = 1;
   if (hasStatus(reg, part, 'concussed'))      mul *= 1.5;
+  if (hasStatus(reg, part, 'corroded'))       mul *= 1.4;   // UP, per-part, NOT consumed
   if (buddyHas(reg, 'antitrust_split'))       mul *= 2;
+  if (hasStatus(reg, part, 'wired'))          mul *= 0.5;   // DOWN, defensive toughness
   return mul;
 }
 

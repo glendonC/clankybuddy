@@ -57,6 +57,26 @@ export default [
     effect: (s) => { s.radius = 320; s.force *= 1.5; s.firePoolMs = 8000; },
   }),
 
+  // Acid flask branch (its own root), lobbed caustic flask → lingering
+  // corrosion pool that amps damage on whatever wades through it.
+  toolNode({
+    id: 'g.corruption.acid_flask', parents: [], cost: 180, toolId: 'acid_flask',
+    label: 'acid flask',
+    blurb: 'Lob a flask of caustic acid; shatters into a corroding green pool.',
+  }),
+  statNode({
+    id: 'g.corruption.acid_flask.pool', parents: ['g.corruption.acid_flask'], cost: 300, toolId: 'acid_flask',
+    label: 'Wider spill',
+    blurb: 'Pool lasts 5s → 8s. The corrosion lingers longer.',
+    effect: (s) => { s.poolMs += 3000; },
+  }),
+  statNode({
+    id: 'g.corruption.acid_flask.deep', parents: ['g.corruption.acid_flask'], cost: 300, toolId: 'acid_flask',
+    label: 'Deeper corrosion',
+    blurb: 'Corroded coat lasts 8s → 12s. The damage-amp sticks around.',
+    effect: (s) => { s.corrodeMs += 4000; },
+  }),
+
   // The `poison`/mode-collapse zone and the `gaslight` speech-hijack were
   // AI-culture gags cut in the grounded-roster pass; nodes refunded via
   // REMOVED_NODE_COSTS. The debounced-pass zone *mechanic* is preserved as
