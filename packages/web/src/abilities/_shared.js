@@ -88,6 +88,74 @@ export function partInRange(ragdoll, x, y, range) {
   return d <= range ? part : null;
 }
 
+// --- Segment geometry (melee sweep substrate, Batch 3B) ---
+//
+// Perpendicular distance from point P to segment AB, with the clamped
+// projection parameter t. Identical math to the lightsaber/chainsaw
+// `segmentDistance` hand-rolls; consolidated here so sweep weapons share
+// one implementation. lenSq is OR-1'd so a degenerate (zero-length)
+// segment can't divide by zero.
+function segmentDistance(px, py, ax, ay, bx, by) {
+  const abx = bx - ax, aby = by - ay;
+  const apx = px - ax, apy = py - ay;
+  const lenSq = abx * abx + aby * aby || 1;
+  let t = (apx * abx + apy * aby) / lenSq;
+  t = Math.max(0, Math.min(1, t));
+  const cx = ax + abx * t, cy = ay + aby * t;
+  return { dist: Math.hypot(px - cx, py - cy), t };
+}
+
+// Ragdoll parts whose CENTER lies within `radius` of the segment
+// (ax,ay)→(bx,by). Used by sweep melee (machete/chainsaw-style line damage)
+// to gather every part the blade crosses in one pass. The segment-distance
+// math matches lightsaber.js exactly. A degenerate (zero-length) segment is
+// NaN-guarded by segmentDistance's `|| 1` denominator, it collapses to a
+// radius test around the single point (ax,ay).
+export function gatherInSegment(ragdoll, ax, ay, bx, by, radius) {
+  const out = [];
+  if (!ragdoll?.parts) return out;
+  for (const p of ragdoll.parts) {
+    const { dist } = segmentDistance(p.position.x, p.position.y, ax, ay, bx, by);
+    if (dist <= radius) out.push(p);
+  }
+  return out;
+}
+
+// SWEEP-IMPACT, melee line/arc damage applicator (Batch 3B substrate).
+//
+// IMPULSE LANE, NOT splash. sweepImpact routes every hit through
+// applyImpulseScaled → applyImpulse, so each struck part inherits the full
+// hit-impulse pipeline: the master damageMul, the markHit blend-down, and
+// the ~0.30× one-hop neighbor PROPAGATE_FACTOR that makes limbs flail. This
+// is deliberately DIFFERENT from the spawnDrop / bigImpact "squashVel +
+// splashForce" lane, which sets velocity directly and shoves neighbors by a
+// separate falloff. A melee sweep is a series of solid hits, not a blast, so
+// it must use the impulse lane. Do not reroute it through setVelocity.
+//
+// `marker` is an OPAQUE dedupe pair { seen(partId) -> bool, mark(partId) }.
+// One swing passes a Set-backed marker (each part hit at most once per
+// frame); a persistent hazard (a lingering damage volume) passes a
+// time-map-backed marker so a part can be re-hit only after a cooldown. The
+// caller owns the marker's lifetime and semantics; sweepImpact only asks
+// "have you seen this part?" and "mark it."
+//
+// Returns the array of parts actually struck this call (post-dedupe) so the
+// caller can spawn per-part VFX / apply statuses / count hits.
+//
+// opts: { upBias = 0 } — mass-scaled upward bias forwarded to
+// applyImpulseScaled (same force-per-mass unit as everywhere else).
+export function sweepImpact(ctx, parts, nx, ny, mag, marker, opts = {}) {
+  const { upBias = 0 } = opts;
+  const hit = [];
+  for (const part of parts) {
+    if (marker.seen(part.id)) continue;
+    marker.mark(part.id);
+    applyImpulseScaled(part, nx, ny, mag, upBias);
+    hit.push(part);
+  }
+  return hit;
+}
+
 // Aimed-firearm tool ids. These route their cursor + apply through aimAngle()
 // so the auto-aim ("aimbot") is gated behind the firearms shared unlock
 // instead of being always-on. Everything else keeps cursor-faces-nearest-part.

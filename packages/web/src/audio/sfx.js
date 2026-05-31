@@ -67,4 +67,72 @@ export const sfx = {
   },
   // Soft ascending two-note relief chime (first aid).
   heal:    () => { beep({ freq: 740, dur: 0.12, type: 'sine', vol: 0.08, sweep: 120 }); setTimeout(()=>beep({ freq: 1110, dur: 0.16, type: 'sine', vol: 0.07, sweep: 80 }), 90); },
+
+  // ── Batch 3B grounded melee ─────────────────────────────────────
+  // Solid wooden bat crack: sharp transient + woody mid knock + low body
+  // thump. No metallic ring (blunt wood). ~120ms.
+  bat: () => {
+    preTransientClick(0.6, 0);
+    noise({ dur: 0.03, vol: 0.16, lpFreq: 2000 });        // woody knock
+    beep({ freq: 150, dur: 0.08, type: 'sine', vol: 0.18, sweep: -40 }); // body thump
+  },
+  // Heavy steel cleave: haft-crack transient + low body thud + metallic bite.
+  // Lower/heavier and longer-tailed than the punch/hammer.
+  battle_axe: () => {
+    preTransientClick(0.7, 0);
+    beep({ freq: 90, dur: 0.18, type: 'sawtooth', vol: 0.24, sweep: -40 }); // head thud
+    noise({ dur: 0.12, vol: 0.16, lpFreq: 3200 });        // edge 'chnk' bite
+  },
+  // Chop + ignite-whoosh, two stacked layers: wood/steel thunk then an
+  // air-rush fwoomp ~30ms later.
+  fire_axe: () => {
+    preTransientClick(0.6, 0);
+    beep({ freq: 150, dur: 0.07, type: 'square', vol: 0.18, sweep: -60 }); // chop
+    noise({ dur: 0.05, vol: 0.12, lpFreq: 3400 });        // blade bite
+    setTimeout(() => {                                     // ignite whoosh
+      noise({ dur: 0.22, vol: 0.12, lpFreq: 1400 });
+      beep({ freq: 90, dur: 0.18, type: 'sawtooth', vol: 0.06, sweep: 40 });
+    }, 30);
+  },
+  // Quick dry stab/slash: short bright steel 'shink' + tiny flesh-impact tick.
+  // Tighter / higher-pitched than sword.
+  hunting_knife: () => {
+    beep({ freq: 110, dur: 0.03, type: 'square', vol: 0.1, sweep: -40 }); // impact tick
+    noise({ dur: 0.06, vol: 0.14, lpFreq: 5000 });        // steel shink
+  },
+  // Electric prod jolt: contact snap + high crackle + fast descending zap.
+  // Dry & snappy (~110ms), reads as a stun jab not a continuous arc.
+  cattle_prod: () => {
+    preTransientClick(0.5, 0);
+    noise({ dur: 0.1, vol: 0.12, lpFreq: 6000 });          // high crackle
+    beep({ freq: 1800, dur: 0.08, type: 'sawtooth', vol: 0.12, sweep: -1200 }); // zap sweep
+  },
+  // Continuous oxy-acetylene cutting-torch hiss. Called at most every
+  // ~120ms so consecutive bursts overlap into a steady jet. Bright hiss,
+  // no pitched component; modest gain (fires ~8×/sec).
+  blowtorch: () => {
+    noise({ dur: 0.13, vol: 0.1, lpFreq: 5000 });          // bright jet hiss
+    noise({ dur: 0.1, vol: 0.04, lpFreq: 220 });           // gas-feed body rumble
+  },
+  // Staccato pneumatic nailer: firing-pin snap + driving 'chunk' + air-release
+  // hiss. Under ~40ms total so re-fires read as a chattering nailer.
+  nail_gun: () => {
+    preTransientClick(0.45, 0);
+    beep({ freq: 170, dur: 0.022, type: 'square', vol: 0.16, sweep: -40 }); // pneumatic chunk
+    noise({ dur: 0.012, vol: 0.1, lpFreq: 7000 });         // air release
+  },
+  // Looping mid-high motor whirr (held drill). Retrigger throttled to ~110ms
+  // so consecutive bursts blend into a continuous whirr.
+  power_drill: () => {
+    const j = (Math.random() - 0.5) * 30;
+    beep({ freq: 320 + j, dur: 0.1, type: 'sawtooth', vol: 0.1, sweep: 30 }); // motor whirr
+    noise({ dur: 0.09, vol: 0.06, lpFreq: 2600 });         // bit grind
+  },
+  // Metallic scatter rattle: a short burst of high dry clicks, like a handful
+  // of spikes hitting the floor. Reads as clatter, not an impact thud.
+  caltrops: () => {
+    for (let i = 0; i < 5; i++) {
+      setTimeout(() => noise({ dur: 0.015, vol: 0.14, lpFreq: 6000 + (Math.random() - 0.5) * 1500 }), i * (8 + Math.random() * 7));
+    }
+  },
 };

@@ -8,7 +8,7 @@
 // terminal node was removed; players who bought it get a 1200¢ refund
 // on next boot (REMOVED_NODE_COSTS in that file).
 
-import { toolNode, statNode } from './_shared.js';
+import { toolNode, statNode, sharedNode } from './_shared.js';
 
 export default [
   toolNode({
@@ -255,5 +255,95 @@ export default [
     iconHint: '⚡',
     blurb: 'A1, Mood 12 → 16. Post-yank, the cursor stays linked to the part for 1.5s, drag it like a puppet (PR5 consumer reads cursorPuppetMs).',
     effect: (s) => { s.mood = 16; s.cursorPuppetMs = 1500; },
+  }),
+
+  // ── Batch 3B grounded melee roster ──────────────────────────────
+  // Real-world implements hung off the existing kinetic spine. Tree
+  // shape per docs/abilities-v3.md §3:
+  //   bat, hunting_knife, cattle_prod, blowtorch, caltrops <- root (punch)
+  //   battle_axe <- machete (sword); fire_axe <- battle_axe
+  //   power_drill, nail_gun <- hunting_knife
+
+  // Baseball bat <- root. Wide swept arc, launches the limb cluster sideways.
+  toolNode({
+    id: 'g.kinetic.bat', parents: ['g.kinetic.punch'], cost: 130, toolId: 'bat',
+    label: 'baseball bat',
+    blurb: 'Wide swept arc. Catches every limb in the swing and launches them sideways.',
+  }),
+
+  // Hunting knife <- root. Short fast stab, edged, leaves BLEED.
+  toolNode({
+    id: 'g.kinetic.hunting_knife', parents: ['g.kinetic.punch'], cost: 130, toolId: 'hunting_knife',
+    label: 'hunting knife',
+    blurb: 'Short, fast stab. Small knockback, leaves the part BLEEDing. Edged.',
+  }),
+
+  // Power drill <- hunting knife. Hold-on-a-part, BLEED ramps to 5×.
+  toolNode({
+    id: 'g.kinetic.power_drill', parents: ['g.kinetic.hunting_knife'], cost: 320, toolId: 'power_drill',
+    label: 'power drill',
+    blurb: 'Hold on one part, BLEED ramps toward 5× the longer you dwell; resets on target change.',
+  }),
+
+  // Nail gun <- hunting knife. Rapid hold, staples stack BLEED + brief pin.
+  toolNode({
+    id: 'g.kinetic.nail_gun', parents: ['g.kinetic.hunting_knife'], cost: 170, toolId: 'nail_gun',
+    label: 'nail gun',
+    blurb: 'Rapid hold. Staples stack BLEED (caps 5×) and briefly pin the part.',
+  }),
+
+  // Cattle prod <- root. Short jab, ELECTRIFIES; shatters frozen.
+  toolNode({
+    id: 'g.kinetic.cattle_prod', parents: ['g.kinetic.punch'], cost: 130, toolId: 'cattle_prod',
+    label: 'cattle prod',
+    blurb: 'Short jab. ELECTRIFIES the struck part; shatters a frozen one.',
+  }),
+
+  // Blowtorch <- root. Hold-on-a-part cutting torch, ramps ON_FIRE.
+  toolNode({
+    id: 'g.kinetic.blowtorch', parents: ['g.kinetic.punch'], cost: 200, toolId: 'blowtorch',
+    label: 'blowtorch',
+    blurb: 'Hold-on-a-part cutting torch. Dwell ramps ON_FIRE intensity (caps at 5×); shatters frozen.',
+  }),
+
+  // Caltrops <- root. Drag-place a lingering spike strip that BLEEDs.
+  toolNode({
+    id: 'g.kinetic.caltrops', parents: ['g.kinetic.punch'], cost: 180, toolId: 'caltrops',
+    label: 'caltrops',
+    blurb: 'Drag-place a spike strip. Lingering floor hazard, BLEEDs any part that lands on or rolls across it, stacking to 5×.',
+  }),
+
+  // Battle axe <- machete (tool id 'sword'). Heavy radial cleave + edged bleed.
+  toolNode({
+    id: 'g.kinetic.battle_axe', parents: ['g.kinetic.sword'], cost: 300, toolId: 'battle_axe',
+    label: 'battle axe',
+    blurb: 'Heavy cleave. Wide radial chop + edged bleed. Branches off the machete.',
+  }),
+
+  // Fire axe <- battle axe. Cleave that sets struck parts ablaze; edged.
+  toolNode({
+    id: 'g.kinetic.fire_axe', parents: ['g.kinetic.battle_axe'], cost: 380, toolId: 'fire_axe',
+    label: 'fire axe',
+    blurb: 'Cleave + ignite. Struck parts catch fire (persistent); edged, so they bleed too.',
+  }),
+
+  // ── Shared melee family behavior flags (S8) ─────────────────────
+  // Cross-tool nodes that flip a FLAG every melee tool reads, never a
+  // scalar (the sharedNode guard rejects scalar-only effects).
+  sharedNode({
+    id: 'g.kinetic.melee.flurry', parents: ['g.kinetic.punch'], cost: 400,
+    family: 'melee', flag: 'flurry',
+    label: "Brawler's tempo",
+    iconHint: '⚔',
+    blurb: 'Every swing melee tool lands a synchronous second hit the same frame.',
+    effect: (fam) => { fam.flurry = true; },
+  }),
+  sharedNode({
+    id: 'g.kinetic.melee.bleed_edge', parents: ['g.kinetic.hunting_knife'], cost: 450,
+    family: 'melee', flag: 'bleedOnEdge',
+    label: 'Bleed edge',
+    iconHint: '⚔',
+    blurb: 'Every edged melee tool opens a BLEED wound on contact, even a clean hit.',
+    effect: (fam) => { fam.bleedOnEdge = true; },
   }),
 ];
