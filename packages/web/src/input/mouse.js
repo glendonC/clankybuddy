@@ -23,6 +23,8 @@ const { Events } = Matter;
 const FIRE_INTERVAL = {
   pet: 30,
   flamethrower: 30,
+  liquid_nitrogen: 30,            // cryo cone, matches flamethrower cadence
+  laser_cutter: 30,               // continuous beam sweep
   sword: 50,                      // machete sweep
   machinegun: 70,
   smg: 50,                        // faster than the MG
