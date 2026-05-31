@@ -38,4 +38,32 @@ export default [
     label: 'first aid',
     blurb: 'Patch them up: +mood and clears BLEED / ON_FIRE off every part.',
   }),
+
+  // Defibrillator — recovery branch off first aid. Shocks a BROKEN/KO'd buddy
+  // back to life, clearing the knockout and jolting mood out of rock-bottom.
+  toolNode({
+    id: 'g.provision.defibrillator', parents: ['g.provision.first_aid'], cost: 160, toolId: 'defibrillator',
+    label: 'defibrillator',
+    blurb: "Crash-cart paddles. Shock a BROKEN or KO'd buddy back to life.",
+  }),
+  statNode({
+    id: 'g.provision.defibrillator.charge', parents: ['g.provision.defibrillator'], cost: 280, toolId: 'defibrillator',
+    label: 'Bigger charge',
+    blurb: 'Recovery 35 → 50 and the toughness kicker lasts longer (2.5s → 4s).',
+    effect: (s) => { s.moodRecover = 50; s.wiredMs = 4000; },
+  }),
+
+  // Adrenaline shot — recovery branch off first aid. A brief amped toughness
+  // window halves incoming damage so the beatdown runs longer.
+  toolNode({
+    id: 'g.provision.adrenaline', parents: ['g.provision.first_aid'], cost: 140, toolId: 'adrenaline',
+    label: 'adrenaline shot',
+    blurb: 'Jab the buddy with adrenaline. A brief toughness window halves incoming damage.',
+  }),
+  statNode({
+    id: 'g.provision.adrenaline.dose', parents: ['g.provision.adrenaline'], cost: 240, toolId: 'adrenaline',
+    label: 'Heavy dose',
+    blurb: 'Toughness window 3s → 5s. The amped state runs longer.',
+    effect: (s) => { s.wiredMs = 5000; },
+  }),
 ];

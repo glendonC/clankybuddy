@@ -17,6 +17,8 @@ import pet         from './praise/pet.js';
 import feed        from './praise/feed.js';
 import gift        from './praise/gift.js';
 import firstAid    from './praise/first-aid.js';
+import defibrillator from './praise/defibrillator.js';
+import adrenaline  from './praise/adrenaline.js';
 
 import punch         from './punish/punch.js';
 import brassKnuckles from './punish/brass-knuckles.js';
@@ -40,6 +42,7 @@ import freeze        from './punish/freeze.js';
 import whip          from './punish/whip.js';
 import chainsaw      from './punish/chainsaw.js';
 import sawblade      from './punish/sawblade.js';
+import acidFlask     from './punish/acid-flask.js';
 
 import bat           from './punish/bat.js';
 import battleAxe     from './punish/battle_axe.js';
@@ -100,9 +103,9 @@ let _initialized = false;
 // Build the SOURCES object at call time so the import cycle has fully resolved.
 function buildSources() {
   return {
-    pet, feed, gift, first_aid: firstAid,
+    pet, feed, gift, first_aid: firstAid, defibrillator, adrenaline,
     punch, brass_knuckles: brassKnuckles, hammer, sword, gun, revolver, machinegun, smg, assault_rifle: assaultRifle, lmg, minigun, shotgun, rocket, fireball, grenade, frag_grenade: fragGrenade, flame, lightning, freeze,
-    whip, chainsaw, sawblade,
+    whip, chainsaw, sawblade, acid_flask: acidFlask,
     bat, battle_axe: battleAxe, fire_axe: fireAxe, hunting_knife: huntingKnife, cattle_prod: cattleProd, blowtorch, power_drill: powerDrill, nail_gun: nailGun, caltrops,
     brick, bowling_ball: bowlingBall, piano, crt, car, steamroller, city_bus: cityBus, trebuchet, office_chair: officeChair, battering_ram: batteringRam,
     anvil, blackhole, nuke, force_quit: forceQuit,

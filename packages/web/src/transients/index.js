@@ -20,6 +20,7 @@ import caltrops         from './caltrops.js';
 import steamrollerH     from './steamroller.js';
 import cityBusH         from './city-bus.js';
 import officeChairH     from './office-chair.js';
+import acidPool         from './acid-pool.js';
 
 const { Composite } = Matter;
 
@@ -28,7 +29,7 @@ const { Composite } = Matter;
 // cloud, caltrops). It is intentionally NOT registered here: nothing spawns
 // it now that the `poison` tool is cut.
 const HANDLERS = {};
-[treat, gift, bullet, firepool, sawblade, bearTrap, meathook, caltrops, steamrollerH, cityBusH, officeChairH]
+[treat, gift, bullet, firepool, sawblade, bearTrap, meathook, caltrops, steamrollerH, cityBusH, officeChairH, acidPool]
   .forEach(h => { HANDLERS[h.partType] = h; });
 
 export function getTransientHandler(partType) { return HANDLERS[partType] || null; }

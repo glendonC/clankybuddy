@@ -20,6 +20,10 @@ export const TOOLS = [
     blurb: 'wrapped box, biggest standard boost' },
   { id: 'first_aid',   label: 'first aid',    key: '3', kind: 'click',     delta: '+18',  spine: 'positive', group: 'provision', cost: 90,
     blurb: 'patch them up: mood boost + clears BLEED and ON_FIRE off every part' },
+  { id: 'defibrillator',label: 'defibrillator',key: '', kind: 'click',     delta: '+35',  spine: 'positive', group: 'provision', cost: 160, cd: 2,
+    blurb: "crash-cart paddles. shock a BROKEN or KO'd buddy back to life — clears the knockout and jolts mood up out of rock-bottom." },
+  { id: 'adrenaline',  label: 'adrenaline shot',key: '', kind: 'click',    delta: '+4+tough',spine: 'positive', group: 'provision', cost: 140, cd: 3,
+    blurb: 'jab the buddy with adrenaline. a brief amped toughness window halves incoming damage so the beatdown runs longer.' },
 
   // NEGATIVE / kinetic (renamed from `melee`)
   { id: 'punch',       label: 'punch',        key: 'Q', kind: 'click',     delta: '−8',   spine: 'negative', group: 'kinetic',
@@ -93,6 +97,8 @@ export const TOOLS = [
     blurb: 'lobbed magic, splash + fire pool on impact' },
   { id: 'flamethrower',label: 'flamethrower', key: 'O', kind: 'hold',      delta: '−1/t', spine: 'negative', group: 'corruption', cost: 140,
     blurb: 'continuous flame stream' },
+  { id: 'acid_flask',  label: 'acid flask',   key: '', kind: 'drag',       delta: '−8+corrode', spine: 'negative', group: 'corruption', cost: 180, cd: 1.5,
+    blurb: 'lob a flask of caustic acid; it shatters into a lingering green pool that corrodes (×1.4 damage) whatever wades through it.' },
 
   // NEGATIVE / cataclysm (renamed from `god`), gravity & screen-clearing drama buttons
   { id: 'anvil',       label: 'anvil',        key: 'Z', kind: 'click',     delta: '−30',  spine: 'negative', group: 'cataclysm', cd: 6,  cost: 300,
