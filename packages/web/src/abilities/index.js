@@ -34,6 +34,10 @@ import whip          from './punish/whip.js';
 import chainsaw      from './punish/chainsaw.js';
 import sawblade      from './punish/sawblade.js';
 import acidFlask     from './punish/acid-flask.js';
+import liquidNitrogen from './punish/liquid-nitrogen.js';
+import flashFreeze   from './punish/flash-freeze.js';
+import laserCutter   from './punish/laser-cutter.js';
+import taser         from './punish/taser.js';
 
 import bat           from './punish/bat.js';
 import battleAxe     from './punish/battle_axe.js';
@@ -77,6 +81,7 @@ const ABILITIES = {
   pet, feed, gift, first_aid: firstAid, defibrillator, adrenaline,
   punch, brass_knuckles: brassKnuckles, hammer, sword, gun, revolver, machinegun, smg, assault_rifle: assaultRifle, lmg, minigun, shotgun, rocket, fireball, grenade, frag_grenade: fragGrenade, flame, lightning, freeze,
   whip, chainsaw, sawblade, acid_flask: acidFlask,
+  liquid_nitrogen: liquidNitrogen, flash_freeze: flashFreeze, laser_cutter: laserCutter, taser,
   bat, battle_axe: battleAxe, fire_axe: fireAxe, hunting_knife: huntingKnife, cattle_prod: cattleProd, blowtorch, power_drill: powerDrill, nail_gun: nailGun, caltrops,
   brick, bowling_ball: bowlingBall, piano, crt, car, steamroller, city_bus: cityBus, trebuchet, office_chair: officeChair, battering_ram: batteringRam,
   anvil, blackhole, nuke, force_quit: forceQuit,

@@ -99,6 +99,14 @@ export const TOOLS = [
     blurb: 'continuous flame stream' },
   { id: 'acid_flask',  label: 'acid flask',   key: '', kind: 'drag',       delta: '−8+corrode', spine: 'negative', group: 'corruption', cost: 180, cd: 1.5,
     blurb: 'lob a flask of caustic acid; it shatters into a lingering green pool that corrodes (×1.4 damage) whatever wades through it.' },
+  { id: 'liquid_nitrogen', label: 'liquid nitrogen', key: '', kind: 'hold', delta: 'freeze/t', spine: 'negative', group: 'corruption', cost: 200,
+    blurb: 'continuous cryo cone; paints persistent freeze (brittle) onto whatever the stream touches' },
+  { id: 'flash_freeze',label: 'cryo grenade', key: '', kind: 'drag',       delta: '−8+freeze', spine: 'negative', group: 'corruption', cost: 220, cd: 1.2,
+    blurb: 'lob a flash-freeze grenade; airbursts into a cryo AOE that freezes every limb in range solid (brittle) and arrests it mid-motion. sets up shatter follow-ups.' },
+  { id: 'laser_cutter',label: 'laser cutter', key: '', kind: 'hold',       delta: '−1/t+burn', spine: 'negative', group: 'corruption', cost: 220,
+    blurb: 'a continuous industrial cutting beam; sweep it across the buddy to slice, burn, and shatter anything frozen' },
+  { id: 'taser',       label: 'taser',        key: '', kind: 'click',      delta: '−4+zap', spine: 'negative', group: 'corruption', cost: 200,
+    blurb: 'fire two conductive darts; the wires shock and reel the buddy in' },
 
   // NEGATIVE / cataclysm (renamed from `god`), gravity & screen-clearing drama buttons
   { id: 'anvil',       label: 'anvil',        key: 'Z', kind: 'click',     delta: '−30',  spine: 'negative', group: 'cataclysm', cd: 6,  cost: 300,

@@ -77,6 +77,91 @@ export default [
     effect: (s) => { s.corrodeMs += 4000; },
   }),
 
+  // Cryo / offensive-cold line. Freeze proper lives in `manipulation`
+  // (control tool), so cross-group parenting is rejected — these root here
+  // as independent corruption roots instead of hanging under the freeze node.
+  toolNode({
+    id: 'g.corruption.liquid_nitrogen', parents: [], cost: 200, toolId: 'liquid_nitrogen',
+    label: 'liquid nitrogen',
+    blurb: 'Continuous cryo cone — paints persistent freeze (brittle) onto whatever the stream touches. Hold to lock a region down for shatter follow-ups.',
+  }),
+  statNode({
+    id: 'g.corruption.liquid_nitrogen.range', parents: ['g.corruption.liquid_nitrogen'], cost: 280, toolId: 'liquid_nitrogen',
+    label: 'Long lance',
+    blurb: 'Range 170 → 250.',
+    effect: (s) => { s.range = 250; },
+  }),
+  statNode({
+    id: 'g.corruption.liquid_nitrogen.flow', parents: ['g.corruption.liquid_nitrogen'], cost: 280, toolId: 'liquid_nitrogen',
+    label: 'High flow',
+    blurb: 'Freeze paint chance 0.6 → 0.9; mood drain 0.4 → 0.6/t.',
+    effect: (s) => { s.freezeChance = 0.9; s.moodPerTick = 0.6; },
+  }),
+
+  // Flash-freeze (cryo grenade) — lobbed mass-freeze airburst. Own root.
+  toolNode({
+    id: 'g.corruption.flash_freeze', parents: [], cost: 220, toolId: 'flash_freeze',
+    label: 'cryo grenade',
+    blurb: 'Lobbed flash-freeze airburst — freezes every limb in the burst radius solid + arrests motion. Mass freeze for shatter combos.',
+  }),
+  statNode({
+    id: 'g.corruption.flash_freeze.radius', parents: ['g.corruption.flash_freeze'], cost: 320, toolId: 'flash_freeze',
+    label: 'Wide burst',
+    blurb: 'Cryo-burst radius 150 → 210px.',
+    effect: (s) => { s.radius = 210; },
+  }),
+  statNode({
+    id: 'g.corruption.flash_freeze.arrest', parents: ['g.corruption.flash_freeze'], cost: 300, toolId: 'flash_freeze',
+    label: 'Dead stop',
+    blurb: 'Burst arrest 0.55 → 0.85 — caught limbs snap to a near-total halt.',
+    effect: (s) => { s.arrest = 0.85; },
+  }),
+
+  // Directed-energy line — laser cutter (continuous cutting beam). Own root.
+  toolNode({
+    id: 'g.corruption.laser_cutter', parents: [], cost: 220, toolId: 'laser_cutter',
+    label: 'laser cutter',
+    blurb: 'A continuous industrial cutting beam — sweep it across the buddy to slice, burn, and shatter anything frozen.',
+  }),
+  statNode({
+    id: 'g.corruption.laser_cutter.range', parents: ['g.corruption.laser_cutter'], cost: 300, toolId: 'laser_cutter',
+    label: 'focusing optics',
+    blurb: 'Beam range +90px.',
+    effect: (st) => { st.range += 90; },
+  }),
+  statNode({
+    id: 'g.corruption.laser_cutter.ignite', parents: ['g.corruption.laser_cutter'], cost: 300, toolId: 'laser_cutter',
+    label: 'thermal lens',
+    blurb: 'Ignite chance +0.25.',
+    effect: (st) => { st.igniteChance = Math.min(1, st.igniteChance + 0.25); },
+  }),
+  statNode({
+    id: 'g.corruption.laser_cutter.cut', parents: ['g.corruption.laser_cutter.range', 'g.corruption.laser_cutter.ignite'], cost: 1200, toolId: 'laser_cutter',
+    label: 'industrial cutting head',
+    iconHint: '⚡',
+    blurb: 'Push force +0.008, beam width +6px.',
+    effect: (st) => { st.pushForce += 0.008; st.beamRadius += 6; },
+  }),
+
+  // Taser — directed-energy dart pair. Own root.
+  toolNode({
+    id: 'g.corruption.taser', parents: [], cost: 200, toolId: 'taser',
+    label: 'taser',
+    blurb: 'Fire two conductive darts; the wires shock and reel the buddy in.',
+  }),
+  statNode({
+    id: 'g.corruption.taser.shock', parents: ['g.corruption.taser'], cost: 300, toolId: 'taser',
+    label: 'Longer charge',
+    blurb: 'Convulsion 1.4s → 2.4s.',
+    effect: (s) => { s.shockMs = 2400; },
+  }),
+  statNode({
+    id: 'g.corruption.taser.reel', parents: ['g.corruption.taser'], cost: 300, toolId: 'taser',
+    label: 'Stronger wires',
+    blurb: 'Reel pull ×1.8 — yanks the buddy harder toward the gun.',
+    effect: (s) => { s.reelForce *= 1.8; },
+  }),
+
   // The `poison`/mode-collapse zone and the `gaslight` speech-hijack were
   // AI-culture gags cut in the grounded-roster pass; nodes refunded via
   // REMOVED_NODE_COSTS. The debounced-pass zone *mechanic* is preserved as
