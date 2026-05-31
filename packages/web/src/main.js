@@ -25,6 +25,7 @@ import {
   transientBodies, getRagdoll, getCurrentBuddy, spawnRagdoll, resetMood,
 } from './state/ragdoll-lifecycle.js';
 import { tickConstraintRegistry } from './state/constraint-registry.js';
+import { tickScheduler } from './state/scheduler.js';
 
 // UI / input
 import { buildCharacterPicker, getActiveChar, onCharChange } from './ui/character-picker.js';
@@ -161,6 +162,12 @@ function loop() {
   // constraint via onExpire, so the valve just confirms a clean table (+ catches
   // any orphan whose owner left the world without firing onExpire).
   tickConstraintRegistry(now);
+  // Scheduler tick (S4). Same between-Engine.updates window as the constraint
+  // valve; fires every barrage shell whose absolute due-stamp elapsed this frame,
+  // with a fresh per-step ctx. abilityCtx (the factory) is makeCtx — each fired
+  // step mints a ctx for the current buddy; the per-task epoch check drops a
+  // barrage whose buddy was swapped out mid-walk.
+  tickScheduler(now, abilityCtx);
 
   // Frame-phase modes (e.g. plumbing), runs once per render frame, not
   // per physics step. Cosmetic-only systems live here.

@@ -104,6 +104,8 @@ export const TOOLS = [
     blurb: 'a furnace-heated cannonball that sets the buddy alight and leaves burning embers where it lands' },
   { id: 'mortar',      label: 'mortar',       key: '', kind: 'click',     delta: '−32',  spine: 'negative', group: 'ordnance', cost: 210, cd: 4,
     blurb: 'mark the ground, a shell whistles in from above and detonates' },
+  { id: 'creeping_barrage',label: 'creeping barrage',key: '', kind: 'click', delta: '−12×4', spine: 'negative', group: 'ordnance', cost: 280, cd: 8,
+    blurb: 'mark a line; four shells walk across the buddy on a timed schedule' },
   { id: 'flashbang',   label: 'flashbang',    key: '', kind: 'drag',      delta: '−10+concuss',spine: 'negative', group: 'ordnance', cost: 160,
     blurb: 'drag to lob, 2s fuse, blinding flash that concusses everything nearby' },
   { id: 'sonic_cannon',label: 'sonic cannon', key: '', kind: 'click',     delta: '−14+concuss',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 190,

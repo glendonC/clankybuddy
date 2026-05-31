@@ -158,6 +158,18 @@ export default [
     blurb: 'Blast radius 240 → 340, mood damage +40%.',
     effect: (s) => { s.radius = 340; s.mood = Math.round(s.mood * 1.4); },
   }),
+  // Creeping barrage — walks K shells along a line via the S4 scheduler. Mortar fork.
+  toolNode({
+    id: 'g.ordnance.creeping_barrage', parents: ['g.ordnance.mortar'], cost: 280, toolId: 'creeping_barrage',
+    label: 'creeping barrage',
+    blurb: 'Mark a line; four shells walk across the buddy on a timed schedule.',
+  }),
+  statNode({
+    id: 'g.ordnance.creeping_barrage.walk', parents: ['g.ordnance.creeping_barrage'], cost: 600, toolId: 'creeping_barrage',
+    label: 'Sustained fire',
+    blurb: 'Shells 4 → 6, each blast radius 130 → 156.',
+    effect: (s) => { s.count = 6; s.radius = Math.round(s.radius * 1.2); },
+  }),
   toolNode({
     id: 'g.ordnance.frag_grenade', parents: ['g.ordnance.mortar'], cost: 150, toolId: 'frag_grenade',
     label: 'frag grenade',

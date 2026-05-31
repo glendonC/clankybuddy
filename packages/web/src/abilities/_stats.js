@@ -55,6 +55,7 @@ import hotShot       from './punish/hot-shot.js';
 import mortar        from './punish/mortar.js';
 import flashbang     from './punish/flashbang.js';
 import sonicCannon   from './punish/sonic-cannon.js';
+import creepingBarrage from './punish/creeping-barrage.js';
 
 import bat           from './punish/bat.js';
 import battleAxe     from './punish/battle_axe.js';
@@ -126,7 +127,7 @@ function buildSources() {
     punch, brass_knuckles: brassKnuckles, hammer, sword, gun, revolver, machinegun, smg, assault_rifle: assaultRifle, lmg, minigun, shotgun, rocket, fireball, grenade, frag_grenade: fragGrenade, flame, lightning, freeze,
     whip, chainsaw, sawblade, acid_flask: acidFlask,
     liquid_nitrogen: liquidNitrogen, flash_freeze: flashFreeze, laser_cutter: laserCutter, taser,
-    cannon, grapeshot, chain_shot: chainShot, hot_shot: hotShot, mortar, flashbang, sonic_cannon: sonicCannon,
+    cannon, grapeshot, chain_shot: chainShot, hot_shot: hotShot, mortar, flashbang, sonic_cannon: sonicCannon, creeping_barrage: creepingBarrage,
     bat, battle_axe: battleAxe, fire_axe: fireAxe, hunting_knife: huntingKnife, cattle_prod: cattleProd, blowtorch, power_drill: powerDrill, nail_gun: nailGun, caltrops,
     brick, bowling_ball: bowlingBall, piano, crt, car, steamroller, city_bus: cityBus, trebuchet, office_chair: officeChair, battering_ram: batteringRam, wrecking_ball: wreckingBall,
     anvil, blackhole, nuke, force_quit: forceQuit,

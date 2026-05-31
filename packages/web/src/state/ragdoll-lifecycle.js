@@ -14,6 +14,7 @@ import { createMood } from '../mood.js';
 import { createStatusRegistry, clearAll as clearAllStatus } from '../effects/registry.js';
 import { canvas, world } from './world.js';
 import { teardownAllConstraints } from './constraint-registry.js';
+import { cancelAllScheduled } from './scheduler.js';
 import { FLOOR_INSET, RAGDOLL_RIG_HEIGHT } from '../physics/constants.js';
 
 const { Composite } = Matter;
@@ -51,6 +52,11 @@ export function spawnRagdoll(charId) {
   // body next step → NaN. Runs under the OLD epoch (epoch++ is below) — correct,
   // it clears the outgoing buddy's constraints.
   teardownAllConstraints();
+  // Drop any in-flight scheduled sequences (e.g. a mid-walk creeping barrage)
+  // before the buddy swaps. Defense — the per-frame epoch check already blocks
+  // firing on the new buddy; this reclaims the task entries immediately so the
+  // new buddy starts with an empty scheduler, mirroring teardownAllConstraints.
+  cancelAllScheduled();
   if (_buddy.ragdoll) Composite.remove(world, _buddy.ragdoll.composite);
   clearAllStatus(_buddy.status);
   _buddy.epoch++;
