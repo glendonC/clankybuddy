@@ -135,4 +135,64 @@ export const sfx = {
       setTimeout(() => noise({ dur: 0.015, vol: 0.14, lpFreq: 6000 + (Math.random() - 0.5) * 1500 }), i * (8 + Math.random() * 7));
     }
   },
+
+  // ── Siege / vehicle batch ───────────────────────────────────────
+  // CRT smash: glass shatter + tube implosion thud + electric crackle, layered.
+  crtSmash: () => {
+    preTransientClick(0.6, 0);
+    beep({ freq: 3400, dur: 0.05, type: 'sine', vol: 0.13, sweep: 900 });   // high glass ping
+    noise({ dur: 0.18, vol: 0.2, lpFreq: 6500 });                          // glass scatter
+    beep({ freq: 70, dur: 0.16, type: 'sawtooth', vol: 0.22, sweep: -40 }); // implosion thud
+    setTimeout(() => { beep({ freq: 1800, dur: 0.05, type: 'square', vol: 0.13, sweep: -1200 }); noise({ dur: 0.04, vol: 0.16, lpFreq: 8000 }); }, 6);
+    setTimeout(() => noise({ dur: 0.03, vol: 0.12, lpFreq: 8000 }), 60);
+    setTimeout(() => noise({ dur: 0.03, vol: 0.09, lpFreq: 8000 }), 110);
+  },
+  // Car crunch: sheet-metal buckle on landing — sawtooth body thud + dull
+  // low-passed noise (the explode() bomb whump follows from the onImpact seam).
+  carCrunch: () => {
+    preTransientClick(0.4, 0);
+    beep({ freq: 95, dur: 0.16, type: 'sawtooth', vol: 0.24, sweep: -50 });
+    noise({ dur: 0.22, vol: 0.2, lpFreq: 900 });
+    noise({ dur: 0.09, vol: 0.14, lpFreq: 2600 });
+  },
+  // Heavy diesel rumble bed under the slow drum (long, low-frequency).
+  steamrollerRumble: () => {
+    preTransientClick(0.3, 0);                                              // engine catch
+    noise({ dur: 0.8, vol: 0.16, lpFreq: 180 });                           // diesel rumble bed
+    beep({ freq: 60, dur: 0.7, type: 'sawtooth', vol: 0.2, sweep: -8 });   // drum weight sub
+  },
+  // City bus: diesel engine note + two-tone air horn (Eb4 + Bb4).
+  cityBus: () => {
+    noise({ dur: 0.5, vol: 0.14, lpFreq: 300 });                           // bus engine
+    beep({ freq: 80, dur: 0.45, type: 'sawtooth', vol: 0.18, sweep: -10 });// engine sub
+    setTimeout(() => {                                                      // air horn honk
+      beep({ freq: 311, dur: 0.5, type: 'square', vol: 0.12, sweep: -6 });
+      beep({ freq: 466, dur: 0.5, type: 'square', vol: 0.1, sweep: -8 });
+    }, 100);
+  },
+  // Trebuchet counterweight creak on launch: strained rising timber.
+  trebuchetCreak: () => {
+    beep({ freq: 150, dur: 0.34, type: 'sawtooth', vol: 0.14, sweep: 70 });
+    noise({ dur: 0.3, vol: 0.07, lpFreq: 900 });
+  },
+  // Trebuchet ground-shaking impact: deep sawtooth body + fat low rumble.
+  trebuchetThud: () => {
+    beep({ freq: 64, dur: 0.42, type: 'sawtooth', vol: 0.26, sweep: -30 });
+    noise({ dur: 0.5, vol: 0.28, lpFreq: 560 });
+  },
+  // Office chair: metal-and-plastic clatter — frame ping + plastic thunk + caster rattle.
+  officeChair: () => {
+    preTransientClick(0.6, 0);
+    beep({ freq: 1700, dur: 0.05, type: 'square', vol: 0.10, sweep: -700 });
+    beep({ freq: 90, dur: 0.10, type: 'sawtooth', vol: 0.16, sweep: -40 });
+    noise({ dur: 0.10, vol: 0.16, lpFreq: 4200 });
+    setTimeout(() => noise({ dur: 0.04, vol: 0.08, lpFreq: 6000 }), 45);
+  },
+  // Battering ram: deep wooden boom — low sub + hollow woody knock + muffled timber crack.
+  batteringRam: () => {
+    preTransientClick(0.6, 0);
+    beep({ freq: 70, dur: 0.32, type: 'sawtooth', vol: 0.30, sweep: -34 });
+    beep({ freq: 150, dur: 0.16, type: 'triangle', vol: 0.16, sweep: -90 });
+    noise({ dur: 0.30, vol: 0.20, lpFreq: 520 });
+  },
 };
