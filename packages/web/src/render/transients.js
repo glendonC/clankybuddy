@@ -300,6 +300,74 @@ export function renderTransients(ctx, bodies) {
       }
       ctx.stroke();
       ctx.restore();
+
+    // ── cannon-and-mortar batch projectiles (render.visible:false → drawn here) ──
+    } else if (b.partType === 'cannonball') {
+      // Cannon + hot shot share this. b._heated adds the orange glow (hot shot).
+      const r = b.circleRadius || 11;
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      const g = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.2, 0, 0, r);
+      g.addColorStop(0, '#5a5e66'); g.addColorStop(0.6, '#2c2f35'); g.addColorStop(1, '#16181c');
+      ctx.fillStyle = g;
+      ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#0c0d10'; ctx.lineWidth = 1; ctx.stroke();
+      ctx.fillStyle = 'rgba(255,255,255,0.18)';
+      ctx.beginPath(); ctx.arc(-r * 0.35, -r * 0.4, r * 0.28, 0, Math.PI * 2); ctx.fill();
+      if (b._heated) {
+        ctx.globalCompositeOperation = 'lighter';
+        const hg = ctx.createRadialGradient(0, 0, r * 0.3, 0, 0, r * 1.6);
+        hg.addColorStop(0, 'rgba(255,170,60,0.55)'); hg.addColorStop(1, 'rgba(255,80,0,0)');
+        ctx.fillStyle = hg;
+        ctx.beginPath(); ctx.arc(0, 0, r * 1.6, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+
+    } else if (b.partType === 'chain_shot') {
+      // The LEAD draws the tether + BOTH balls (the partner 'chain_shot_partner'
+      // has no branch). Guard on partner.position (lead may outlive partner 1 frame).
+      const r = b.circleRadius || 8;
+      const partner = b._partner;
+      if (partner && partner.position) {
+        ctx.save();
+        ctx.strokeStyle = '#3a3a40'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(b.position.x, b.position.y); ctx.lineTo(partner.position.x, partner.position.y); ctx.stroke();
+        ctx.strokeStyle = '#6a6a72'; ctx.lineWidth = 1.5; ctx.setLineDash([3, 3]);
+        ctx.beginPath(); ctx.moveTo(b.position.x, b.position.y); ctx.lineTo(partner.position.x, partner.position.y); ctx.stroke();
+        ctx.setLineDash([]);
+        ctx.restore();
+      }
+      const positions = (partner && partner.position) ? [b.position, partner.position] : [b.position];
+      for (const pos of positions) {
+        ctx.save();
+        ctx.translate(pos.x, pos.y);
+        const g = ctx.createRadialGradient(-r * 0.35, -r * 0.35, r * 0.2, 0, 0, r);
+        g.addColorStop(0, '#5a5e66'); g.addColorStop(0.6, '#2c2f35'); g.addColorStop(1, '#16181c');
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(0, 0, r, 0, Math.PI * 2); ctx.fill();
+        ctx.fillStyle = 'rgba(255,255,255,0.16)';
+        ctx.beginPath(); ctx.arc(-r * 0.35, -r * 0.4, r * 0.26, 0, Math.PI * 2); ctx.fill();
+        ctx.restore();
+      }
+
+    } else if (b.partType === 'mortar_shell') {
+      // Finned shell, nose-down (b.angle set to PI/2 at spawn). Body points +x local.
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      ctx.fillStyle = '#3a4038'; ctx.fillRect(-10, -5, 16, 10);
+      ctx.fillStyle = '#2b302a';
+      ctx.beginPath(); ctx.moveTo(6, -5); ctx.lineTo(14, 0); ctx.lineTo(6, 5); ctx.closePath(); ctx.fill();   // ogive nose (+x)
+      ctx.fillStyle = '#1c201b';
+      ctx.beginPath(); ctx.moveTo(-10, -5); ctx.lineTo(-16, -8); ctx.lineTo(-10, -1); ctx.closePath(); ctx.fill();  // tail fins (-x)
+      ctx.beginPath(); ctx.moveTo(-10, 5);  ctx.lineTo(-16, 8);  ctx.lineTo(-10, 1);  ctx.closePath(); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.10)'; ctx.fillRect(-10, -5, 16, 2);
+      ctx.restore();
+      // descent smoke trail from the tail (mirrors the rocket branch)
+      const tx = b.position.x - Math.cos(b.angle) * 12;
+      const ty = b.position.y - Math.sin(b.angle) * 12;
+      if (Math.random() < 0.6) {
+        P.spawn({ x: tx, y: ty, vx: 0, vy: -0.04, type: 'smoke', color: '#999', size: 7, life: 500, gravity: -0.0004, drag: 0.99 });
+      }
     }
   }
 }

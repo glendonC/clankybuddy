@@ -39,6 +39,14 @@ import flashFreeze   from './punish/flash-freeze.js';
 import laserCutter   from './punish/laser-cutter.js';
 import taser         from './punish/taser.js';
 
+import cannon        from './punish/cannon.js';
+import grapeshot     from './punish/grapeshot.js';
+import chainShot     from './punish/chain-shot.js';
+import hotShot       from './punish/hot-shot.js';
+import mortar        from './punish/mortar.js';
+import flashbang     from './punish/flashbang.js';
+import sonicCannon   from './punish/sonic-cannon.js';
+
 import bat           from './punish/bat.js';
 import battleAxe     from './punish/battle_axe.js';
 import fireAxe       from './punish/fire_axe.js';
@@ -82,6 +90,7 @@ const ABILITIES = {
   punch, brass_knuckles: brassKnuckles, hammer, sword, gun, revolver, machinegun, smg, assault_rifle: assaultRifle, lmg, minigun, shotgun, rocket, fireball, grenade, frag_grenade: fragGrenade, flame, lightning, freeze,
   whip, chainsaw, sawblade, acid_flask: acidFlask,
   liquid_nitrogen: liquidNitrogen, flash_freeze: flashFreeze, laser_cutter: laserCutter, taser,
+  cannon, grapeshot, chain_shot: chainShot, hot_shot: hotShot, mortar, flashbang, sonic_cannon: sonicCannon,
   bat, battle_axe: battleAxe, fire_axe: fireAxe, hunting_knife: huntingKnife, cattle_prod: cattleProd, blowtorch, power_drill: powerDrill, nail_gun: nailGun, caltrops,
   brick, bowling_ball: bowlingBall, piano, crt, car, steamroller, city_bus: cityBus, trebuchet, office_chair: officeChair, battering_ram: batteringRam,
   anvil, blackhole, nuke, force_quit: forceQuit,

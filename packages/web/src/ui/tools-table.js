@@ -91,6 +91,23 @@ export const TOOLS = [
     blurb: 'sky bolt + branching forks. pairs with ice (CONDUCT) and fire (COMBUST).' },
   { id: 'sawblade',    label: 'saw blade',    key: 'L', kind: 'click',     delta: '−12',  spine: 'negative', group: 'ordnance', cost: 180,
     blurb: 'spinning disc ricochets off walls, pure impact damage, no DoT.' },
+  // ordnance — cannon-and-mortar batch. All key:'' (hotbar-slot input; bare keys
+  // exhausted). The cannon family + sonic cannon are family:'firearms' so they
+  // route through aimAngle/AIMED_FIREARMS (manual aim until Targeting computer).
+  { id: 'cannon',      label: 'cannon',       key: '', kind: 'click',     delta: '−40',  spine: 'negative', group: 'ordnance', family: 'firearms', cost: 160,
+    blurb: 'emplaced cannon fires a heavy iron ball along your aim line, pure crushing impact' },
+  { id: 'grapeshot',   label: 'grapeshot',    key: '', kind: 'click',     delta: '−24',  spine: 'negative', group: 'ordnance', family: 'firearms', cost: 200,
+    blurb: 'one trigger pull scatters a tight forward cone of iron shot' },
+  { id: 'chain_shot',  label: 'chain shot',   key: '', kind: 'click',     delta: '−16/part',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 230,
+    blurb: 'two linked balls fly as a pair and clothesline anything caught between them' },
+  { id: 'hot_shot',    label: 'hot shot',     key: '', kind: 'click',     delta: '−38+fire',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 260,
+    blurb: 'a furnace-heated cannonball that sets the buddy alight and leaves burning embers where it lands' },
+  { id: 'mortar',      label: 'mortar',       key: '', kind: 'click',     delta: '−32',  spine: 'negative', group: 'ordnance', cost: 210, cd: 4,
+    blurb: 'mark the ground, a shell whistles in from above and detonates' },
+  { id: 'flashbang',   label: 'flashbang',    key: '', kind: 'drag',      delta: '−10+concuss',spine: 'negative', group: 'ordnance', cost: 160,
+    blurb: 'drag to lob, 2s fuse, blinding flash that concusses everything nearby' },
+  { id: 'sonic_cannon',label: 'sonic cannon', key: '', kind: 'click',     delta: '−14+concuss',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 190,
+    blurb: 'instant aimed cone, shoves and concusses every part it sweeps' },
 
   // NEGATIVE / corruption (renamed from `elemental`).
   { id: 'fireball',    label: 'fireball',     key: 'U', kind: 'click',     delta: '−22',  spine: 'negative', group: 'corruption', cost: 180,

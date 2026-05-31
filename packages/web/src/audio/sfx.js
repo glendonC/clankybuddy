@@ -224,4 +224,67 @@ export const sfx = {
     beep({ freq: 150, dur: 0.16, type: 'triangle', vol: 0.16, sweep: -90 });
     noise({ dur: 0.30, vol: 0.20, lpFreq: 520 });
   },
+
+  // ── cannon-and-mortar batch ─────────────────────────────────────
+  // Black-powder boom: deep sub thump + low body + a bright muzzle crack.
+  cannon: () => {
+    preTransientClick(0.7, 0);
+    beep({ freq: 55, dur: 0.42, type: 'sawtooth', vol: 0.30, sweep: -34 });
+    noise({ dur: 0.4, vol: 0.26, lpFreq: 700 });
+    setTimeout(() => { beep({ freq: 2600, dur: 0.04, type: 'square', vol: 0.08, sweep: -900 }); noise({ dur: 0.04, vol: 0.12, lpFreq: 8000 }); }, 4);
+  },
+  // Solid iron-on-flesh crunch (NO explosion sizzle): low body thud + dull mid knock + short metal ring.
+  cannonHit: () => {
+    preTransientClick(0.6, 0);
+    beep({ freq: 80, dur: 0.2, type: 'sawtooth', vol: 0.26, sweep: -44 });
+    beep({ freq: 160, dur: 0.1, type: 'triangle', vol: 0.14, sweep: -80 });
+    noise({ dur: 0.14, vol: 0.16, lpFreq: 1200 });
+  },
+  // Heavier, wider scatter than the shotgun: deeper boom + broad noise spread + bright shot rattle.
+  grapeshot: () => {
+    preTransientClick(0.6, 0);
+    beep({ freq: 64, dur: 0.2, type: 'sawtooth', vol: 0.28, sweep: -34 });
+    noise({ dur: 0.26, vol: 0.3, lpFreq: 800 });
+    for (let i = 0; i < 4; i++) setTimeout(() => noise({ dur: 0.02, vol: 0.1, lpFreq: 5200 + (Math.random() - 0.5) * 1600 }), 4 + i * (10 + Math.random() * 8));
+  },
+  // Twin-launch boom + iron-chain rattle: low body + two quick metallic clinks.
+  chainShot: () => {
+    preTransientClick(0.6, 0);
+    beep({ freq: 70, dur: 0.24, type: 'sawtooth', vol: 0.26, sweep: -36 });
+    noise({ dur: 0.22, vol: 0.2, lpFreq: 900 });
+    setTimeout(() => beep({ freq: 2100, dur: 0.03, type: 'square', vol: 0.08, sweep: -500 }), 18);
+    setTimeout(() => beep({ freq: 1800, dur: 0.03, type: 'square', vol: 0.07, sweep: -400 }), 42);
+  },
+  // Powder boom + ignition fwoomp: cannon body layered with an air-rush hiss ~30ms after.
+  hotShot: () => {
+    preTransientClick(0.7, 0);
+    beep({ freq: 58, dur: 0.4, type: 'sawtooth', vol: 0.28, sweep: -32 });
+    noise({ dur: 0.38, vol: 0.24, lpFreq: 720 });
+    setTimeout(() => { noise({ dur: 0.22, vol: 0.12, lpFreq: 1500 }); beep({ freq: 95, dur: 0.18, type: 'sawtooth', vol: 0.07, sweep: 36 }); }, 30);
+  },
+  // Iron crunch + flame whoosh: cannonHit body with an added fire-roar band.
+  hotShotHit: () => {
+    preTransientClick(0.6, 0);
+    beep({ freq: 78, dur: 0.2, type: 'sawtooth', vol: 0.26, sweep: -42 });
+    noise({ dur: 0.14, vol: 0.16, lpFreq: 1200 });
+    setTimeout(() => { noise({ dur: 0.26, vol: 0.14, lpFreq: 1600 }); beep({ freq: 220, dur: 0.16, type: 'sawtooth', vol: 0.08, sweep: -120 }); }, 24);
+  },
+  // Incoming mortar whistle: high sine sweeping down (detonation reuses rocketBoom).
+  mortarWhistle: () => {
+    beep({ freq: 2000, dur: 0.7, type: 'sine', vol: 0.10, sweep: -1500 });
+    beep({ freq: 1400, dur: 0.7, type: 'triangle', vol: 0.05, sweep: -1000 });
+  },
+  // Flashbang: dry crack + ringing-ears high sine tail.
+  flashbang: () => {
+    preTransientClick(0.7, 0);
+    noise({ dur: 0.12, vol: 0.3, lpFreq: 5000 });
+    beep({ freq: 80, dur: 0.14, type: 'square', vol: 0.2, sweep: -30 });
+    setTimeout(() => beep({ freq: 4000, dur: 0.5, type: 'sine', vol: 0.06, sweep: -200 }), 40);
+  },
+  // Sonic cannon: low-frequency pressure whump + swept resonant tone.
+  sonicCannon: () => {
+    beep({ freq: 55, dur: 0.3, type: 'sine', vol: 0.26, sweep: 30 });
+    beep({ freq: 220, dur: 0.22, type: 'triangle', vol: 0.12, sweep: -120 });
+    noise({ dur: 0.18, vol: 0.1, lpFreq: 400 });
+  },
 };

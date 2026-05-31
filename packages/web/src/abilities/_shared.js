@@ -162,7 +162,7 @@ export function sweepImpact(ctx, parts, nx, ny, mag, marker, opts = {}) {
 // Aimed-firearm tool ids. These route their cursor + apply through aimAngle()
 // so the auto-aim ("aimbot") is gated behind the firearms shared unlock
 // instead of being always-on. Everything else keeps cursor-faces-nearest-part.
-export const AIMED_FIREARMS = new Set(['gun', 'machinegun', 'smg', 'shotgun', 'rocket']);
+export const AIMED_FIREARMS = new Set(['gun', 'machinegun', 'smg', 'shotgun', 'rocket', 'cannon', 'grapeshot', 'chain_shot', 'hot_shot', 'sonic_cannon']);
 
 // Resolve the firing angle for an aimed weapon. With the `aimbot` family flag
 // unlocked, it locks onto the NEAREST part (returns that part as `target` so

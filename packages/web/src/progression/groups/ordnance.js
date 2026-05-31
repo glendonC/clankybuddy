@@ -144,11 +144,22 @@ export default [
     effect: (s) => { s.pellets = 1; s.force *= 4; s.mood *= 3; s.coneRad = 0.05; },
   }),
 
-  // Explosives sub-tree (lobbed). Frag is the root; molotov is the
-  // lingering-fire variant. (Phase 3 re-roots this under a mortar; for now
-  // frag is its own independent entry, parallel to the pistol chain.)
+  // Explosives sub-tree (lobbed + dropped). Mortar is now the ROOT (Phase 3
+  // re-root); frag grenade hangs off it and molotov off frag. Creeping barrage /
+  // cluster / airstrike / breaching are deferred to later batches.
   toolNode({
-    id: 'g.ordnance.frag_grenade', parents: [], cost: 150, toolId: 'frag_grenade',
+    id: 'g.ordnance.mortar', parents: [], cost: 210, toolId: 'mortar',
+    label: 'mortar',
+    blurb: 'Mark the ground; a shell whistles in from above and detonates.',
+  }),
+  statNode({
+    id: 'g.ordnance.mortar.shell', parents: ['g.ordnance.mortar'], cost: 500, toolId: 'mortar',
+    label: 'Bigger shell',
+    blurb: 'Blast radius 240 → 340, mood damage +40%.',
+    effect: (s) => { s.radius = 340; s.mood = Math.round(s.mood * 1.4); },
+  }),
+  toolNode({
+    id: 'g.ordnance.frag_grenade', parents: ['g.ordnance.mortar'], cost: 150, toolId: 'frag_grenade',
     label: 'frag grenade',
     blurb: 'Drag to lob, 2s fuse, dry blast + a radial spray of shrapnel.',
   }),
@@ -179,6 +190,48 @@ export default [
     // burn, so the name was a check the code couldn't cash. Inferno fits.
     blurb: 'Bigger radius, longer burn (4s), the whole stage shakes.',
     effect: (s) => { s.radius *= 1.2; s.igniteMs = 4000; },
+  }),
+
+  // Cannon branch (player-aimed heavy projectile; family: firearms). Independent
+  // root; grapeshot / chain shot / hot shot fork off it.
+  toolNode({
+    id: 'g.ordnance.cannon', parents: [], cost: 160, toolId: 'cannon',
+    label: 'cannon',
+    blurb: 'Emplaced cannon: fires a heavy iron ball along your aim line. Pure crushing impact.',
+  }),
+  statNode({
+    id: 'g.ordnance.cannon.bigger_ball', parents: ['g.ordnance.cannon'], cost: 350, toolId: 'cannon',
+    label: 'Heavier ball',
+    blurb: 'Ball radius 11 → 15, blast radius 120 → 150, mood 40 → 50.',
+    effect: (s) => { s.ballRadius = 15; s.radius = 150; s.mood = 50; },
+  }),
+  toolNode({
+    id: 'g.ordnance.grapeshot', parents: ['g.ordnance.cannon'], cost: 200, toolId: 'grapeshot',
+    label: 'grapeshot',
+    blurb: 'One trigger pull scatters a tight forward cone of iron shot. Composes with firearms ammo mods.',
+  }),
+  toolNode({
+    id: 'g.ordnance.chain_shot', parents: ['g.ordnance.cannon'], cost: 230, toolId: 'chain_shot',
+    label: 'chain shot',
+    blurb: 'Two linked balls fly as a parallel pair and clothesline anything caught between them.',
+  }),
+  toolNode({
+    id: 'g.ordnance.hot_shot', parents: ['g.ordnance.cannon'], cost: 260, toolId: 'hot_shot',
+    label: 'hot shot',
+    blurb: 'A furnace-heated cannonball: sets the buddy alight on impact and leaves a pool of burning embers.',
+  }),
+
+  // Concussive branch (flashbang root → sonic cannon). The first RANGED CONCUSSED
+  // applicators (the status existed; nothing applied it at range until now).
+  toolNode({
+    id: 'g.ordnance.flashbang', parents: [], cost: 160, toolId: 'flashbang',
+    label: 'flashbang',
+    blurb: 'Drag to lob, 2s fuse, blinding flash that concusses everything nearby.',
+  }),
+  toolNode({
+    id: 'g.ordnance.sonic_cannon', parents: ['g.ordnance.flashbang'], cost: 190, toolId: 'sonic_cannon',
+    label: 'sonic cannon',
+    blurb: 'Instant aimed cone; shoves and concusses every part it sweeps.',
   }),
 
   // Lightning branch, sky bolt + chains. Joined ordnance in Phase 2
