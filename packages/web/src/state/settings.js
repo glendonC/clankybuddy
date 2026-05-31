@@ -13,7 +13,7 @@ const DEFAULTS = {
   reduceMotion: false,
   muteSFX: false,
   debugOverlay: false,
-  theme: 'dark',           // 'dark' | 'light', applied as body.theme-<value>
+  theme: 'light',          // 'dark' | 'light', applied as body.theme-<value>
   // Live mode = the buddy has agency: idle walking, cursor/projectile dodge,
   // panic moves. Off by default (per docs/ideas.md "classic mode is the
   // default for purists"), the always-on default was making the buddy glide
