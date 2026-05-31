@@ -34,6 +34,30 @@ export const TOOLS = [
     blurb: 'chain-hit. primary part takes a welt + 2 nearest take echoes. all four lashed for 4s.' },
   { id: 'chainsaw',    label: 'chainsaw',     key: 'H', kind: 'hold+drag', delta: '−3/t+bleed', spine: 'negative', group: 'kinetic', cost: 220,
     blurb: 'rev-and-drag, every tick stacks BLEED intensity (caps at 5×). longer drag, deeper wound.' },
+  // NEGATIVE / kinetic — Batch 3B grounded melee roster.
+  // No bare single keys remain free (1-9,0 + A-Z + Space are all bound), and
+  // input is hotbar-slot based anyway: keyboard.js dispatches by physical slot
+  // (Digit*), never by `key`, and TOOLS_BY_KEY has no consumers. `key` is only a
+  // display chip (slot-picker renders it when truthy), so these melee tools ship
+  // with no chip rather than a non-dispatchable one. Equip to a hotbar slot to use.
+  { id: 'bat',           label: 'baseball bat', key: '', kind: 'click',     delta: '−12',  spine: 'negative', group: 'kinetic', cost: 130, family: 'melee',
+    blurb: 'wide swing. launches every part in the arc sideways, not just the one you aimed at.' },
+  { id: 'hunting_knife', label: 'hunting knife',key: '', kind: 'click',     delta: '−7+bleed', spine: 'negative', group: 'kinetic', cost: 130, family: 'melee',
+    blurb: 'short, fast stab. small knockback, leaves the part BLEEDing.' },
+  { id: 'cattle_prod',   label: 'cattle prod',  key: '', kind: 'click',     delta: '−7+zap', spine: 'negative', group: 'kinetic', cost: 130, family: 'melee',
+    blurb: 'short jab that ELECTRIFIES the part (brief convulsions). shatters a frozen limb instead.' },
+  { id: 'caltrops',      label: 'caltrops',     key: '', kind: 'drag',      delta: '−3+bleed', spine: 'negative', group: 'kinetic', cost: 180, cd: 4, family: 'melee',
+    blurb: 'scatter a spike strip on the floor. anything that lands on or rolls across it BLEEDs (stacks to 5×).' },
+  { id: 'blowtorch',     label: 'blowtorch',    key: '', kind: 'hold',      delta: '−1/t', spine: 'negative', group: 'kinetic', cost: 200, family: 'melee',
+    blurb: 'hold the cutting torch on one limb, the longer you dwell the hotter it burns (ramps ON_FIRE). shatters frozen parts.' },
+  { id: 'nail_gun',      label: 'nail gun',     key: '', kind: 'hold',      delta: '−2/t+bleed', spine: 'negative', group: 'kinetic', cost: 170, family: 'melee',
+    blurb: 'rapid-fire hold. each staple stacks BLEED (caps 5×) and pins the limb with a short stun.' },
+  { id: 'power_drill',   label: 'power drill',  key: '', kind: 'hold',      delta: '−2/t+bleed', spine: 'negative', group: 'kinetic', cost: 320, family: 'melee',
+    blurb: 'hold the bit on one part, the wound deepens. drill the same spot and BLEED ramps to 5×. move off and it resets.' },
+  { id: 'battle_axe',    label: 'battle axe',   key: '', kind: 'click',     delta: '−20',  spine: 'negative', group: 'kinetic', cost: 300, cd: 0.7, family: 'melee',
+    blurb: 'heavy two-handed cleave. wide radial chop flings the limb cluster; edged, so it bleeds on contact.' },
+  { id: 'fire_axe',      label: 'fire axe',     key: '', kind: 'click',     delta: '−12',  spine: 'negative', group: 'kinetic', cost: 380, family: 'melee', edged: true,
+    blurb: 'wide cleave that sets struck parts ablaze. edged.' },
 
   // NEGATIVE / ordnance (renamed from `ranged`; lightning joined this
   // group in Phase 2, it's a ranged-form damage tool, not a status DoT)
