@@ -113,6 +113,38 @@
         </div>
       </div>
     </div>
+
+    <!-- Minimal legal footer. Fixed bottom-right, low-opacity so it stays out
+         of the way of the full-bleed stage; brightens on hover. Links resolve
+         to the static pages in public/. -->
+    <nav id="legal-footer" aria-label="legal">
+      <a href="/privacy">privacy</a>
+      <span aria-hidden="true">·</span>
+      <a href="/terms">terms</a>
+      <span aria-hidden="true">·</span>
+      <a href="https://github.com/glendonC/clankybuddy" rel="noopener">github</a>
+    </nav>
+    <style>
+      #legal-footer {
+        position: fixed;
+        right: 14px;
+        bottom: 8px;
+        z-index: 50;
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        font-family: 'Inter', system-ui, sans-serif;
+        font-size: 11px;
+        letter-spacing: 0.01em;
+        opacity: 0.35;
+        transition: opacity 0.2s ease;
+      }
+      #legal-footer:hover { opacity: 0.85; }
+      #legal-footer a { color: currentColor; text-decoration: none; }
+      #legal-footer a:hover { text-decoration: underline; }
+      @media (max-width: 900px) { #legal-footer { display: none; } }
+    </style>
+
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

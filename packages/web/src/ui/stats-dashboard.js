@@ -462,13 +462,13 @@ function renderError(err) {
   const status = err?.status ?? 0;
   if (!status) {
     return `<div class="sd-error">
-      <div class="sd-error-title">backend offline</div>
-      <div class="sd-error-msg">analytics live in the cloudflare worker. start it with <code>npm run dev --workspace packages/worker</code> or check your connection.</div>
+      <div class="sd-error-title">global stats coming soon</div>
+      <div class="sd-error-msg">the cross-model leaderboard isn't live yet. your own progress is saved right here on this device in the meantime.</div>
     </div>`;
   }
   return `<div class="sd-error">
-    <div class="sd-error-title">analytics unavailable (${status})</div>
-    <div class="sd-error-msg">the worker returned an error. check the network tab.</div>
+    <div class="sd-error-title">stats unavailable right now</div>
+    <div class="sd-error-msg">couldn't reach the leaderboard. give it a moment and try again.</div>
   </div>`;
 }
 
