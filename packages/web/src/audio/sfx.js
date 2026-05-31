@@ -13,6 +13,35 @@ export const sfx = {
   hammer:() => { beep({ freq: 90, dur: 0.16, type: 'sawtooth', vol: 0.22, sweep: -50 }); noise({ dur: 0.18, vol: 0.18, lpFreq: 600 }); },
   bomb:  () => { beep({ freq: 60, dur: 0.4, type: 'sawtooth', vol: 0.25, sweep: -40 }); noise({ dur: 0.5, vol: 0.3, lpFreq: 800 }); },
   flame: () => noise({ dur: 0.08, vol: 0.06, lpFreq: 1800 }),
+  // Electromagnet hum tick. magnet is kind:'hold' (re-fires ~every 50ms),
+  // so keep it a short quiet 60Hz mains-buzz pulse + faint lowpassed hiss;
+  // overlapping ticks blend into a continuous hum.
+  magnet: () => { beep({ freq: 60, dur: 0.06, type: 'sawtooth', vol: 0.05 }); noise({ dur: 0.05, vol: 0.025, lpFreq: 500 }); },
+  // Landmine arming/trigger CLICK (dry pressure-plate snap). The BOOM half is
+  // explode()'s sound:'bomb' (above). Click-then-boom.
+  landmine: () => { preTransientClick(0.45, 0); beep({ freq: 1800, dur: 0.025, type: 'square', vol: 0.07, sweep: -600 }); },
+  // Buzzsaw — shrill spinning-blade whine: two slightly-detuned sawtooth voices
+  // (beating "shriek") + a bright lowpassed noise band (tooth-on-metal grind).
+  buzzsaw: () => {
+    beep({ freq: 2200, dur: 0.22, type: 'sawtooth', vol: 0.07, sweep: 400 });
+    beep({ freq: 1500, dur: 0.20, type: 'sawtooth', vol: 0.05, sweep: 300 });
+    noise({ dur: 0.20, vol: 0.05, lpFreq: 3200 });
+  },
+  // Cryo mine DETONATION — pressurized gas hiss + icy crystallize chirp + ice crackle.
+  cryoMine: () => {
+    noise({ dur: 0.28, vol: 0.16, lpFreq: 5200 });
+    noise({ dur: 0.12, vol: 0.08, lpFreq: 900 });
+    beep({ freq: 1100, dur: 0.2, type: 'sine', vol: 0.1, sweep: -820 });
+    for (let i = 0; i < 4; i++) {
+      setTimeout(() => noise({ dur: 0.018, vol: 0.12, lpFreq: 7000 + (Math.random() - 0.5) * 1800 }), 30 + i * (22 + Math.random() * 18));
+    }
+  },
+  // Cryo mine PLACEMENT — soft pressurized "set" click.
+  cryoArm: () => {
+    preTransientClick(0.4, 0);
+    noise({ dur: 0.06, vol: 0.05, lpFreq: 2200 });
+    beep({ freq: 1500, dur: 0.04, type: 'sine', vol: 0.05, sweep: 200 });
+  },
   zap:   () => {
     // 3-layer (Agent R §4): low rumble + mid crack + high sizzle.
     // Pre-transient click 4ms before the crack adds bite.

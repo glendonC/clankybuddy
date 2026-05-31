@@ -8,6 +8,11 @@ import { register, setEnabled, isEnabled } from './bus.js';
 import { liveTick, resetLive } from '../live/index.js';
 import { tickPanicMoves } from '../live/panic-moves.js';
 import { getSetting, onSettingsChange } from '../state/settings.js';
+// Force-loop Modes (phase:'physics'). Importing the module runs its
+// self-register call on the bus. S5: magnet tractor beam. Gravity well /
+// flood register the same way once they land — they reuse the generic
+// tool.forceMode enable/disable seam in input/mouse.js + ui/hotbar.js.
+import './force-magnet.js';
 
 // ---------- live mode ----------
 // Wraps liveTick + resetLive. Gated by the 'liveMode' setting; we mirror

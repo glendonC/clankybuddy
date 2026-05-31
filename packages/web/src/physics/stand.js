@@ -93,6 +93,22 @@ function isGrounded(ragdoll) {
   return false;
 }
 
+// Public read of the exact gate applyStandPose uses to decide it owns the
+// body's weight: grounded (active contact with any static body) AND not
+// pinned against the ceiling. Force Modes (magnet whole-body lift) consult
+// this so they only inject COUNTER_GRAVITY-grade lift while the stand pose
+// is the thing it's cancelling, never once the parts have left the floor
+// (which would stack two upward forces and rocket the buddy). No behavior
+// change to applyStandPose, this just wraps the same private predicate.
+export function isStanding(ragdoll) {
+  if (!ragdoll || !ragdoll.parts) return false;
+  const chest = ragdoll.chest;
+  if (!chest) return false;
+  const ceilY = engine.world.bounds?.max?.y ?? 800;
+  const nearCeiling = chest.position.y < ceilY * 0.25;
+  return isGrounded(ragdoll) && !nearCeiling;
+}
+
 export function applyStandPose(ragdoll, gravityY = 1) {
   const now = performance.now();
   const stunned = now < (ragdoll.stunUntil || 0);

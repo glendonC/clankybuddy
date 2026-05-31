@@ -5,6 +5,7 @@
 
 import * as P from '../particles.js';
 import { isFinitePart } from './ragdoll.js';
+import { renderBuzzsaw } from '../transients/buzzsaw-wall.js';
 
 export function renderTransients(ctx, bodies) {
   for (const b of bodies) {
@@ -232,6 +233,72 @@ export function renderTransients(ctx, bodies) {
       ctx.fillStyle = '#1c1f24'; ctx.fillRect(-2, 8, 4, 10);              // gas column
       ctx.beginPath(); ctx.arc(-12, 22, 3, 0, Math.PI * 2); ctx.fill();   // casters
       ctx.beginPath(); ctx.arc(12, 22, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
+    // ── Placed hazards (sensor bodies, render.visible:false — drawn here) ──
+    } else if (b.partType === 'buzzsaw') {
+      renderBuzzsaw(ctx, b, performance.now());
+
+    } else if (b.partType === 'landmine') {
+      // Buried pressure-plate: a small domed charge on the floor. Dim + cool
+      // pip when disarmed (rearm spin-down), warm armed pip otherwise.
+      const armed = b._armed !== false;
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.globalAlpha = armed ? 0.95 : 0.5;
+      ctx.fillStyle = '#3a3f3a';
+      ctx.beginPath();
+      ctx.arc(0, 1, 9, Math.PI, 0);
+      ctx.lineTo(9, 4); ctx.lineTo(-9, 4); ctx.closePath();
+      ctx.fill();
+      ctx.strokeStyle = '#1d1f1d'; ctx.lineWidth = 1.5;
+      ctx.beginPath(); ctx.moveTo(-9, 0); ctx.lineTo(9, 0); ctx.stroke();
+      ctx.fillStyle = armed ? '#ffcf4d' : '#7a6a3a';
+      ctx.beginPath(); ctx.arc(0, -3, 2.2, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
+    } else if (b.partType === 'cryo_mine') {
+      // Buried cryo charge: a frosted dome with a pulsing blue prime pip.
+      const armed = b._armed !== false;
+      const r = b.circleRadius || 16;
+      const pulse = armed ? 0.5 + 0.5 * Math.abs(Math.sin(performance.now() * 0.004)) : 0;
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.globalAlpha = armed ? 0.9 : 0.45;
+      ctx.fillStyle = '#2a3a40';
+      ctx.beginPath(); ctx.arc(0, 1, r * 0.6, Math.PI, 0);
+      ctx.lineTo(r * 0.6, 4); ctx.lineTo(-r * 0.6, 4); ctx.closePath(); ctx.fill();
+      ctx.fillStyle = '#3d5560';
+      ctx.beginPath(); ctx.arc(0, 0, r * 0.32, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = armed ? `rgba(155,231,255,${0.5 + pulse * 0.5})` : 'rgba(110,150,165,0.6)';
+      ctx.beginPath(); ctx.arc(0, -2, 2.4, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
+    } else if (b.partType === 'electrified_panel') {
+      // Live sensor plate: a metal strip on the floor with two terminals and a
+      // jittering arc between them.
+      const w = b._width || 60;
+      const h = b._height || 10;
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.fillStyle = '#3a4049';
+      ctx.fillRect(-w / 2, -h / 2, w, h);
+      ctx.fillStyle = '#cfd8e3';
+      ctx.fillRect(-w / 2 + 3, -h / 2 - 3, 4, 4);
+      ctx.fillRect(w / 2 - 7, -h / 2 - 3, 4, 4);
+      // jittered live-wire arc
+      ctx.strokeStyle = '#9be7ff';
+      ctx.lineWidth = 1.5;
+      ctx.globalAlpha = 0.6 + 0.4 * Math.abs(Math.sin(performance.now() * 0.02));
+      ctx.beginPath();
+      const x0 = -w / 2 + 5, x1 = w / 2 - 5, ay = -h / 2 - 2;
+      ctx.moveTo(x0, ay);
+      const segs = 6;
+      for (let i = 1; i <= segs; i++) {
+        const t = i / segs;
+        ctx.lineTo(x0 + (x1 - x0) * t, ay - (Math.random() - 0.5) * 6);
+      }
+      ctx.stroke();
       ctx.restore();
     }
   }

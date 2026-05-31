@@ -150,6 +150,24 @@ export const TOOLS = [
     blurb: 'drag-place a trap. snaps shut → 3s lock + BLEED + CONCUSSED (next hit ×1.5).' },
   { id: 'meathook',    label: 'meat hook',    key: 'N', kind: 'drag',      delta: '−8+yank',spine: 'negative', group: 'kinetic', cd: 6, cost: 240,
     blurb: 'drag to throw a hook, spears the part then yanks it back at speed.' },
+
+  // UTILITY / manipulation — magnet (tractor beam). MUST carry forceMode so the
+  // generic OFF seam (input/mouse.js endPress + ui/hotbar.js setActiveTool reads
+  // forceMode and setEnabled(tag,false)) turns the force Mode off on release.
+  { id: 'magnet',      label: 'magnet',       key: '', kind: 'hold',       delta: '',     spine: 'utility', group: 'manipulation', cost: 160, forceMode: 'force.magnet',
+    blurb: 'Tractor beam — hold to drag the buddy toward the cursor and suspend it in midair.' },
+
+  // NEGATIVE / hazard — placed traps. The buddy triggers them by contact.
+  // Claymore / Bounding-mine forks hang under landmine (its tree root). No
+  // forceMode (placed traps, not force-loop tools).
+  { id: 'landmine',         label: 'landmine',         key: '', kind: 'drag',  delta: '−26',          spine: 'negative', group: 'hazard', cost: 650, cd: 20,
+    blurb: 'Bury a pressure-plate charge. First contact launches the buddy skyward.' },
+  { id: 'electrified_panel',label: 'electrified panel',key: '', kind: 'drag',  delta: '−6/zap',       spine: 'negative', group: 'hazard', cost: 140, cd: 4,
+    blurb: 'Drop a live sensor plate — anything standing on it gets zapped (ELECTRIFIED) every ~0.4s until the plate burns out. Drag to widen.' },
+  { id: 'buzzsaw_wall',     label: 'buzzsaw wall',     key: '', kind: 'click', delta: '−9+bleed',     spine: 'negative', group: 'hazard', cost: 180, cd: 1.4,
+    blurb: 'Mount a spinning blade. Bites anything driven into it and stacks bleed.' },
+  { id: 'cryo_mine',        label: 'cryo mine',        key: '', kind: 'drag',  delta: 'freeze AOE',   spine: 'negative', group: 'hazard', cost: 220, cd: 5,
+    blurb: 'Bury a pressure-sensor cryo charge. Step on it and it vents an AOE freeze burst — locks the buddy down, no damage. Sets up the shatter.' },
 ];
 
 export const TOOLS_BY_ID  = Object.fromEntries(TOOLS.map(t => [t.id, t]));
@@ -170,6 +188,7 @@ export const TAXONOMY = [
     { id: 'corruption', label: 'corruption' },
     { id: 'cataclysm',  label: 'cataclysm' },
     { id: 'siege',      label: 'siege' },
+    { id: 'hazard',     label: 'hazard' },
   ]},
   { spine: 'utility', groups: [
     { id: 'manipulation', label: 'manipulation' },
