@@ -42,6 +42,23 @@ export const sfx = {
     noise({ dur: 0.06, vol: 0.05, lpFreq: 2200 });
     beep({ freq: 1500, dur: 0.04, type: 'sine', vol: 0.05, sweep: 200 });
   },
+  // Gravity well PLACEMENT — a low descending "suck engaging" hum: a sub sine
+  // sweeping down + a lowpassed noise swell. One-shot (kind:'drag' release).
+  gravityWell: () => {
+    beep({ freq: 150, dur: 0.55, type: 'sine', vol: 0.06, sweep: -100 });
+    noise({ dur: 0.5, vol: 0.04, lpFreq: 600 });
+  },
+  // Gravity well COLLAPSE — a sharp inward implosion thump: a fast descending
+  // sawtooth + a punchy lowpassed noise burst.
+  gravityWellCollapse: () => {
+    beep({ freq: 240, dur: 0.28, type: 'sawtooth', vol: 0.18, sweep: -180 });
+    noise({ dur: 0.3, vol: 0.18, lpFreq: 700 });
+  },
+  // Flood CAST — a rising-water surge: lowpassed noise wash + a low rising sine.
+  flood: () => {
+    noise({ dur: 0.6, vol: 0.1, lpFreq: 1200 });
+    beep({ freq: 80, dur: 0.6, type: 'sine', vol: 0.06, sweep: 120 });
+  },
   zap:   () => {
     // 3-layer (Agent R §4): low rumble + mid crack + high sizzle.
     // Pre-transient click 4ms before the crack adds bite.

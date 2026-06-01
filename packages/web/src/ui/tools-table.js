@@ -215,6 +215,12 @@ export const TOOLS = [
     blurb: 'A heavier toxic cloud whose choke STACKS the longer the buddy stays inside it.' },
   { id: 'cryo_fog',         label: 'cryo fog',         key: '', kind: 'drag',  delta: 'freeze/dwell', spine: 'negative', group: 'hazard', cost: 240, cd: 6,
     blurb: 'A freezing vapor — dwell in it long enough and the limb frosts over brittle, setting up a shatter.' },
+  // Force-field hazards (phase:'physics' force Modes). No forceMode tag: the well
+  // self-disables when it expires, the flood's rise/hold/drain FSM owns its OFF.
+  { id: 'gravity_well',     label: 'gravity well',     key: '', kind: 'drag',  delta: 'pull',         spine: 'negative', group: 'hazard', cost: 240, cd: 6,
+    blurb: 'Drop a sustained gravity well that drags everything nearby inward toward one point — pure pull, it never throws.' },
+  { id: 'flood',            label: 'flood',            key: '', kind: 'click', delta: 'float',        spine: 'negative', group: 'hazard', cost: 280, cd: 14,
+    blurb: 'Flood the arena: the water rises, floats and drags the buddy, and douses any fire before it drains away.' },
 ];
 
 export const TOOLS_BY_ID  = Object.fromEntries(TOOLS.map(t => [t.id, t]));

@@ -89,6 +89,8 @@ import gasCloud    from './cursor/gas-cloud.js';
 import tearGas     from './cursor/tear-gas.js';
 import chlorine    from './cursor/chlorine.js';
 import cryoFog     from './cursor/cryo-fog.js';
+import gravityWell from './cursor/gravity-well.js';
+import flood       from './cursor/flood.js';
 
 import electrifiedPanel from './punish/electrified-panel.js';
 import buzzsawWall      from './punish/buzzsaw-wall.js';
@@ -108,6 +110,7 @@ const ABILITIES = {
   grab, bear_trap: bearTrap, meathook, magnet,
   landmine, electrified_panel: electrifiedPanel, buzzsaw_wall: buzzsawWall, cryo_mine: cryoMine,
   gas_cloud: gasCloud, tear_gas: tearGas, chlorine, cryo_fog: cryoFog, subwoofer,
+  gravity_well: gravityWell, flood,
 };
 
 // flame.js exports id 'flamethrower'; the variable name above is just for

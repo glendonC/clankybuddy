@@ -9,10 +9,14 @@ import { liveTick, resetLive } from '../live/index.js';
 import { tickPanicMoves } from '../live/panic-moves.js';
 import { getSetting, onSettingsChange } from '../state/settings.js';
 // Force-loop Modes (phase:'physics'). Importing the module runs its
-// self-register call on the bus. S5: magnet tractor beam. Gravity well /
-// flood register the same way once they land — they reuse the generic
-// tool.forceMode enable/disable seam in input/mouse.js + ui/hotbar.js.
+// self-register call on the bus. S5: magnet tractor beam. The gravity well /
+// flood are placed/one-shot (not held), so they do NOT use the magnet's
+// tool.forceMode mouseup seam: the well ability flips its Mode on and the Mode
+// self-disables when no live well bodies remain; the flood's rise/hold/drain
+// FSM owns its own OFF.
 import './force-magnet.js';
+import './force-gravity-well.js';
+import './force-flood.js';
 
 // ---------- live mode ----------
 // Wraps liveTick + resetLive. Gated by the 'liveMode' setting; we mirror

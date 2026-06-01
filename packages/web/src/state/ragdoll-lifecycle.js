@@ -15,6 +15,7 @@ import { createStatusRegistry, clearAll as clearAllStatus } from '../effects/reg
 import { canvas, world } from './world.js';
 import { teardownAllConstraints } from './constraint-registry.js';
 import { cancelAllScheduled } from './scheduler.js';
+import { clearFlood } from '../modes/force-flood.js';
 import { FLOOR_INSET, RAGDOLL_RIG_HEIGHT } from '../physics/constants.js';
 
 const { Composite } = Matter;
@@ -57,6 +58,10 @@ export function spawnRagdoll(charId) {
   // firing on the new buddy; this reclaims the task entries immediately so the
   // new buddy starts with an empty scheduler, mirroring teardownAllConstraints.
   cancelAllScheduled();
+  // Drain any in-flight flood so the new buddy doesn't spawn into a stale tide.
+  // The flood Mode's per-tick epoch check already blocks it from acting on the
+  // new buddy; this reclaims the level state + disables the Mode immediately.
+  clearFlood();
   if (_buddy.ragdoll) Composite.remove(world, _buddy.ragdoll.composite);
   clearAllStatus(_buddy.status);
   _buddy.epoch++;

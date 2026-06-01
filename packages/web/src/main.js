@@ -58,6 +58,10 @@ import { tickModes, onCharChange as modesOnCharChange } from './modes/bus.js';
 // Side-effect import: registers the live / panic-moves / gameplay-shape /
 // plumbing adapter Modes on the bus. Must run before the first loop tick.
 import './modes/register-defaults.js';
+// renderFlood is owned by the flood Mode (a screen-wide plane has no transient
+// body to hang a render branch on). The Mode itself self-registers via the
+// side-effect import above; this named import is just for the render call.
+import { renderFlood } from './modes/force-flood.js';
 // Side-effect import: registers the 4 Mode events (Antitrust, Board Drama,
 // Sora Wave, Compliance Theater), Phase 7 of the 2026-05-02 ability
 // redesign (see docs/abilities.md §6).
@@ -213,6 +217,9 @@ function loop() {
   clearStage(ctx, canvas.width, canvas.height);
   renderFloor(ctx, canvas.width, canvas.height);
   if (ragdoll) renderContactShadow(ctx, ragdoll, canvas.width, canvas.height);
+  // Water plane behind the buddy (early-returns when dry) so the buddy reads as
+  // submerged: floor → shadow → water → buddy.
+  renderFlood(ctx, canvas.width, canvas.height, now);
   if (ragdoll) renderRagdoll(ctx, ragdoll, mood, status);
   renderTransients(ctx, transientBodies);
   P.render(ctx);

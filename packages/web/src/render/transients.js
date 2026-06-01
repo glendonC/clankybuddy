@@ -298,6 +298,33 @@ export function renderTransients(ctx, bodies) {
       ctx.beginPath(); ctx.arc(0, -2, 2.4, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
 
+    } else if (b.partType === 'gravity_well') {
+      // Placed inward sink: a dark gravity dimple + concentric arcs pulsing
+      // inward, dimming as it nears expiry. (Lifecycle + epoch-wipe are owned by
+      // cleanupTransients / spawnRagdoll — this branch is the well's whole render.)
+      const now = performance.now();
+      const lifeFrac = Math.min(1, Math.max(0, (now - (b.bornAt ?? now)) / (b.lifeMs || 7000)));
+      const fade = 1 - lifeFrac * 0.7;
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, 40);
+      grad.addColorStop(0, `rgba(20,8,40,${0.55 * fade})`);
+      grad.addColorStop(1, 'rgba(20,8,40,0)');
+      ctx.fillStyle = grad;
+      ctx.beginPath(); ctx.arc(0, 0, 40, 0, Math.PI * 2); ctx.fill();
+      ctx.lineWidth = 1.6;
+      for (let i = 0; i < 3; i++) {
+        const rad = 30 - ((now * 0.02 + i * 10) % 28);
+        if (rad < 4) continue;
+        ctx.globalAlpha = (rad / 30) * fade;
+        ctx.strokeStyle = 'rgba(167,139,250,0.5)';
+        ctx.beginPath(); ctx.arc(0, 0, rad, 0, Math.PI * 2); ctx.stroke();
+      }
+      ctx.globalAlpha = 1;
+      ctx.fillStyle = `rgba(120,90,180,${0.8 * fade})`;
+      ctx.beginPath(); ctx.arc(0, 0, 3.5, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
     } else if (b.partType === 'electrified_panel') {
       // Live sensor plate: a metal strip on the floor with two terminals and a
       // jittering arc between them.

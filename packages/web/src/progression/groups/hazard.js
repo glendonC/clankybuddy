@@ -106,6 +106,56 @@ export default [
     blurb: 'A freezing vapor — dwell in it long enough and the limb frosts over brittle, setting up a shatter.',
   }),
 
+  // ── Gravity well (independent force-field root) + forks ────────────
+  // A placed inward SINK driven by a phase:'physics' force Mode. The verb forks
+  // are flag-flipping statNodes on the ROOT (user decision: one tool the tree
+  // mutates, not separate equippable weapons). A statNode may set a behavior
+  // flag freely — the scalar-rejection guard is sharedNode-only.
+  toolNode({
+    id: 'g.hazard.gravity_well', parents: [], cost: 240, toolId: 'gravity_well',
+    label: 'gravity well',
+    blurb: 'Drop a sustained gravity well that drags everything nearby inward toward one point — pure pull, it never throws.',
+  }),
+  statNode({
+    id: 'g.hazard.gravity_well.pull', parents: ['g.hazard.gravity_well'], cost: 200, toolId: 'gravity_well',
+    label: 'Stronger pull',
+    blurb: 'A deeper well — stronger inward force and longer reach.',
+    effect: (s) => { s.pull = 0.009; s.range = 320; },
+  }),
+  statNode({
+    id: 'g.hazard.gravity_well.collapse', parents: ['g.hazard.gravity_well'], cost: 380, toolId: 'gravity_well',
+    label: 'Collapse',
+    blurb: 'The well caves in at the end of its life — a final inward crush that slams everything to the center.',
+    effect: (s) => { s.collapse = true; },
+  }),
+
+  // ── Flood (independent force-field root) + forks ───────────────────
+  // A screen-wide one-shot tide. "Higher tide" raises the LEVEL (capFrac/holdMs),
+  // NEVER the buoyancy ceiling — that hard clamp is the no-rocket guarantee.
+  toolNode({
+    id: 'g.hazard.flood', parents: [], cost: 280, toolId: 'flood',
+    label: 'flood',
+    blurb: 'Flood the arena: the water rises, floats and drags the buddy, and douses any fire before it drains away.',
+  }),
+  statNode({
+    id: 'g.hazard.flood.tide', parents: ['g.hazard.flood'], cost: 220, toolId: 'flood',
+    label: 'Higher tide',
+    blurb: 'The water rises higher and holds longer before it drains.',
+    effect: (s) => { s.capFrac = 0.6; s.holdMs = 3200; },
+  }),
+  statNode({
+    id: 'g.hazard.flood.whirlpool', parents: ['g.hazard.flood'], cost: 340, toolId: 'flood',
+    label: 'Whirlpool',
+    blurb: 'The flood spins — submerged parts are dragged toward a central vortex.',
+    effect: (s) => { s.whirlpool = true; },
+  }),
+  statNode({
+    id: 'g.hazard.flood.acid', parents: ['g.hazard.flood'], cost: 360, toolId: 'flood',
+    label: 'Acid flood',
+    blurb: 'Caustic water — submerged parts are corroded, so your follow-up hits on them land harder.',
+    effect: (s) => { s.acid = true; },
+  }),
+
   // ── Shared hazard-family behavior FLAGS (cross-trap, never scalars) ──
   // Both parent off the landmine root (the canonical hazard tool) but flip a
   // FAMILY flag that EVERY placed trap reads via getFamilyStats('hazard').
