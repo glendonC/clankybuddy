@@ -114,6 +114,8 @@ export const TOOLS = [
     blurb: 'instant aimed cone, shoves and concusses every part it sweeps' },
   { id: 'sniper_rifle',label: 'sniper rifle', key: '', kind: 'click',     delta: '−28+pierce',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 240,
     blurb: 'long-barreled bolt-action; one high-velocity round drills clean through a line of parts' },
+  { id: 'charge_shot', label: 'charge shot',  key: '', kind: 'drag',      delta: '−18…46+pierce',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 360,
+    blurb: 'hold to steady your breath; a quick tap drills one limb, a full charge punches a heavy slug clean through the whole line' },
   { id: 'railgun',     label: 'railgun',      key: '', kind: 'click',     delta: '−40+pierce',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 520,
     blurb: 'electromagnetic launcher; a hypervelocity tungsten slug pierces a whole line of parts' },
   { id: 'subwoofer',   label: 'subwoofer',    key: '', kind: 'drag',      delta: '−concuss/beat',spine: 'negative', group: 'ordnance', cost: 230, cd: 8,

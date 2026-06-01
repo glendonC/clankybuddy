@@ -84,6 +84,7 @@ export function endPress() {
       const dy = lastY - dragStart.y;
       applyDragRelease(tool, abilityCtx({
         x: dragStart.x, y: dragStart.y, dx, dy, dragVec: { x: dx, y: dy }, _verb: tool,
+        holdMs: performance.now() - dragStart.t,   // generic hold duration for charge-style drag tools (inert to others)
       }));
       const meta = TOOLS_BY_ID[tool];
       if (meta) {

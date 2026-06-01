@@ -57,6 +57,32 @@ export default [
     effect: (s) => { s.pierce = 3; s.pierceShatter = true; },
   }),
 
+  // Hold-breath charge shot <- sniper rifle. A kind:'drag' charge fork: hold to
+  // build the PIERCE BUDGET of one natively-spawned pierce_bullet — a snap is
+  // pierce 1 (single drill), a full charge is pierce 4 (a whole-body line-clear).
+  // The charge modulates the same pierce axis that separates handgun/sniper/
+  // railgun, so it's a player-controlled verb, not a damage scalar. Leaves cash
+  // distinct reads: Bipod → s.chargeMs (charge tempo); Heavy barrel → s.pierceMax
+  // (line depth) + s.dmgMax (the c=1 ceiling).
+  toolNode({
+    id: 'g.ordnance.charge_shot', parents: ['g.ordnance.sniper_rifle'], cost: 360, toolId: 'charge_shot',
+    label: 'hold-breath charge shot',
+    blurb: 'Hold to steady your breath: a quick tap drills one limb, a full charge punches a heavy slug clean through the whole line.',
+  }),
+  statNode({
+    id: 'g.ordnance.charge_shot.bipod', parents: ['g.ordnance.charge_shot'], cost: 320, toolId: 'charge_shot',
+    label: 'Bipod',
+    blurb: 'A folding bipod steadies your aim: full charge in 0.9s → 0.6s, so you reach a line-clearing shot faster.',
+    effect: (s) => { s.chargeMs = 600; },
+  }),
+  statNode({
+    id: 'g.ordnance.charge_shot.heavy_barrel', parents: ['g.ordnance.charge_shot.bipod'], cost: 520, toolId: 'charge_shot',
+    label: 'Heavy barrel',
+    iconHint: '⚡',
+    blurb: 'A long bull barrel: a full charge now drills six limbs (pierce 4 → 6) and hits harder (46 → 60).',
+    effect: (s) => { s.pierceMax = 6; s.dmgMax = 60; },
+  }),
+
   // SHARED (cross-tool, family: firearms). Targeting computer turns auto-aim
   // from the old always-on default into a paid unlock: every firearm now aims
   // MANUALLY (fires at the buddy's centroid, no lock) until you buy this, at
