@@ -114,6 +114,8 @@ export const TOOLS = [
     blurb: 'long-barreled bolt-action; one high-velocity round drills clean through a line of parts' },
   { id: 'railgun',     label: 'railgun',      key: '', kind: 'click',     delta: '−40+pierce',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 520,
     blurb: 'electromagnetic launcher; a hypervelocity tungsten slug pierces a whole line of parts' },
+  { id: 'subwoofer',   label: 'subwoofer',    key: '', kind: 'drag',      delta: '−concuss/beat',spine: 'negative', group: 'ordnance', cost: 230, cd: 8,
+    blurb: 'drop a speaker stack that thuds out a concussive pulse on a steady beat, dazing everything in range' },
 
   // NEGATIVE / corruption (renamed from `elemental`).
   { id: 'fireball',    label: 'fireball',     key: 'U', kind: 'click',     delta: '−22',  spine: 'negative', group: 'corruption', cost: 180,
@@ -205,6 +207,14 @@ export const TOOLS = [
     blurb: 'Mount a spinning blade. Bites anything driven into it and stacks bleed.' },
   { id: 'cryo_mine',        label: 'cryo mine',        key: '', kind: 'drag',  delta: 'freeze AOE',   spine: 'negative', group: 'hazard', cost: 220, cd: 5,
     blurb: 'Bury a pressure-sensor cryo charge. Step on it and it vents an AOE freeze burst — locks the buddy down, no damage. Sets up the shatter.' },
+  { id: 'gas_cloud',        label: 'gas cloud',        key: '', kind: 'drag',  delta: '−choke',       spine: 'negative', group: 'hazard', cost: 200, cd: 6,
+    blurb: 'Pop a chemical canister; anything that dwells in the drifting cloud starts CHOKING — mood bleed, flailing, and a hard time staying on its feet.' },
+  { id: 'tear_gas',         label: 'tear gas',         key: '', kind: 'drag',  delta: '−choke+panic', spine: 'negative', group: 'hazard', cost: 180, cd: 6,
+    blurb: 'A drifting irritant cloud that sends the buddy into a blind panic-run instead of just choking it.' },
+  { id: 'chlorine',         label: 'chlorine',         key: '', kind: 'drag',  delta: '−choke×',      spine: 'negative', group: 'hazard', cost: 220, cd: 6,
+    blurb: 'A heavier toxic cloud whose choke STACKS the longer the buddy stays inside it.' },
+  { id: 'cryo_fog',         label: 'cryo fog',         key: '', kind: 'drag',  delta: 'freeze/dwell', spine: 'negative', group: 'hazard', cost: 240, cd: 6,
+    blurb: 'A freezing vapor — dwell in it long enough and the limb frosts over brittle, setting up a shatter.' },
 ];
 
 export const TOOLS_BY_ID  = Object.fromEntries(TOOLS.map(t => [t.id, t]));

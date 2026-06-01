@@ -303,6 +303,11 @@ export default [
     label: 'sonic cannon',
     blurb: 'Instant aimed cone; shoves and concusses every part it sweeps.',
   }),
+  toolNode({
+    id: 'g.ordnance.subwoofer', parents: ['g.ordnance.flashbang'], cost: 230, toolId: 'subwoofer',
+    label: 'subwoofer',
+    blurb: 'Drop a speaker stack that thuds out a concussive pulse on a steady beat, dazing everything in range.',
+  }),
 
   // Lightning branch, sky bolt + chains. Joined ordnance in Phase 2
   // (was in `corruption` while the group was still called `elemental`).

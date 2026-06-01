@@ -16,6 +16,7 @@ import electrified      from './electrified.js';
 import powered          from './powered.js';
 import inBlackhole      from './in-blackhole.js';
 import concussed        from './concussed.js';
+import choking          from './choking.js';
 import aligned          from './aligned.js';
 import lashed           from './lashed.js';
 import finishing        from './finishing.js';
@@ -34,6 +35,7 @@ const EFFECTS = {
   powered,
   in_blackhole: inBlackhole,
   concussed,
+  choking,
   // `aligned` retained as Compliance Theater event's producer.
   aligned,
   lashed,

@@ -81,6 +81,31 @@ export default [
     effect: (s) => { s.lifeMs = 24000; },
   }),
 
+  // ── Gas cloud (independent root) + verb forks ─────────────────────
+  // A drifting choking-status dwell zone. The three forks are distinct VERBS
+  // (panic-run / stacking DoT / freeze-on-dwell), so they are child toolNodes
+  // (each its own equippable tool), all parenting the gas_cloud ROOT.
+  toolNode({
+    id: 'g.hazard.gas_cloud', parents: [], cost: 200, toolId: 'gas_cloud',
+    label: 'gas cloud',
+    blurb: 'Pop a chemical canister; anything that dwells in the drifting cloud starts CHOKING — mood bleed, flailing, and a hard time staying on its feet.',
+  }),
+  toolNode({
+    id: 'g.hazard.gas_cloud.tear_gas', parents: ['g.hazard.gas_cloud'], cost: 180, toolId: 'tear_gas',
+    label: 'tear gas',
+    blurb: 'A drifting irritant cloud that sends the buddy into a blind panic-run instead of just choking it.',
+  }),
+  toolNode({
+    id: 'g.hazard.gas_cloud.chlorine', parents: ['g.hazard.gas_cloud'], cost: 220, toolId: 'chlorine',
+    label: 'chlorine',
+    blurb: 'A heavier toxic cloud whose choke STACKS the longer the buddy stays inside it.',
+  }),
+  toolNode({
+    id: 'g.hazard.gas_cloud.cryo_fog', parents: ['g.hazard.gas_cloud'], cost: 240, toolId: 'cryo_fog',
+    label: 'cryo fog',
+    blurb: 'A freezing vapor — dwell in it long enough and the limb frosts over brittle, setting up a shatter.',
+  }),
+
   // ── Shared hazard-family behavior FLAGS (cross-trap, never scalars) ──
   // Both parent off the landmine root (the canonical hazard tool) but flip a
   // FAMILY flag that EVERY placed trap reads via getFamilyStats('hazard').

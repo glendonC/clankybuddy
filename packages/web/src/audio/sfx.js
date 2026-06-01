@@ -316,4 +316,25 @@ export const sfx = {
     noise({ dur: 0.24, vol: 0.20, lpFreq: 700 });
     setTimeout(() => beep({ freq: 1900, dur: 0.03, type: 'square', vol: 0.07, sweep: -500 }), 26);
   },
+
+  // ── gas-cloud + subwoofer batch ─────────────────────────────────
+  // Gas cloud release: canister pop (click) + sustained chemical hiss + a soft
+  // low sigh as it disperses.
+  gasCloud: () => {
+    preTransientClick(0.4, 0);
+    noise({ dur: 0.5, vol: 0.07, lpFreq: 1800 });
+    beep({ freq: 320, dur: 0.18, type: 'sine', vol: 0.05, sweep: -160 });
+  },
+  // Subwoofer drop: heavy cabinet thud as the stack lands (deep sub + dull body).
+  subwooferDrop: () => {
+    preTransientClick(0.4, 0);
+    beep({ freq: 50, dur: 0.3, type: 'sine', vol: 0.24, sweep: -20 });
+    noise({ dur: 0.18, vol: 0.14, lpFreq: 300 });
+  },
+  // Subwoofer pulse: a sub-bass whump per beat (fires N times/cast, so kept low
+  // and short so overlapping beats don't muddy).
+  subwooferPulse: () => {
+    beep({ freq: 45, dur: 0.22, type: 'sine', vol: 0.24, sweep: 20 });
+    noise({ dur: 0.12, vol: 0.07, lpFreq: 260 });
+  },
 };

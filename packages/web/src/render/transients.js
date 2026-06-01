@@ -325,6 +325,47 @@ export function renderTransients(ctx, bodies) {
       ctx.stroke();
       ctx.restore();
 
+    } else if (b.partType === 'gas_cloud') {
+      // Drifting translucent cloud — overlapping low-alpha blobs that breathe in
+      // place (render-only drift; the sensor stays put). Tint per variant (_rgb).
+      const rgb = b._rgb || '155,206,106';
+      const R = b._radius || 70;
+      const now = performance.now();
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      for (let i = 0; i < 5; i++) {
+        const ph = now * 0.0005 + i * 1.3;
+        const ox = Math.cos(ph) * R * 0.35;
+        const oy = Math.sin(ph * 0.8) * R * 0.22;
+        const rr = R * (0.5 + 0.18 * Math.sin(ph * 1.7));
+        const g = ctx.createRadialGradient(ox, oy, 1, ox, oy, rr);
+        g.addColorStop(0, `rgba(${rgb}, 0.16)`);
+        g.addColorStop(1, `rgba(${rgb}, 0)`);
+        ctx.fillStyle = g;
+        ctx.beginPath(); ctx.arc(ox, oy, rr, 0, Math.PI * 2); ctx.fill();
+      }
+      ctx.restore();
+
+    } else if (b.partType === 'subwoofer') {
+      // Speaker cabinet + an expanding pulse ring keyed to the beat.
+      const R = b._radius || 180;
+      const iv = b._intervalMs || 700;
+      const now = performance.now();
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      const t = ((now - (b.bornAt || 0)) % iv) / iv;
+      ctx.strokeStyle = `rgba(176,124,255,${0.4 * (1 - t)})`;
+      ctx.lineWidth = 3;
+      ctx.beginPath(); ctx.arc(0, 0, t * R, 0, Math.PI * 2); ctx.stroke();
+      ctx.fillStyle = '#26262b'; ctx.fillRect(-12, -16, 24, 32);
+      ctx.fillStyle = '#3a3a42';
+      ctx.beginPath(); ctx.arc(0, -6, 6, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#1c1c20';
+      ctx.beginPath(); ctx.arc(0, 7, 8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = '#b07cff';
+      ctx.beginPath(); ctx.arc(0, 7, 2.6, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
     // ── cannon-and-mortar batch projectiles (render.visible:false → drawn here) ──
     } else if (b.partType === 'cannonball') {
       // Cannon + hot shot share this. b._heated adds the orange glow (hot shot).

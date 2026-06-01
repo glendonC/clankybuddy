@@ -12,6 +12,7 @@ export const EVENTS = {
   frozen:      ['c-c-cold', 'b-brrrr', 'my joints', '❄', 'cant move'],
   electrified: ['BZZT', 'AHHGZTZT', 'arc of pain', '⚡⚡', 'stop conducting me'],
   concussed:   ['ow my head', '...stars', 'see birds', 'wh.. what year', '???'],
+  choking:     ['*cough*', "can't breathe", 'gas!', '*hack*', 'choking'],
   powered:     ['ENERGIZED', 'compute compute', 'overclocked'],
   in_blackhole:['no no no', 'spaghettifying', 'event horizon!', 'pull me out!'],
 

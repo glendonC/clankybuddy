@@ -94,9 +94,14 @@ import meathook    from './cursor/meathook.js';
 import magnet      from './cursor/magnet.js';
 import landmine    from './cursor/landmine.js';
 import cryoMine    from './cursor/cryo-mine.js';
+import gasCloud    from './cursor/gas-cloud.js';
+import tearGas     from './cursor/tear-gas.js';
+import chlorine    from './cursor/chlorine.js';
+import cryoFog     from './cursor/cryo-fog.js';
 
 import electrifiedPanel from './punish/electrified-panel.js';
 import buzzsawWall      from './punish/buzzsaw-wall.js';
+import subwoofer        from './punish/subwoofer.js';
 
 // Master "stats" slot, cross-tool multipliers live here. Master tree nodes
 // mutate this and individual abilities can opt-in to read e.g. masterStats.moodMul.
@@ -137,6 +142,7 @@ function buildSources() {
     anvil, blackhole, nuke, force_quit: forceQuit,
     grab, bear_trap: bearTrap, meathook, magnet,
     landmine, electrified_panel: electrifiedPanel, buzzsaw_wall: buzzsawWall, cryo_mine: cryoMine,
+    gas_cloud: gasCloud, tear_gas: tearGas, chlorine, cryo_fog: cryoFog, subwoofer,
   };
 }
 
