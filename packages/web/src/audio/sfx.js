@@ -77,6 +77,18 @@ export const sfx = {
     setTimeout(() => noise({ dur: 0.03, vol: 0.14, lpFreq: 8000 }), 50);
     setTimeout(() => noise({ dur: 0.03, vol: 0.10, lpFreq: 8000 }), 100);
   },
+  // Lightning storm CAST — a distant rolling rumble telegraphing the volley
+  // (the per-bolt cracks reuse zap). Low swelling sawtooth + lowpassed noise
+  // wash + a delayed second roll. setTimeout is audio-only (touches no
+  // ragdoll/world), matching the zap/railgun house style; no epoch guard needed.
+  thunder: () => {
+    beep({ freq: 70, dur: 0.7, type: 'sawtooth', vol: 0.16, sweep: -20 });
+    noise({ dur: 0.8, vol: 0.12, lpFreq: 500 });
+    setTimeout(() => {
+      beep({ freq: 55, dur: 0.5, type: 'sawtooth', vol: 0.12, sweep: -15 });
+      noise({ dur: 0.5, vol: 0.08, lpFreq: 380 });
+    }, 280);
+  },
   gun:   () => { beep({ freq: 220, dur: 0.05, type: 'square', vol: 0.2, sweep: -160 }); noise({ dur: 0.05, vol: 0.16 }); },
   // Deeper, louder than the pistol — magnum boom.
   revolver: () => { beep({ freq: 140, dur: 0.1, type: 'square', vol: 0.26, sweep: -100 }); noise({ dur: 0.12, vol: 0.24, lpFreq: 1200 }); },

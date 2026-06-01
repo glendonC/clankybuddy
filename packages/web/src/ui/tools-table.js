@@ -89,6 +89,8 @@ export const TOOLS = [
     blurb: 'drag to lob, 2s fuse, dry blast + a radial spray of shrapnel' },
   { id: 'lightning',   label: 'lightning',    key: 'P', kind: 'click',     delta: '−14',  spine: 'negative', group: 'ordnance', cost: 250,
     blurb: 'sky bolt + branching forks. pairs with ice (CONDUCT) and fire (COMBUST).' },
+  { id: 'lightning_storm',label: 'lightning storm',key: '', kind: 'click', delta: '−14×5',spine: 'negative', group: 'ordnance', cost: 450, cd: 10,
+    blurb: 'call down a walking barrage of sky bolts on a timed schedule. each bolt is a local strike that electrifies the whole body.' },
   { id: 'sawblade',    label: 'saw blade',    key: 'L', kind: 'click',     delta: '−12',  spine: 'negative', group: 'ordnance', cost: 180,
     blurb: 'spinning disc ricochets off walls, pure impact damage, no DoT.' },
   // ordnance — cannon-and-mortar batch. All key:'' (hotbar-slot input; bare keys

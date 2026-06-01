@@ -59,6 +59,85 @@ function spawnBolt(x0, y0, x1, y1, segs = 10, jitterPx = 28, color = '#dff7ff', 
   return points;
 }
 
+// STRIKE CORE (B6). One bolt's worth of lightning at a single resolved `part`:
+// sky->part bolt + forks + arc-zap visual + impact starburst + impulse +
+// body-wide electrify + mood + stun + feel. Extracted VERBATIM from the
+// lightning tool's steps 1-6 so the one-shot tool is byte-for-byte unchanged
+// (apply() calls this with localOnly:false). The lightning storm walks a
+// SEQUENCE of these on the scheduler with localOnly:true.
+//
+// DELIBERATELY NOT here (stays in lightning.apply, the tool's one-shot wrapper):
+// KO-REVIVE, the combust-all / shatter-all global passes, and the OVERCLOCK
+// powered-scan + heal. The storm calls strikeAt DIRECTLY (never apply()), so a
+// storm bolt structurally CANNOT revive, combust/shatter the whole body, or
+// trigger the overclock heal — there is no code path from a storm bolt to them.
+//
+// localOnly (storm path): dampens the screen FEEL only — drops the full-screen
+// white flash (showFlash stacks DOM overlays, so a per-bolt flash across a
+// volley would strobe) and shrinks the shake/hitStop, so a multi-bolt storm
+// never locks the sim or seizure-flashes. Steps 1-5 are identical in both modes.
+// overclocked (tool path only): preserves the original `if(!overclocked)` mood
+// gate verbatim (overclock turns the strike into a heal, so it suppresses the
+// damage-mood line). The storm always passes overclocked:false.
+export function strikeAt(ctx, part, { localOnly = false, overclocked = false } = {}) {
+  const s = getStats('lightning');
+  const { ragdoll, status, screenShake } = ctx;
+
+  // 1. Sky-to-target main bolt (drops from above stage).
+  const skyX = part.position.x + (Math.random() - 0.5) * 60;
+  const points = spawnBolt(skyX, -20, part.position.x, part.position.y, 11, 36, '#dff7ff', 360);
+
+  // 2. Branching forks at random mid-vertices.
+  for (let i = 2; i < points.length - 1; i++) {
+    if (Math.random() > s.forkChance) continue;
+    const root = points[i];
+    const angle = Math.random() * Math.PI * 2;
+    const forkLen = 60 + Math.random() * 50;
+    const tx = root.x + Math.cos(angle) * forkLen;
+    const ty = root.y + Math.sin(angle) * forkLen;
+    spawnBolt(root.x, root.y, tx, ty, 5, 14, '#9be7ff', 260);
+  }
+
+  // 3. Arc-zap to neighboring parts.
+  const others = ragdoll.parts.filter(p => p !== part);
+  others.sort((a, b) =>
+    Math.hypot(a.position.x - part.position.x, a.position.y - part.position.y) -
+    Math.hypot(b.position.x - part.position.x, b.position.y - part.position.y));
+  for (const n of others.slice(0, s.chainTargets)) {
+    spawnBolt(part.position.x, part.position.y, n.position.x, n.position.y, 6, 14, '#9be7ff', 240);
+  }
+
+  // 4. Impact starburst at the strike point.
+  P.burst(part.position.x, part.position.y, 28, { type: 'spark', color: '#9be7ff', size: 4, life: 420, speedRange: 1.4 });
+  P.burst(part.position.x, part.position.y, 14, { type: 'spark', color: '#fff',    size: 3, life: 220, speedRange: 1.8 });
+  P.burst(part.position.x, part.position.y, 10, { type: 'smoke', color: '#cdd',    size: 8, life: 700, speedRange: 0.4, gravity: -0.0004 });
+
+  // 5. Status + impulse + stun.
+  const fx = (Math.random() - 0.5) * 0.05;
+  const fy = -0.06;
+  applyImpulse(part, fx, fy);
+  for (const p of ragdoll.parts) {
+    Body.setAngularVelocity(p, (Math.random() - 0.5) * 0.6);
+    applyStatus(status, p, 'electrified', { duration: s.electrifiedMs, source: 'lightning' });
+  }
+  if (!overclocked) {
+    ctx.reactTo?.({ source: 'lightning', part, moodDelta: -s.mood, impulse: Math.hypot(fx, fy), speakMs: 500 });
+  }
+  stun(ragdoll, 600);
+
+  // 6. Audio + visceral shake + screen flash. localOnly (storm) dampens the
+  // feel and drops the flash so a volley never locks/strobes.
+  sfx.zap();
+  if (localOnly) {
+    screenShake(s.shake * 0.45, 200);
+    ctx.hitStop?.(25, 0.1);
+  } else {
+    screenShake(s.shake, 350);
+    ctx.hitStop?.(50, 0.05);
+    showFlash('#ffffff', 90, 0.7);
+  }
+}
+
 export default {
   id: 'lightning',
   defaultStats,
@@ -121,53 +200,10 @@ export default {
     }
     if (shocked && !overclocked) showCombo?.('SHOCK SHATTER', '#9be7ff');
 
-    // 1. Sky-to-target main bolt (drops from above stage).
-    const skyX = part.position.x + (Math.random() - 0.5) * 60;
-    const points = spawnBolt(skyX, -20, part.position.x, part.position.y, 11, 36, '#dff7ff', 360);
-
-    // 2. Branching forks at random mid-vertices.
-    for (let i = 2; i < points.length - 1; i++) {
-      if (Math.random() > s.forkChance) continue;
-      const root = points[i];
-      const angle = Math.random() * Math.PI * 2;
-      const forkLen = 60 + Math.random() * 50;
-      const tx = root.x + Math.cos(angle) * forkLen;
-      const ty = root.y + Math.sin(angle) * forkLen;
-      spawnBolt(root.x, root.y, tx, ty, 5, 14, '#9be7ff', 260);
-    }
-
-    // 3. Arc-zap to neighboring parts.
-    const others = ragdoll.parts.filter(p => p !== part);
-    others.sort((a, b) =>
-      Math.hypot(a.position.x - part.position.x, a.position.y - part.position.y) -
-      Math.hypot(b.position.x - part.position.x, b.position.y - part.position.y));
-    for (const n of others.slice(0, s.chainTargets)) {
-      spawnBolt(part.position.x, part.position.y, n.position.x, n.position.y, 6, 14, '#9be7ff', 240);
-    }
-
-    // 4. Impact starburst at the strike point.
-    P.burst(part.position.x, part.position.y, 28, { type: 'spark', color: '#9be7ff', size: 4, life: 420, speedRange: 1.4 });
-    P.burst(part.position.x, part.position.y, 14, { type: 'spark', color: '#fff',    size: 3, life: 220, speedRange: 1.8 });
-    P.burst(part.position.x, part.position.y, 10, { type: 'smoke', color: '#cdd',    size: 8, life: 700, speedRange: 0.4, gravity: -0.0004 });
-
-    // 5. Status + impulse + stun.
-    const fx = (Math.random() - 0.5) * 0.05;
-    const fy = -0.06;
-    applyImpulse(part, fx, fy);
-    for (const p of ragdoll.parts) {
-      Body.setAngularVelocity(p, (Math.random() - 0.5) * 0.6);
-      applyStatus(status, p, 'electrified', { duration: s.electrifiedMs, source: 'lightning' });
-    }
-    if (!overclocked) {
-      ctx.reactTo?.({ source: 'lightning', part, moodDelta: -s.mood, impulse: Math.hypot(fx, fy), speakMs: 500 });
-    }
-    stun(ragdoll, 600);
-
-    // 6. Audio + visceral shake + screen flash.
-    sfx.zap();
-    screenShake(s.shake, 350);
-    ctx.hitStop?.(50, 0.05);
-    showFlash('#ffffff', 90, 0.7);
+    // Steps 1-6: the strike core, extracted to strikeAt so the lightning storm
+    // can walk a sequence of these. localOnly:false = full feel (byte-for-byte
+    // with the original); overclocked preserves the `!overclocked` mood gate.
+    strikeAt(ctx, part, { localOnly: false, overclocked });
   },
   drawCursor(ctx, { x, y, target }) {
     ctx.save();

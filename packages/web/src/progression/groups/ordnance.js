@@ -378,6 +378,29 @@ export default [
     effect: (s) => { s.mood = Math.round(s.mood * 1.5); s.electrifiedMs *= 2; s.shake = 28; },
   }),
 
+  // Lightning storm — a scheduler-walked volley of the lightning strike core.
+  // Parents the lightning root (DOCS §3). Each bolt reuses getStats('lightning')
+  // for damage/VFX, so the chains/Zeus upgrades above flow into the storm for
+  // free; the storm's OWN stats are the volley shape (count/interval).
+  toolNode({
+    id: 'g.ordnance.lightning_storm', parents: ['g.ordnance.lightning'], cost: 450, toolId: 'lightning_storm',
+    label: 'lightning storm',
+    blurb: 'A walking barrage of sky bolts on a timed schedule. Each strike is local, so fire and ice set up combos limb by limb across the volley.',
+  }),
+  statNode({
+    id: 'g.ordnance.lightning_storm.supercell', parents: ['g.ordnance.lightning_storm'], cost: 600, toolId: 'lightning_storm',
+    label: 'Supercell',
+    blurb: 'Bolts 5 → 8 — the storm rolls longer across the body.',
+    effect: (s) => { s.count = 8; },
+  }),
+  statNode({
+    id: 'g.ordnance.lightning_storm.rolling_thunder', parents: ['g.ordnance.lightning_storm.supercell'], cost: 900, toolId: 'lightning_storm',
+    iconHint: '⚡',
+    label: 'Rolling thunder',
+    blurb: 'Bolts fall faster (every 0.36s → 0.22s) and the storm opens sooner.',
+    effect: (s) => { s.intervalMs = 220; s.startDelayMs = 400; },
+  }),
+
   // Saw blade (Phase 7, gore add). Click-throw a spinning disc that
   // ricochets off walls until it bites. Pure impact damage, bleed lives
   // on chainsaw / bear-trap / meathook, sawblade owns the bounce.
