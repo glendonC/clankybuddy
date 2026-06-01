@@ -36,6 +36,7 @@ import rocket        from './punish/rocket.js';
 import sniperRifle   from './punish/sniper-rifle.js';
 import chargeShot    from './punish/charge-shot.js';
 import railgun       from './punish/railgun.js';
+import sabotSpread   from './punish/sabot-spread.js';
 import fireball      from './punish/fireball.js';
 import grenade       from './punish/grenade.js';
 import fragGrenade   from './punish/frag-grenade.js';
@@ -141,7 +142,7 @@ let _initialized = false;
 function buildSources() {
   return {
     pet, feed, gift, first_aid: firstAid, defibrillator, adrenaline,
-    punch, brass_knuckles: brassKnuckles, hammer, sword, gun, revolver, machinegun, smg, assault_rifle: assaultRifle, lmg, minigun, shotgun, rocket, sniper_rifle: sniperRifle, charge_shot: chargeShot, railgun, fireball, grenade, frag_grenade: fragGrenade, flame, lightning, freeze,
+    punch, brass_knuckles: brassKnuckles, hammer, sword, gun, revolver, machinegun, smg, assault_rifle: assaultRifle, lmg, minigun, shotgun, rocket, sniper_rifle: sniperRifle, charge_shot: chargeShot, railgun, sabot_spread: sabotSpread, fireball, grenade, frag_grenade: fragGrenade, flame, lightning, freeze,
     whip, chainsaw, sawblade, acid_flask: acidFlask,
     liquid_nitrogen: liquidNitrogen, flash_freeze: flashFreeze, laser_cutter: laserCutter, taser,
     cannon, grapeshot, chain_shot: chainShot, hot_shot: hotShot, mortar, flashbang, sonic_cannon: sonicCannon, creeping_barrage: creepingBarrage,

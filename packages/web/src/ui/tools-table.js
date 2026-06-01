@@ -118,6 +118,8 @@ export const TOOLS = [
     blurb: 'hold to steady your breath; a quick tap drills one limb, a full charge punches a heavy slug clean through the whole line' },
   { id: 'railgun',     label: 'railgun',      key: '', kind: 'click',     delta: '−40+pierce',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 520,
     blurb: 'electromagnetic launcher; a hypervelocity tungsten slug pierces a whole line of parts' },
+  { id: 'sabot_spread',label: 'sabot spread', key: '', kind: 'click',     delta: '−16×5+pierce',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 560,
+    blurb: 'discarding-sabot rail load; one pull fans a cone of hypervelocity penetrator darts, each drilling a couple of parts — area pierce, not a single deep slug' },
   { id: 'subwoofer',   label: 'subwoofer',    key: '', kind: 'drag',      delta: '−concuss/beat',spine: 'negative', group: 'ordnance', cost: 230, cd: 8,
     blurb: 'drop a speaker stack that thuds out a concussive pulse on a steady beat, dazing everything in range' },
   { id: 'breaching_charge',label: 'breaching charge',key: '', kind: 'click', delta: '−28',  spine: 'negative', group: 'ordnance', cost: 230,

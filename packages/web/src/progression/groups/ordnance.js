@@ -363,6 +363,33 @@ export default [
     effect: (s) => { s.speed = 64; s.shake = 20; },
   }),
 
+  // Sabot spread <- railgun. A discarding-sabot load: fires a CONE of K lighter
+  // penetrator darts instead of one deep slug, each drilling a couple of parts.
+  // The only tool in the SPREAD × PENETRATES cell (grapeshot spreads but stops;
+  // railgun/sniper pierce but fire one line). NO synchronous knockback pass — the
+  // travelling sabots are the whole damage model, so it's not grapeshot; per-dart
+  // pierce/damage stay below the rail's single slug, so it's a sidegrade not an
+  // upgrade. Leaves cash distinct axes: Choke removed → coverage (sabots/cone);
+  // Tungsten darts → depth (pierce/damage).
+  toolNode({
+    id: 'g.ordnance.sabot_spread', parents: ['g.ordnance.railgun'], cost: 560, toolId: 'sabot_spread',
+    label: 'sabot spread',
+    blurb: 'A discarding-sabot load for the rail: one pull fans a cone of lighter penetrator darts that each drill a couple of parts, saturating a cluster instead of one precise line.',
+  }),
+  statNode({
+    id: 'g.ordnance.sabot_spread.wider', parents: ['g.ordnance.sabot_spread'], cost: 320, toolId: 'sabot_spread',
+    label: 'Choke removed',
+    blurb: 'Sabots 5 → 7, cone 0.42 → 0.58 — a wider, denser fan blankets the whole silhouette.',
+    effect: (s) => { s.sabots = 7; s.coneRad = 0.58; },
+  }),
+  statNode({
+    id: 'g.ordnance.sabot_spread.tungsten_darts', parents: ['g.ordnance.sabot_spread'], cost: 420, toolId: 'sabot_spread',
+    label: 'Tungsten darts',
+    iconHint: '⚡',
+    blurb: 'Each dart drills deeper and hits harder: pierce 2 → 3, damage 16 → 24 (still a fan, not the rail\'s single deep slug).',
+    effect: (s) => { s.pierce = 3; s.damage = 24; },
+  }),
+
   // Concussive branch (flashbang root → sonic cannon). The first RANGED CONCUSSED
   // applicators (the status existed; nothing applied it at range until now).
   toolNode({
