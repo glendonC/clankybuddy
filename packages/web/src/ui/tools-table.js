@@ -167,6 +167,10 @@ export const TOOLS = [
     blurb: 'swing an iron-shod oak log along the drag; one heavy directional shove per part, per swing' },
   { id: 'wrecking_ball',label: 'wrecking ball',key: '', kind: 'click',    delta: '−22/pass', spine: 'negative', group: 'siege', cost: 400,
     blurb: 'rig a chained steel ball that swings down through the buddy for two or three demolition passes' },
+  { id: 'meteor_shower',label: 'meteor shower',key: '', kind: 'click',    delta: '−14×6', spine: 'negative', group: 'siege', cost: 420, cd: 12,
+    blurb: 'mark a zone; a staggered barrage of flaming rocks rains down and detonates with fire' },
+  { id: 'hailstorm',   label: 'hailstorm',    key: '', kind: 'click',    delta: 'freeze×10', spine: 'negative', group: 'siege', cost: 360, cd: 10,
+    blurb: 'mark a zone; a volley of ice chunks pelts the buddy, freezing each limb it strikes brittle' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It

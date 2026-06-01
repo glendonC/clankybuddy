@@ -76,6 +76,11 @@ export const sfx = {
   shotgun: () => { beep({ freq: 70, dur: 0.18, type: 'sawtooth', vol: 0.26, sweep: -30 }); noise({ dur: 0.22, vol: 0.28, lpFreq: 700 }); setTimeout(()=>beep({ freq: 4200, dur: 0.03, type: 'square', vol: 0.06 }), 5); },
   rocket: () => { beep({ freq: 320, dur: 0.45, type: 'sawtooth', vol: 0.14, sweep: -160 }); noise({ dur: 0.45, vol: 0.08, lpFreq: 1400 }); },
   rocketBoom: () => { beep({ freq: 50, dur: 0.5, type: 'sawtooth', vol: 0.28, sweep: -30 }); noise({ dur: 0.6, vol: 0.32, lpFreq: 600 }); },
+  // Meteor — inbound air-tearing roar on spawn (the detonation reuses rocketBoom
+  // via explode's sound). Descending sawtooth + bright lowpassed noise.
+  meteor: () => { beep({ freq: 300, dur: 0.4, type: 'sawtooth', vol: 0.16, sweep: -200 }); noise({ dur: 0.35, vol: 0.1, lpFreq: 5000 }); },
+  // Hail — a light icy tick per chunk (fires ~10x/cast, so deliberately quiet + short).
+  hail: () => { beep({ freq: 2600, dur: 0.04, type: 'sine', vol: 0.08, sweep: 400 }); noise({ dur: 0.02, vol: 0.06, lpFreq: 7000 }); },
   fireball: () => { beep({ freq: 480, dur: 0.18, type: 'triangle', vol: 0.12, sweep: -260 }); noise({ dur: 0.18, vol: 0.08, lpFreq: 1200 }); },
   grenadeFuse: () => beep({ freq: 1400, dur: 0.04, type: 'square', vol: 0.06 }),
   anvil: () => { beep({ freq: 1100, dur: 0.5, type: 'sine', vol: 0.05, sweep: -800 }); setTimeout(()=>{ beep({ freq: 60, dur: 0.25, type: 'sawtooth', vol: 0.3, sweep: -20 }); noise({ dur: 0.25, vol: 0.22, lpFreq: 500 }); }, 480); },

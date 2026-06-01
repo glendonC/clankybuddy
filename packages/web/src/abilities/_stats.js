@@ -80,6 +80,8 @@ import trebuchet    from './siege/trebuchet.js';
 import officeChair  from './siege/office-chair.js';
 import batteringRam from './siege/battering-ram.js';
 import wreckingBall from './siege/wrecking-ball.js';
+import meteorShower from './siege/meteor-shower.js';
+import hailstorm    from './siege/hailstorm.js';
 
 import anvil        from './chaos/anvil.js';
 import blackhole    from './chaos/blackhole.js';
@@ -131,7 +133,7 @@ function buildSources() {
     liquid_nitrogen: liquidNitrogen, flash_freeze: flashFreeze, laser_cutter: laserCutter, taser,
     cannon, grapeshot, chain_shot: chainShot, hot_shot: hotShot, mortar, flashbang, sonic_cannon: sonicCannon, creeping_barrage: creepingBarrage,
     bat, battle_axe: battleAxe, fire_axe: fireAxe, hunting_knife: huntingKnife, cattle_prod: cattleProd, blowtorch, power_drill: powerDrill, nail_gun: nailGun, caltrops,
-    brick, bowling_ball: bowlingBall, piano, crt, car, steamroller, city_bus: cityBus, trebuchet, office_chair: officeChair, battering_ram: batteringRam, wrecking_ball: wreckingBall,
+    brick, bowling_ball: bowlingBall, piano, crt, car, steamroller, city_bus: cityBus, trebuchet, office_chair: officeChair, battering_ram: batteringRam, wrecking_ball: wreckingBall, meteor_shower: meteorShower, hailstorm,
     anvil, blackhole, nuke, force_quit: forceQuit,
     grab, bear_trap: bearTrap, meathook, magnet,
     landmine, electrified_panel: electrifiedPanel, buzzsaw_wall: buzzsawWall, cryo_mine: cryoMine,

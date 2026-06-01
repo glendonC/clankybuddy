@@ -139,4 +139,44 @@ export default [
     blurb: 'Heavier head: mood 22 → 30 per pass, force 0.16 → 0.20.',
     effect: (s) => { s.ballRadius = 30; s.density = 0.03; s.mood = 30; s.force = 0.20; },
   }),
+
+  // ── Weather barrages (independent roots, scheduler-driven; docs §3
+  // "Directed / siege / weather"). Staggered drops onto a marked zone. ──
+  toolNode({
+    id: 'g.siege.meteor_shower', parents: [], cost: 420, toolId: 'meteor_shower',
+    label: 'meteor shower',
+    blurb: 'A staggered barrage of flaming rocks falls from the sky onto a marked zone and detonates with fire.',
+  }),
+  statNode({
+    id: 'g.siege.meteor_shower.dense', parents: ['g.siege.meteor_shower'], cost: 500, toolId: 'meteor_shower',
+    label: 'Dense barrage',
+    blurb: 'More rocks per cast (6 → 9), tighter interval.',
+    effect: (s) => { s.count = 9; s.intervalMs = 190; },
+  }),
+  statNode({
+    id: 'g.siege.meteor_shower.craters', parents: ['g.siege.meteor_shower'], cost: 650, toolId: 'meteor_shower',
+    iconHint: '⚡',
+    label: 'Impact craters',
+    blurb: 'Wider blasts (radius 140 → 182) and each impact leaves a lingering fire pool.',
+    effect: (s) => { s.radius = Math.round(s.radius * 1.3); s.fireDuration = 2200; },
+  }),
+
+  toolNode({
+    id: 'g.siege.hailstorm', parents: [], cost: 360, toolId: 'hailstorm',
+    label: 'hailstorm',
+    blurb: 'A pelting volley of ice chunks rains down on a marked zone, freezing each limb it strikes brittle.',
+  }),
+  statNode({
+    id: 'g.siege.hailstorm.stones', parents: ['g.siege.hailstorm'], cost: 420, toolId: 'hailstorm',
+    label: 'Larger stones',
+    blurb: 'Bigger chunks (radius 6 → 9), harder impact (mood 4 → 7).',
+    effect: (s) => { s.stoneR = 9; s.mood = 7; s.squashVel = 11; },
+  }),
+  statNode({
+    id: 'g.siege.hailstorm.rain', parents: ['g.siege.hailstorm'], cost: 500, toolId: 'hailstorm',
+    iconHint: '⚡',
+    label: 'Freezing rain',
+    blurb: 'A denser volley — more chunks per cast (10 → 15) to lock the limbs solid.',
+    effect: (s) => { s.count = 15; s.intervalMs = 100; },
+  }),
 ];

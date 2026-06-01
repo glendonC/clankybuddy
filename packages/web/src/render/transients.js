@@ -420,6 +420,45 @@ export function renderTransients(ctx, bodies) {
       ctx.fillStyle = '#3a3a40';
       ctx.beginPath(); ctx.arc(0, -r, 3.5, 0, Math.PI * 2); ctx.fill();   // chain lug
       ctx.restore();
+
+    } else if (b.partType === 'meteor') {
+      // Flaming rock: a fire/smoke trail + a molten additive glow over a dark core.
+      const sp = Math.hypot(b.velocity.x, b.velocity.y) || 1;
+      const tx = b.position.x - (b.velocity.x / sp) * 8;
+      const ty = b.position.y - (b.velocity.y / sp) * 8;
+      P.spawn({ x: tx + (Math.random() - 0.5) * 4, y: ty + (Math.random() - 0.5) * 4,
+        vx: -b.velocity.x * 0.04, vy: -b.velocity.y * 0.04,
+        type: 'fire', color: ['#fff7c2', '#ffae3c', '#ff6b1a'][Math.floor(Math.random() * 3)],
+        size: 7 + Math.random() * 4, life: 320, gravity: -0.0006, drag: 0.96 });
+      if (Math.random() < 0.5) {
+        P.spawn({ x: tx, y: ty, vx: 0, vy: 0, type: 'smoke', color: '#555', size: 7, life: 500, gravity: -0.0004, drag: 0.98 });
+      }
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.globalCompositeOperation = 'lighter';
+      const mg = ctx.createRadialGradient(0, 0, 3, 0, 0, 18);
+      mg.addColorStop(0, '#fff7c2'); mg.addColorStop(0.45, '#ff6b1a'); mg.addColorStop(1, 'rgba(255, 80, 0, 0)');
+      ctx.fillStyle = mg;
+      ctx.beginPath(); ctx.arc(0, 0, 18, 0, Math.PI * 2); ctx.fill();
+      ctx.globalCompositeOperation = 'source-over';
+      ctx.fillStyle = '#3a2a22';
+      ctx.beginPath(); ctx.arc(0, 0, 8, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255, 180, 90, 0.5)';
+      ctx.beginPath(); ctx.arc(-2, -2, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
+    } else if (b.partType === 'hail') {
+      // Small pale-blue ice shard (diamond) with a brighter highlight facet.
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);
+      const r = b.circleRadius || 6;
+      ctx.fillStyle = 'rgba(155, 231, 255, 0.85)';
+      ctx.beginPath();
+      ctx.moveTo(0, -r); ctx.lineTo(r * 0.7, 0); ctx.lineTo(0, r); ctx.lineTo(-r * 0.7, 0); ctx.closePath();
+      ctx.fill();
+      ctx.fillStyle = '#e8fbff';
+      ctx.beginPath(); ctx.moveTo(0, -r); ctx.lineTo(r * 0.4, -r * 0.2); ctx.lineTo(0, 0); ctx.closePath(); ctx.fill();
+      ctx.restore();
     }
   }
 }
