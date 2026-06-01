@@ -15,6 +15,19 @@
 //    fires from cleanupTransients / nuke's wipe — all between frames, never
 //    inside the FIXED_DT loop or a physics-phase Mode. Removing a constraint
 //    mid-solve corrupts solver state.
+//  - ONE sanctioned mid-update exception: shatter() (abilities/_shared.js) calls
+//    releaseConstraintsForBody(part) to drop a pinned limb's stake, and CAN run
+//    mid-Engine.update (it's reachable from the collisionStart handler via a
+//    transient's onHit — e.g. a heavy drop landing on a frozen, pinned limb). This
+//    is SAFE — not because of timing, but because shatter NEVER frees the limb body.
+//    matter-js fires collisionStart BETWEEN its two Constraint.solveAll passes, but
+//    `allConstraints` is a top-of-update snapshot that Composite.remove never mutates
+//    (it only splices world.constraints), so the post-event solve harmlessly solves
+//    the just-removed constraint ONE last time against a still-valid bodyB — the limb
+//    survives shatter (it only loses its 'frozen' status). The load-bearing guarantee
+//    is "shatter keeps bodyB alive", not snapshot ordering. Verified against
+//    node_modules/matter-js Engine.js + Composite.js; proven by the pin sim (150+
+//    steps, zero NaN across the mid-update removal step).
 //  - Every release path DELETES the Map entry BEFORE Composite.remove, so a
 //    double release (onExpire AND the valve AND teardown) is an idempotent
 //    no-op, never a double-remove or a leaked entry.
@@ -107,6 +120,11 @@ export function tickConstraintRegistry(now) {
   }
   for (const h of doomed) _releaseEntry(h);
 }
+
+// Liveness probe (O(1)). The pin tool's per-frame reconcile reads this to detect an
+// OUT-OF-BAND release (shatter's teardown (b), or the valve backstop) so it can
+// restore the pinned limb's HUD collision bit + reap its render marker within a frame.
+export function isConstraintLive(handle) { return entries.has(handle); }
 
 // Dev/test introspection.
 export function constraintCount() { return entries.size; }

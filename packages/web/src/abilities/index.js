@@ -94,6 +94,7 @@ import chlorine    from './cursor/chlorine.js';
 import cryoFog     from './cursor/cryo-fog.js';
 import gravityWell from './cursor/gravity-well.js';
 import flood       from './cursor/flood.js';
+import pin         from './cursor/pin.js';
 import shepherdsCrook from './cursor/shepherds-crook.js';
 
 import electrifiedPanel from './punish/electrified-panel.js';
@@ -115,7 +116,7 @@ const ABILITIES = {
   grab, bear_trap: bearTrap, meathook, magnet, shepherds_crook: shepherdsCrook,
   landmine, electrified_panel: electrifiedPanel, buzzsaw_wall: buzzsawWall, cryo_mine: cryoMine,
   gas_cloud: gasCloud, tear_gas: tearGas, chlorine, cryo_fog: cryoFog, subwoofer,
-  gravity_well: gravityWell, flood,
+  gravity_well: gravityWell, flood, pin,
 };
 
 // flame.js exports id 'flamethrower'; the variable name above is just for

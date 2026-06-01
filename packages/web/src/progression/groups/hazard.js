@@ -156,6 +156,39 @@ export default [
     effect: (s) => { s.acid = true; },
   }),
 
+  // ── Pin (independent hazard root) + verb-scalar forks ─────────────
+  // Nail a limb to a fixed world point (an S3 Matter.Constraint, ownerBody=limb).
+  // FIRST constraint to bind a ragdoll PART; shatter() drops it (registry teardown
+  // capability b). Pin is PLACEMENT-activated, NOT a contact-triggered trap, so it
+  // intentionally does NOT consult getFamilyStats('hazard').chain/rearm — those family
+  // flags govern triggered traps only (a player who buys Chain/Re-arm sees no effect on
+  // pin; that asymmetry is by design, not missed wiring). The three forks are flag/scalar
+  // statNodes on the ROOT — none is a distinct verb (all = "pin a limb", stronger / more
+  // / nastier) — which the scalar-rejection guard permits (it's sharedNode-only).
+  toolNode({
+    id: 'g.hazard.pin', parents: [], cost: 220, toolId: 'pin',
+    label: 'pin',
+    blurb: 'Drive a stake through a limb and nail it to the floor — the buddy can only thrash around the anchor.',
+  }),
+  statNode({
+    id: 'g.hazard.pin.deeper_drive', parents: ['g.hazard.pin'], cost: 200, toolId: 'pin',
+    label: 'Deeper drive',
+    blurb: 'The stake bites harder and holds longer: hold 6s → 10s, firmer grip.',
+    effect: (s) => { s.lifeMs = 10000; s.stiffness = 0.86; },   // 0.86 < 0.9 ceiling
+  }),
+  statNode({
+    id: 'g.hazard.pin.driven_stakes', parents: ['g.hazard.pin'], cost: 300, toolId: 'pin',
+    label: 'Driven stakes',
+    blurb: 'Carry a fistful of stakes — pin up to three limbs at once instead of one.',
+    effect: (s) => { s.maxPins = 3; },
+  }),
+  statNode({
+    id: 'g.hazard.pin.barbed_stake', parents: ['g.hazard.pin'], cost: 260, toolId: 'pin',
+    label: 'Barbed stake',
+    blurb: 'A ragged, barbed spike — staking a limb tears it, leaving a lingering BLEED.',
+    effect: (s) => { s.barbed = true; },
+  }),
+
   // ── Shared hazard-family behavior FLAGS (cross-trap, never scalars) ──
   // Both parent off the landmine root (the canonical hazard tool) but flip a
   // FAMILY flag that EVERY placed trap reads via getFamilyStats('hazard').

@@ -235,6 +235,8 @@ export const TOOLS = [
     blurb: 'Drop a sustained gravity well that drags everything nearby inward toward one point — pure pull, it never throws.' },
   { id: 'flood',            label: 'flood',            key: '', kind: 'click', delta: 'float',        spine: 'negative', group: 'hazard', cost: 280, cd: 14,
     blurb: 'Flood the arena: the water rises, floats and drags the buddy, and douses any fire before it drains away.' },
+  { id: 'pin',              label: 'pin',              key: '', kind: 'drag',  delta: 'stake',        spine: 'negative', group: 'hazard', cost: 220, cd: 5,
+    blurb: 'Drive a stake through a limb and nail it to the floor — the buddy can only thrash around the anchor until the stake pulls loose.' },
 ];
 
 export const TOOLS_BY_ID  = Object.fromEntries(TOOLS.map(t => [t.id, t]));

@@ -116,6 +116,14 @@ export const sfx = {
   crookLatch: () => { beep({ freq: 520, dur: 0.05, type: 'triangle', vol: 0.08, sweep: -80 }); noise({ dur: 0.04, vol: 0.05, lpFreq: 1800 }); },
   // breachStick: magnetic clack as a charge sticks to the limb.
   breachStick: () => { preTransientClick(0.4, 0); beep({ freq: 900, dur: 0.04, type: 'square', vol: 0.08, sweep: -200 }); },
+  // pinStake: a sharp metallic hammer-thunk as the stake drives home — a hard
+  // transient click + a low descending clack + a short metal ring.
+  pinStake: () => {
+    preTransientClick(0.6, 0);
+    beep({ freq: 220, dur: 0.05, type: 'square', vol: 0.12, sweep: -120 });
+    beep({ freq: 2400, dur: 0.03, type: 'triangle', vol: 0.05, sweep: -800 });
+    noise({ dur: 0.05, vol: 0.06, lpFreq: 3200 });
+  },
   // breachDetonate: dry detonator trigger click (the per-charge boom is explode's 'bomb').
   breachDetonate: () => { preTransientClick(0.5, 0); beep({ freq: 1400, dur: 0.03, type: 'square', vol: 0.08, sweep: -500 }); },
   // clusterPop: airburst canister crack at apex (bomblet impacts reuse explode's 'bomb').

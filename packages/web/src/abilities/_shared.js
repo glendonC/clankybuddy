@@ -16,6 +16,7 @@ import {
 // concussOnImpact / electrifyMs cfg fields route through the same applyStatus.
 import { markHit } from '../physics/secondary.js';
 import { getCurrentBuddy } from '../state/ragdoll-lifecycle.js';
+import { releaseConstraintsForBody } from '../state/constraint-registry.js';
 import { showCombo } from '../ui/overlays.js';
 import { getMasterMul } from '../progression/master-mults.js';
 import { getFamilyStats } from './_stats.js';
@@ -373,6 +374,12 @@ export function bigImpact(ctx, x, y, opts = {}) {
 export function shatter(ctx, part) {
   const { status, screenShake, popBubble, hitStop } = ctx;
   removeStatus(status, part, 'frozen');
+  // S3 teardown (b): a pinned limb that shatters drops its stake. Generic — an
+  // idempotent no-op when nothing is pinned to this part (pin is the only consumer
+  // that binds a ragdoll PART). releaseConstraintsForBody only splices world.constraints,
+  // so it's safe even on the mid-Engine.update shatter path (see constraint-registry.js
+  // header). shatter keeps `part` alive (only removeStatus above), so bodyB stays valid.
+  releaseConstraintsForBody(part);
   // Hardcoded "*kchhhhing*" wins over the pool, it's an iconic scripted
   // reaction. reactTo handles mood + shock + telemetry; we suppress speech
   // by passing a huge speakMs and then call popBubble directly with the

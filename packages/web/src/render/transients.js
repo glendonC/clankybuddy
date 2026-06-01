@@ -325,6 +325,32 @@ export function renderTransients(ctx, bodies) {
       ctx.beginPath(); ctx.arc(0, 0, 3.5, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
 
+    } else if (b.partType === 'pin') {
+      // A driven stake at the anchor + a taut tether to the pinned limb. The marker
+      // body is render-only (isStatic, mask:0); lifecycle/epoch are owned by
+      // cleanupTransients. Guard the tether on a live limb (a shatter/valve release
+      // reaps the marker next frame, but draw defensively until then).
+      const ax = b._anchor?.x ?? b.position.x;
+      const ay = b._anchor?.y ?? b.position.y;
+      const limb = b._limbRef;
+      ctx.save();
+      if (limb?.position && Number.isFinite(limb.position.x) && Number.isFinite(limb.position.y)) {
+        // Taut tether: a dark cord overlaid with a thin steel highlight.
+        ctx.strokeStyle = '#2c2622'; ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(limb.position.x, limb.position.y); ctx.stroke();
+        ctx.strokeStyle = '#8a7f72'; ctx.lineWidth = 1.2;
+        ctx.beginPath(); ctx.moveTo(ax, ay); ctx.lineTo(limb.position.x, limb.position.y); ctx.stroke();
+      }
+      // Stake driven into the ground at the anchor: a metallic head + short shaft.
+      ctx.translate(ax, ay);
+      ctx.strokeStyle = '#6b7280'; ctx.lineWidth = 3; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(0, -2); ctx.lineTo(0, 12); ctx.stroke();
+      ctx.fillStyle = '#c2c9d6';
+      ctx.beginPath(); ctx.ellipse(0, -3, 5.5, 2.6, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = 'rgba(255,255,255,0.35)';
+      ctx.beginPath(); ctx.ellipse(-1.5, -3.6, 2, 1, 0, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
     } else if (b.partType === 'electrified_panel') {
       // Live sensor plate: a metal strip on the floor with two terminals and a
       // jittering arc between them.
