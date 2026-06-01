@@ -12,6 +12,7 @@ import { sfx } from '../audio/sfx.js';
 import treat            from './treat.js';
 import gift             from './gift.js';
 import bullet           from './bullet.js';
+import pierceBullet     from './pierce-bullet.js';
 import firepool         from './firepool.js';
 import sawblade         from './sawblade.js';
 import bearTrap         from './bear-trap.js';
@@ -35,7 +36,7 @@ const { Composite } = Matter;
 // cloud, caltrops). It is intentionally NOT registered here: nothing spawns
 // it now that the `poison` tool is cut.
 const HANDLERS = {};
-[treat, gift, bullet, firepool, sawblade, bearTrap, meathook, caltrops, steamrollerH, cityBusH, officeChairH, acidPool, landmineH, electrifiedPanel, buzzsawWall, cryoMine, chainShotH, wreckingBallH]
+[treat, gift, bullet, pierceBullet, firepool, sawblade, bearTrap, meathook, caltrops, steamrollerH, cityBusH, officeChairH, acidPool, landmineH, electrifiedPanel, buzzsawWall, cryoMine, chainShotH, wreckingBallH]
   .forEach(h => { HANDLERS[h.partType] = h; });
 
 export function getTransientHandler(partType) { return HANDLERS[partType] || null; }

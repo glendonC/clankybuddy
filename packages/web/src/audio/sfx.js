@@ -63,6 +63,12 @@ export const sfx = {
   gun:   () => { beep({ freq: 220, dur: 0.05, type: 'square', vol: 0.2, sweep: -160 }); noise({ dur: 0.05, vol: 0.16 }); },
   // Deeper, louder than the pistol — magnum boom.
   revolver: () => { beep({ freq: 140, dur: 0.1, type: 'square', vol: 0.26, sweep: -100 }); noise({ dur: 0.12, vol: 0.24, lpFreq: 1200 }); },
+  // Sniper — heavy supersonic crack: low body thump + bright supersonic crack + lowpassed boom tail.
+  sniper: () => { beep({ freq: 95, dur: 0.16, type: 'sawtooth', vol: 0.26, sweep: -45 }); beep({ freq: 2800, dur: 0.04, type: 'square', vol: 0.16, sweep: -1100 }); noise({ dur: 0.16, vol: 0.2, lpFreq: 1500 }); },
+  // Railgun — EM discharge: rising capacitor whine into a hard snap + low boom.
+  // The setTimeout is audio-only (touches no ragdoll/world), matching the
+  // anvil/nukeSiren/zap house style; no epoch guard needed.
+  railgun: () => { beep({ freq: 300, dur: 0.16, type: 'sawtooth', vol: 0.1, sweep: 1500 }); setTimeout(() => { beep({ freq: 2400, dur: 0.05, type: 'square', vol: 0.22, sweep: -1800 }); beep({ freq: 110, dur: 0.12, type: 'sine', vol: 0.18, sweep: -30 }); noise({ dur: 0.12, vol: 0.18, lpFreq: 6000 }); }, 110); },
   freeze:() => { beep({ freq: 900, dur: 0.18, type: 'sine', vol: 0.12, sweep: -700 }); },
   sword: () => { beep({ freq: 2200, dur: 0.06, type: 'sine', vol: 0.1, sweep: -1600 }); noise({ dur: 0.08, vol: 0.06, lpFreq: 4000 }); },
   // pitch-randomized so spray doesn't feel sample-locked

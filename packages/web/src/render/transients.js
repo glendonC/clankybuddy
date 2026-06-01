@@ -47,6 +47,20 @@ export function renderTransients(ctx, bodies) {
       ctx.fillStyle = '#fff';
       ctx.beginPath(); ctx.arc(0, 0, 1.6, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
+    } else if (b.partType === 'pierce_bullet') {
+      // Hypervelocity slug: a long cyan/blue-white streak, cooler + longer than
+      // the warm bullet tracer, so sniper/railgun rounds read distinctly.
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.rotate(Math.atan2(b.velocity.y, b.velocity.x));
+      ctx.globalCompositeOperation = 'lighter';
+      ctx.fillStyle = 'rgba(150, 231, 255, 0.45)';
+      ctx.fillRect(-24, -2, 26, 4);
+      ctx.fillStyle = 'rgba(220, 245, 255, 0.9)';
+      ctx.fillRect(-17, -1.2, 19, 2.4);
+      ctx.fillStyle = '#fff';
+      ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
     } else if (b.partType === 'rocket') {
       ctx.save();
       ctx.translate(b.position.x, b.position.y); ctx.rotate(b.angle);

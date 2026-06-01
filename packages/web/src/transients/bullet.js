@@ -8,10 +8,12 @@ import { getFamilyStats } from '../abilities/_stats.js';
 
 const { Body } = Matter;
 
-export default {
-  partType: 'bullet',
-  removeOnContact: true,
-  onContact(self, target, ctx) {
+// Core bullet impact: knockback + frozen-shatter roll + mood + firearms ammo
+// flags. Extracted as a standalone export so pierce_bullet
+// (transients/pierce-bullet.js) applies the EXACT same per-part hit to every
+// limb it drills through. The default bullet handler below just delegates, so
+// this is byte-for-byte the old onContact behavior.
+export function dryBulletHit(self, target, ctx) {
     const dirx = self.velocity.x, diry = self.velocity.y;
     const len = Math.hypot(dirx, diry) || 1;
     const dmg = self.bulletDamage ?? 8;
@@ -52,5 +54,10 @@ export default {
         stunMs: 0, shake: 2, igniteMs: 0, sound: null, limpMs: 0,
       });
     }
-  },
+}
+
+export default {
+  partType: 'bullet',
+  removeOnContact: true,
+  onContact(self, target, ctx) { dryBulletHit(self, target, ctx); },
 };

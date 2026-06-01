@@ -110,6 +110,10 @@ export const TOOLS = [
     blurb: 'drag to lob, 2s fuse, blinding flash that concusses everything nearby' },
   { id: 'sonic_cannon',label: 'sonic cannon', key: '', kind: 'click',     delta: '−14+concuss',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 190,
     blurb: 'instant aimed cone, shoves and concusses every part it sweeps' },
+  { id: 'sniper_rifle',label: 'sniper rifle', key: '', kind: 'click',     delta: '−28+pierce',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 240,
+    blurb: 'long-barreled bolt-action; one high-velocity round drills clean through a line of parts' },
+  { id: 'railgun',     label: 'railgun',      key: '', kind: 'click',     delta: '−40+pierce',spine: 'negative', group: 'ordnance', family: 'firearms', cost: 520,
+    blurb: 'electromagnetic launcher; a hypervelocity tungsten slug pierces a whole line of parts' },
 
   // NEGATIVE / corruption (renamed from `elemental`).
   { id: 'fireball',    label: 'fireball',     key: 'U', kind: 'click',     delta: '−22',  spine: 'negative', group: 'corruption', cost: 180,

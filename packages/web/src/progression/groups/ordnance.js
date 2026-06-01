@@ -32,6 +32,22 @@ export default [
     blurb: 'Six heavy magnum shots with big stun, then a forced reload.',
   }),
 
+  // Sniper rifle, slow heavy round that drills through a LINE of parts (first
+  // pierce_bullet consumer; branches off pistol). Hold-breath charge shot +
+  // Anti-materiel (convergent with armor-piercing rounds) land with the
+  // armor-piercing batch that wires fam.pierce into every firearm.
+  toolNode({
+    id: 'g.ordnance.sniper_rifle', parents: ['g.ordnance.gun'], cost: 240, toolId: 'sniper_rifle',
+    label: 'sniper rifle',
+    blurb: 'A long-barreled bolt-action; one high-velocity round drills clean through a line of parts.',
+  }),
+  statNode({
+    id: 'g.ordnance.sniper_rifle.match', parents: ['g.ordnance.sniper_rifle'], cost: 300, toolId: 'sniper_rifle',
+    label: 'Match ammo',
+    blurb: 'Damage 28 → 38, round speed 32 → 42.',
+    effect: (s) => { s.damage = 38; s.speed = 42; },
+  }),
+
   // SHARED (cross-tool, family: firearms). Targeting computer turns auto-aim
   // from the old always-on default into a paid unlock: every firearm now aims
   // MANUALLY (fires at the buddy's centroid, no lock) until you buy this, at
@@ -231,6 +247,28 @@ export default [
     id: 'g.ordnance.hot_shot', parents: ['g.ordnance.cannon'], cost: 260, toolId: 'hot_shot',
     label: 'hot shot',
     blurb: 'A furnace-heated cannonball: sets the buddy alight on impact and leaves a pool of burning embers.',
+  }),
+
+  // Railgun, hypervelocity tungsten slug that pierces a whole LINE of parts
+  // (pierce_bullet consumer). Independent root (an unlock you take, not a
+  // pistol fork); family: firearms so it routes through aimAngle + the
+  // firearms reticle and sits beside the other aimed ordnance.
+  toolNode({
+    id: 'g.ordnance.railgun', parents: [], cost: 520, toolId: 'railgun',
+    label: 'railgun',
+    blurb: 'Electromagnetic launcher: a hypervelocity tungsten slug pierces a whole line of parts.',
+  }),
+  statNode({
+    id: 'g.ordnance.railgun.tungsten', parents: ['g.ordnance.railgun'], cost: 600, toolId: 'railgun',
+    label: 'Tungsten penetrator',
+    blurb: 'Damage 40 → 56, pierce 4 → 6 (a full line).',
+    effect: (s) => { s.damage = 56; s.pierce = 6; },
+  }),
+  statNode({
+    id: 'g.ordnance.railgun.overcharge', parents: ['g.ordnance.railgun'], cost: 700, toolId: 'railgun',
+    label: 'Overcharge',
+    blurb: 'Slug speed 48 → 64, heavier screen shake.',
+    effect: (s) => { s.speed = 64; s.shake = 20; },
   }),
 
   // Concussive branch (flashbang root → sonic cannon). The first RANGED CONCUSSED
