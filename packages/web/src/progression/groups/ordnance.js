@@ -181,8 +181,9 @@ export default [
   }),
 
   // Explosives sub-tree (lobbed + dropped). Mortar is now the ROOT (Phase 3
-  // re-root); frag grenade hangs off it and molotov off frag. Creeping barrage /
-  // cluster / airstrike / breaching are deferred to later batches.
+  // re-root); frag grenade hangs off it and molotov off frag. Creeping barrage,
+  // cluster munition, and breaching charge all fork the root; airstrike is
+  // deferred to a later batch.
   toolNode({
     id: 'g.ordnance.mortar', parents: [], cost: 210, toolId: 'mortar',
     label: 'mortar',
@@ -215,6 +216,51 @@ export default [
     id: 'g.ordnance.grenade', parents: ['g.ordnance.frag_grenade'], cost: 120, toolId: 'grenade',
     label: 'molotov',
     blurb: 'Drag to lob, 2s fuse, area boom + lingering fire pool.',
+  }),
+
+  // Breaching charge (B4) <- root. Stick charges, blow them on command. The
+  // two leaves are stat nodes (a toolNode runs no effect, so re-pointing at the
+  // already-owned tool would cash nothing): detonation cord reads s.chained for
+  // the linking blast; shaped charge bumps the read scalars (mood, baseVel).
+  toolNode({
+    id: 'g.ordnance.breaching_charge', parents: ['g.ordnance.mortar'], cost: 230, toolId: 'breaching_charge',
+    label: 'breaching charge',
+    blurb: 'Stick a shaped charge to a limb and blow it on command. Click empty space to detonate every charge at once.',
+  }),
+  statNode({
+    id: 'g.ordnance.breaching_charge.detonation_cord', parents: ['g.ordnance.breaching_charge'], cost: 300, toolId: 'breaching_charge',
+    label: 'detonation cord',
+    blurb: 'Daisy-chains your charges: blast radius +15%, and with two or more placed, a linking blast rips through the middle of the string.',
+    effect: (s) => { s.chained = true; s.radius = Math.round(s.radius * 1.15); },
+  }),
+  statNode({
+    id: 'g.ordnance.breaching_charge.shaped_charge', parents: ['g.ordnance.breaching_charge.detonation_cord'], cost: 380, toolId: 'breaching_charge',
+    label: 'shaped charge',
+    iconHint: '⚡',
+    blurb: 'A focused cone: each charge detonates with a tighter, far harder-hitting blast (mood ×1.5, fling ×1.3).',
+    effect: (s) => { s.mood = Math.round(s.mood * 1.5); s.baseVel = Math.round(s.baseVel * 1.3); },
+  }),
+
+  // Cluster munition (B4) <- root. Airburst canister → capped bomblet fan. More
+  // bomblets is a scalar leaf; Thermite flips the igniteBomblets flag (each
+  // bomblet leaves a fire pool) — shipped as a stat flag, not a 4th tool.
+  toolNode({
+    id: 'g.ordnance.cluster_munition', parents: ['g.ordnance.mortar'], cost: 260, toolId: 'cluster_munition',
+    label: 'cluster munition',
+    blurb: 'Lob a canister that airbursts at the top of its arc into a fan of raining bomblets.',
+  }),
+  statNode({
+    id: 'g.ordnance.cluster_munition.bomblets', parents: ['g.ordnance.cluster_munition'], cost: 300, toolId: 'cluster_munition',
+    label: 'more bomblets',
+    blurb: 'Bomblet count 9 → 14 (caps at 12 per burst). A wider, denser footprint of little blasts.',
+    effect: (s) => { s.bomblets = 14; },
+  }),
+  statNode({
+    id: 'g.ordnance.cluster_munition.thermite', parents: ['g.ordnance.cluster_munition'], cost: 360, toolId: 'cluster_munition',
+    label: 'thermite',
+    iconHint: '⚡',
+    blurb: 'Incendiary submunitions: each bomblet bursts into a clinging fire pool.',
+    effect: (s) => { s.igniteBomblets = true; },
   }),
 
   // Rocket branch (flagship boom)

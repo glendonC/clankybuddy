@@ -116,6 +116,10 @@ export const TOOLS = [
     blurb: 'electromagnetic launcher; a hypervelocity tungsten slug pierces a whole line of parts' },
   { id: 'subwoofer',   label: 'subwoofer',    key: '', kind: 'drag',      delta: '−concuss/beat',spine: 'negative', group: 'ordnance', cost: 230, cd: 8,
     blurb: 'drop a speaker stack that thuds out a concussive pulse on a steady beat, dazing everything in range' },
+  { id: 'breaching_charge',label: 'breaching charge',key: '', kind: 'click', delta: '−28',  spine: 'negative', group: 'ordnance', cost: 230,
+    blurb: 'click a limb to stick a shaped charge; click empty space to blow every placed charge at once' },
+  { id: 'cluster_munition',label: 'cluster munition',key: '', kind: 'drag', delta: '−12×bomblets', spine: 'negative', group: 'ordnance', cost: 260,
+    blurb: 'drag to lob a canister that airbursts at the top of its arc and rains a fan of bomblets' },
 
   // NEGATIVE / corruption (renamed from `elemental`).
   { id: 'fireball',    label: 'fireball',     key: 'U', kind: 'click',     delta: '−22',  spine: 'negative', group: 'corruption', cost: 180,
@@ -189,6 +193,14 @@ export const TOOLS = [
     blurb: 'drag-place a trap. snaps shut → 3s lock + BLEED + CONCUSSED (next hit ×1.5).' },
   { id: 'meathook',    label: 'meat hook',    key: 'N', kind: 'drag',      delta: '−8+yank',spine: 'negative', group: 'kinetic', cd: 6, cost: 240,
     blurb: 'drag to throw a hook, spears the part then yanks it back at speed.' },
+  // Shepherd's crook — kind:'hold', and MUST carry forceMode so the generic OFF
+  // seam (input/mouse.js endPress on mouseup/mouseleave + ui/hotbar.js
+  // setActiveTool on tool-switch read forceMode and setEnabled(tag,false)) drops
+  // the cursor-follow latch via the Mode's teardown. family:'melee' is
+  // display-only (surfaces shared melee nodes in the inspect panel; the crook
+  // reads no melee flag — slot-picker.js is the only family reader).
+  { id: 'shepherds_crook',label: "shepherd's crook",key: '', kind: 'hold', delta: '−4+drag', spine: 'negative', group: 'kinetic', cost: 170, family: 'melee', forceMode: 'cursor.follow',
+    blurb: 'hook the nearest limb and drag it around the stage with your cursor; release to drop it' },
 
   // UTILITY / manipulation — magnet (tractor beam). MUST carry forceMode so the
   // generic OFF seam (input/mouse.js endPress + ui/hotbar.js setActiveTool reads

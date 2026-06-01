@@ -327,6 +327,22 @@ export default [
     blurb: 'Cleave + ignite. Struck parts catch fire (persistent); edged, so they bleed too.',
   }),
 
+  // ── Shepherd's crook (B4) <- root ───────────────────────────────
+  // Hook one limb and drag it under gravity via the shared cursor-follow Mode.
+  // Cargo hook is a pure scalar leaf (reach + tear-free span), correctly a
+  // statNode per the §3 legend.
+  toolNode({
+    id: 'g.kinetic.shepherds_crook', parents: ['g.kinetic.punch'], cost: 170, toolId: 'shepherds_crook',
+    label: "shepherd's crook",
+    blurb: 'Hook the nearest limb and drag it around with your cursor; release to drop it.',
+  }),
+  statNode({
+    id: 'g.kinetic.shepherds_crook.cargo_hook', parents: ['g.kinetic.shepherds_crook'], cost: 300, toolId: 'shepherds_crook',
+    label: 'Cargo hook',
+    blurb: 'A longer pole: latch a limb from farther away (reach 140 → 180) and drag it across a wider span before it slips the hook (360 → 520).',
+    effect: (s) => { s.reach = 180; s.maxReach = 520; },
+  }),
+
   // ── Shared melee family behavior flags (S8) ─────────────────────
   // Cross-tool nodes that flip a FLAG every melee tool reads, never a
   // scalar (the sharedNode guard rejects scalar-only effects).

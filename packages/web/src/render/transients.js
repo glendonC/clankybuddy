@@ -527,6 +527,32 @@ export function renderTransients(ctx, bodies) {
       ctx.fillStyle = '#e8fbff';
       ctx.beginPath(); ctx.moveTo(0, -r); ctx.lineTo(r * 0.4, -r * 0.2); ctx.lineTo(0, 0); ctx.closePath(); ctx.fill();
       ctx.restore();
+
+    } else if (b.partType === 'breaching_charge') {
+      // Render-only marker (body is render.visible:false, sensor mask:0). onTick
+      // keeps b.position glued to the limb; we draw a small dark charge brick +
+      // a blinking red blasting-cap pip at the stick point.
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.fillStyle = '#2a221b';
+      ctx.fillRect(-5, -3, 10, 7);
+      ctx.strokeStyle = '#6a4f2e';
+      ctx.lineWidth = 1;
+      ctx.strokeRect(-5, -3, 10, 7);
+      const blink = Math.floor(performance.now() / 300) % 2 === 0;
+      ctx.fillStyle = blink ? '#ff5b5b' : '#7a2222';
+      ctx.beginPath(); ctx.arc(0, -5, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
+
+    } else if (b.partType === 'bomblet') {
+      // Small dark sphere + a faint spark; orange-hot tint for thermite.
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.fillStyle = b._thermite ? '#5a3320' : '#26292e';
+      ctx.beginPath(); ctx.arc(0, 0, b.circleRadius || 4, 0, Math.PI * 2); ctx.fill();
+      ctx.fillStyle = b._thermite ? 'rgba(255, 170, 80, 0.8)' : 'rgba(200, 210, 220, 0.6)';
+      ctx.beginPath(); ctx.arc(-1, -1, 1.3, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
     }
   }
 }

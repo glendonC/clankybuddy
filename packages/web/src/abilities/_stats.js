@@ -58,6 +58,8 @@ import mortar        from './punish/mortar.js';
 import flashbang     from './punish/flashbang.js';
 import sonicCannon   from './punish/sonic-cannon.js';
 import creepingBarrage from './punish/creeping-barrage.js';
+import breachingCharge from './punish/breaching-charge.js';
+import clusterMunition from './punish/cluster-munition.js';
 
 import bat           from './punish/bat.js';
 import battleAxe     from './punish/battle_axe.js';
@@ -100,6 +102,7 @@ import chlorine    from './cursor/chlorine.js';
 import cryoFog     from './cursor/cryo-fog.js';
 import gravityWell from './cursor/gravity-well.js';
 import flood       from './cursor/flood.js';
+import shepherdsCrook from './cursor/shepherds-crook.js';
 
 import electrifiedPanel from './punish/electrified-panel.js';
 import buzzsawWall      from './punish/buzzsaw-wall.js';
@@ -139,10 +142,11 @@ function buildSources() {
     whip, chainsaw, sawblade, acid_flask: acidFlask,
     liquid_nitrogen: liquidNitrogen, flash_freeze: flashFreeze, laser_cutter: laserCutter, taser,
     cannon, grapeshot, chain_shot: chainShot, hot_shot: hotShot, mortar, flashbang, sonic_cannon: sonicCannon, creeping_barrage: creepingBarrage,
+    breaching_charge: breachingCharge, cluster_munition: clusterMunition,
     bat, battle_axe: battleAxe, fire_axe: fireAxe, hunting_knife: huntingKnife, cattle_prod: cattleProd, blowtorch, power_drill: powerDrill, nail_gun: nailGun, caltrops,
     brick, bowling_ball: bowlingBall, piano, crt, car, steamroller, city_bus: cityBus, trebuchet, office_chair: officeChair, battering_ram: batteringRam, wrecking_ball: wreckingBall, meteor_shower: meteorShower, hailstorm,
     anvil, blackhole, nuke, force_quit: forceQuit,
-    grab, bear_trap: bearTrap, meathook, magnet,
+    grab, bear_trap: bearTrap, meathook, magnet, shepherds_crook: shepherdsCrook,
     landmine, electrified_panel: electrifiedPanel, buzzsaw_wall: buzzsawWall, cryo_mine: cryoMine,
     gas_cloud: gasCloud, tear_gas: tearGas, chlorine, cryo_fog: cryoFog, subwoofer,
     gravity_well: gravityWell, flood,

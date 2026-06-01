@@ -100,6 +100,14 @@ export const sfx = {
   hail: () => { beep({ freq: 2600, dur: 0.04, type: 'sine', vol: 0.08, sweep: 400 }); noise({ dur: 0.02, vol: 0.06, lpFreq: 7000 }); },
   fireball: () => { beep({ freq: 480, dur: 0.18, type: 'triangle', vol: 0.12, sweep: -260 }); noise({ dur: 0.18, vol: 0.08, lpFreq: 1200 }); },
   grenadeFuse: () => beep({ freq: 1400, dur: 0.04, type: 'square', vol: 0.06 }),
+  // B4. crookLatch: soft wooden/rope catch when the crook hooks a limb.
+  crookLatch: () => { beep({ freq: 520, dur: 0.05, type: 'triangle', vol: 0.08, sweep: -80 }); noise({ dur: 0.04, vol: 0.05, lpFreq: 1800 }); },
+  // breachStick: magnetic clack as a charge sticks to the limb.
+  breachStick: () => { preTransientClick(0.4, 0); beep({ freq: 900, dur: 0.04, type: 'square', vol: 0.08, sweep: -200 }); },
+  // breachDetonate: dry detonator trigger click (the per-charge boom is explode's 'bomb').
+  breachDetonate: () => { preTransientClick(0.5, 0); beep({ freq: 1400, dur: 0.03, type: 'square', vol: 0.08, sweep: -500 }); },
+  // clusterPop: airburst canister crack at apex (bomblet impacts reuse explode's 'bomb').
+  clusterPop: () => { beep({ freq: 300, dur: 0.06, type: 'square', vol: 0.12, sweep: -120 }); noise({ dur: 0.1, vol: 0.12, lpFreq: 2200 }); },
   anvil: () => { beep({ freq: 1100, dur: 0.5, type: 'sine', vol: 0.05, sweep: -800 }); setTimeout(()=>{ beep({ freq: 60, dur: 0.25, type: 'sawtooth', vol: 0.3, sweep: -20 }); noise({ dur: 0.25, vol: 0.22, lpFreq: 500 }); }, 480); },
   blackhole: () => { beep({ freq: 40, dur: 2.8, type: 'sine', vol: 0.18, sweep: 200 }); },
   blackholeCollapse: () => { beep({ freq: 50, dur: 0.6, type: 'sawtooth', vol: 0.3, sweep: -30 }); noise({ dur: 0.7, vol: 0.3, lpFreq: 700 }); },

@@ -14,6 +14,8 @@ import { sfx } from '../audio/sfx.js';
 // mood via ctx.reactTo.
 import { applyStatus, damageMul, consumeConcussed } from '../effects/registry.js';
 import { goLimp } from '../physics/stand.js';
+import { getStats } from '../abilities/_stats.js';
+import { latchPart } from '../modes/cursor-follow.js';
 
 const { Body } = Matter;
 
@@ -54,5 +56,16 @@ export default {
     });
     sfx.shatter?.();         // reuse the meaty thunk
     ctx.screenShake?.(8, 180);
+
+    // Marionette cash-in: once the meathook tree's Marionette node is owned it
+    // sets cursorPuppetMs; latch the speared part into the shared cursor-follow
+    // Mode for that window so the cursor puppets it after the yank (loop-driven
+    // release in the Mode, NO setTimeout). SCOPE FENCE: read ONLY cursorPuppetMs
+    // here — the dead s.yank / s.mood writes (Heavy-chain) are a separate
+    // out-of-scope fix; wiring them would silently change shipped yank feel.
+    const puppetMs = getStats('meathook').cursorPuppetMs || 0;
+    if (puppetMs > 0) {
+      latchPart(target, { releaseAt: performance.now() + puppetMs, epoch: ctx._epoch });
+    }
   },
 };
