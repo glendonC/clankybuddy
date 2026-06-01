@@ -48,18 +48,28 @@ export function renderTransients(ctx, bodies) {
       ctx.beginPath(); ctx.arc(0, 0, 1.6, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
     } else if (b.partType === 'pierce_bullet') {
-      // Hypervelocity slug: a long cyan/blue-white streak, cooler + longer than
-      // the warm bullet tracer, so sniper/railgun rounds read distinctly.
       ctx.save();
       ctx.translate(b.position.x, b.position.y);
       ctx.rotate(Math.atan2(b.velocity.y, b.velocity.x));
       ctx.globalCompositeOperation = 'lighter';
-      ctx.fillStyle = 'rgba(150, 231, 255, 0.45)';
-      ctx.fillRect(-24, -2, 26, 4);
-      ctx.fillStyle = 'rgba(220, 245, 255, 0.9)';
-      ctx.fillRect(-17, -1.2, 19, 2.4);
-      ctx.fillStyle = '#fff';
-      ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
+      if (b._apConverted) {
+        // AP-converted firearm round: keep the weapon's own warm tracer (only
+        // purpose-built railgun/sniper slugs read as the cyan penetrator).
+        ctx.fillStyle = 'rgba(255, 200, 100, 0.5)';
+        ctx.fillRect(-14, -1.6, 16, 3.2);
+        ctx.fillStyle = 'rgba(255, 240, 180, 0.85)';
+        ctx.fillRect(-10, -1, 12, 2);
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(0, 0, 1.6, 0, Math.PI * 2); ctx.fill();
+      } else {
+        // Native hypervelocity slug (railgun / sniper): a long cyan/blue-white streak.
+        ctx.fillStyle = 'rgba(150, 231, 255, 0.45)';
+        ctx.fillRect(-24, -2, 26, 4);
+        ctx.fillStyle = 'rgba(220, 245, 255, 0.9)';
+        ctx.fillRect(-17, -1.2, 19, 2.4);
+        ctx.fillStyle = '#fff';
+        ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
+      }
       ctx.restore();
     } else if (b.partType === 'rocket') {
       ctx.save();

@@ -7,7 +7,7 @@ import * as P from '../../particles.js';
 import { sfx } from '../../audio/sfx.js';
 import { drawAimLine, drawCrosshair } from '../../render/shared-cursor.js';
 import { getStats } from '../_stats.js';
-import { aimAngle } from '../_shared.js';
+import { aimAngle, markPierce } from '../_shared.js';
 
 const { Body, Bodies, Composite } = Matter;
 
@@ -19,6 +19,7 @@ export const defaultStats = {
   shake:    6,
   cylinder: 6,
   reloadMs: 1500,
+  pierce:   2,
 };
 
 // Single-buddy game → module-local cylinder state is fine.
@@ -49,6 +50,7 @@ export default {
     bullet.lifeMs = s.lifeMs;
     bullet.bulletDamage = s.damage;
     bullet.bulletStun = s.stunMs;
+    markPierce(bullet, s.pierce);   // AP rounds → pierce_bullet (no-op without the flag)
     Body.setVelocity(bullet, { x: Math.cos(angle) * s.speed, y: Math.sin(angle) * s.speed });
     Composite.add(world, bullet);
     ctx.transientBodies.push(bullet);

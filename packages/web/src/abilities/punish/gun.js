@@ -3,7 +3,7 @@ import * as P from '../../particles.js';
 import { sfx } from '../../audio/sfx.js';
 import { drawAimLine, drawCrosshair } from '../../render/shared-cursor.js';
 import { getStats } from '../_stats.js';
-import { aimAngle } from '../_shared.js';
+import { aimAngle, markPierce } from '../_shared.js';
 
 const { Body, Bodies, Composite } = Matter;
 
@@ -13,6 +13,7 @@ export const defaultStats = {
   stunMs:    350,
   lifeMs:    1200,
   shake:     3,
+  pierce:    2,
 };
 
 export default {
@@ -37,6 +38,7 @@ export default {
     bullet.lifeMs = s.lifeMs;
     bullet.bulletDamage = s.damage;
     bullet.bulletStun = s.stunMs;
+    markPierce(bullet, s.pierce);   // AP rounds → pierce_bullet (no-op without the flag)
     Body.setVelocity(bullet, { x: vx, y: vy });
     Composite.add(world, bullet);
     ctx.transientBodies.push(bullet);

@@ -20,6 +20,8 @@
 // self._spent. All work is per-contact (no onTick).
 
 import { dryBulletHit } from './bullet.js';
+import { isBrittle } from '../effects/registry.js';
+import { shatter } from '../abilities/_shared.js';
 
 export default {
   partType: 'pierce_bullet',
@@ -34,6 +36,10 @@ export default {
     if (self._hitSet.has(target.id)) return false;
     self._hitSet.add(target.id);
     dryBulletHit(self, target, ctx);   // full per-part bullet hit + firearms ammo flags
+    // Anti-materiel layer: a frozen part the slug crosses shatters clean off
+    // (deterministic, vs dryBulletHit's probabilistic frozen roll). _pierceShatter
+    // is set only by the sniper's Anti-materiel upgrade; undefined elsewhere.
+    if (self._pierceShatter && isBrittle(ctx.status, target)) shatter(ctx, target);
     self._pierceLeft -= 1;
     return self._pierceLeft <= 0;      // remove on the part that exhausts the budget
   },

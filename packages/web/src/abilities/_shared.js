@@ -185,6 +185,24 @@ export function aimAngle(ragdoll, x, y, family = 'firearms') {
   return { angle: Math.atan2(cy - y, cx - x), target: null, ok: true };
 }
 
+// Convert a just-spawned firearm bullet body into a piercing slug WHEN the
+// firearms.pierce family flag is owned (the Armor-piercing rounds shared node).
+// Post-spawn MUTATOR, not a body factory: it touches ONLY partType + the pierce
+// bookkeeping, so a non-AP round is byte-for-byte unchanged (early return before
+// any mutation). The _apConverted marker lets the renderer keep the weapon's own
+// warm tracer — only purpose-built railgun/sniper slugs read as the cyan
+// penetrator streak. `budget` is the per-tool defaultStats.pierce (the number of
+// parts the slug drills through before the pierce handler removes it).
+export function markPierce(body, budget = 2) {
+  const fam = getFamilyStats('firearms');
+  if (!fam?.pierce) return body;            // flag not owned → stays a plain 'bullet'
+  body.partType = 'pierce_bullet';          // route through the pierce dispatcher + handler
+  body._pierceLeft = budget ?? 2;           // guard a missing defaultStats key → sane default
+  body._hitSet = new Set();                 // per-body dedupe (own-prop, GC'd with the body)
+  body._apConverted = true;                 // renderer keeps this weapon's tracer, not the cyan slug
+  return body;
+}
+
 export function applyImpulse(part, fx, fy) {
   // Master-tree damage multiplier. Touch-tier impulses (below HIT_IMPULSE_MIN,
   // e.g. pet) bypass the multiplier so a pet doesn't get scaled into a hit.

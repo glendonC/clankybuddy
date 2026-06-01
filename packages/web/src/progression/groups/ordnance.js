@@ -47,6 +47,15 @@ export default [
     blurb: 'Damage 28 → 38, round speed 32 → 42.',
     effect: (s) => { s.damage = 38; s.speed = 42; },
   }),
+  // Convergent merge: needs the sniper rifle AND armor-piercing rounds. Both
+  // parents are g.ordnance.* so the cross-group validator passes; shared nodes
+  // live in NODES_BY_ID so ap_rounds is a valid parent.
+  statNode({
+    id: 'g.ordnance.sniper_rifle.anti_materiel', parents: ['g.ordnance.sniper_rifle', 'g.ordnance.ap_rounds'], cost: 700, toolId: 'sniper_rifle',
+    label: 'Anti-materiel rifle',
+    blurb: 'Pierce 2 → 3, and any frozen limb the slug crosses shatters clean off. Needs the sniper rifle + armor-piercing rounds.',
+    effect: (s) => { s.pierce = 3; s.pierceShatter = true; },
+  }),
 
   // SHARED (cross-tool, family: firearms). Targeting computer turns auto-aim
   // from the old always-on default into a paid unlock: every firearm now aims
@@ -85,6 +94,17 @@ export default [
     label: 'HE rounds',
     blurb: 'Every firearm round detonates a small high-explosive burst on impact.',
     effect: (fam) => { fam.he = true; },
+  }),
+  // Armor-piercing rounds — flips firearms.pierce. Single-shot firearm rounds
+  // spawn as pierce_bullet (drill through 2 parts) via markPierce in each
+  // firearm's apply(). Spray (shotgun/grapeshot) + cannon/rocket/grenade are
+  // intentionally NOT routed, so the blurb is explicit about the scope.
+  sharedNode({
+    id: 'g.ordnance.ap_rounds', parents: ['g.ordnance.gun'], cost: 450,
+    family: 'firearms', flag: 'pierce',
+    label: 'Armor-piercing rounds',
+    blurb: 'Single-shot firearm rounds (pistol through minigun) drill through two parts before they stop. Shotgun and grapeshot pellets, cannonballs, rockets and grenades are unaffected.',
+    effect: (fam) => { fam.pierce = true; },
   }),
 
   // Machinegun branch (sustained DPS)

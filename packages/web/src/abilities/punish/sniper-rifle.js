@@ -17,7 +17,8 @@ export const defaultStats = {
   stunMs: 600,
   lifeMs: 1400,
   shake:  8,
-  pierce: 2,      // parts the slug drills through before it burns
+  pierce: 2,            // parts the slug drills through before it burns
+  pierceShatter: false, // Anti-materiel upgrade flips this → frozen parts crossed shatter clean off
 };
 
 export default {
@@ -44,6 +45,7 @@ export default {
     slug.bulletStun = s.stunMs;
     slug._pierceLeft = s.pierce;
     slug._hitSet = new Set();
+    slug._pierceShatter = !!s.pierceShatter;   // Anti-materiel: deterministic shatter of frozen parts crossed
     Body.setVelocity(slug, { x: vx, y: vy });
     Composite.add(world, slug);
     ctx.transientBodies.push(slug);

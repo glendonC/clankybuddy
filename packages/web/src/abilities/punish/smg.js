@@ -8,7 +8,7 @@ import * as P from '../../particles.js';
 import { sfx } from '../../audio/sfx.js';
 import { drawAimLine, drawCrosshair } from '../../render/shared-cursor.js';
 import { getStats } from '../_stats.js';
-import { aimAngle } from '../_shared.js';
+import { aimAngle, markPierce } from '../_shared.js';
 
 const { Body, Bodies, Composite } = Matter;
 
@@ -20,6 +20,7 @@ export const defaultStats = {
   bloomMax:   0.22,   // cone half-width ceiling
   resetMs:    180,    // gap that resets the bloom
   lifeMs:     800,
+  pierce:     2,
 };
 
 // Bloom climbs while you hold; resets after a gap. Single-buddy game, so a
@@ -57,6 +58,7 @@ export default {
     bullet.lifeMs = s.lifeMs;
     bullet.bulletDamage = s.damage;
     bullet.bulletStun = 0;
+    markPierce(bullet, s.pierce);   // AP rounds → pierce_bullet (no-op without the flag)
     Body.setVelocity(bullet, { x: vx, y: vy });
     Composite.add(world, bullet);
     ctx.transientBodies.push(bullet);
