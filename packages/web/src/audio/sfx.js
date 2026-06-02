@@ -315,6 +315,21 @@ export const sfx = {
   droneDive: () => {
     beep({ freq: 900, dur: 0.5, type: 'sawtooth', vol: 0.12, sweep: -520 });
   },
+  // Crane claw: a motorized cable whir on deploy.
+  craneDeploy: () => {
+    beep({ freq: 140, dur: 0.45, type: 'square', vol: 0.08, sweep: 30 });
+    noise({ dur: 0.45, vol: 0.05, lpFreq: 1200 });
+  },
+  // Crane claw: a metallic clamp clang on latching a limb.
+  craneGrab: () => {
+    beep({ freq: 520, dur: 0.08, type: 'square', vol: 0.14, sweep: -120 });
+    noise({ dur: 0.07, vol: 0.12, lpFreq: 4000 });
+  },
+  // Crane claw: a heavy body-slam thud on the drop (low sweep + lowpassed boom).
+  craneSlam: () => {
+    beep({ freq: 80, dur: 0.22, type: 'sawtooth', vol: 0.26, sweep: -40 });
+    noise({ dur: 0.2, vol: 0.2, lpFreq: 650 });
+  },
   // City bus: diesel engine note + two-tone air horn (Eb4 + Bb4).
   cityBus: () => {
     noise({ dur: 0.5, vol: 0.14, lpFreq: 300 });                           // bus engine

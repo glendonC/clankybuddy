@@ -119,6 +119,7 @@ import sentryTurret     from './summons/turret.js';
 import hornetSwarm      from './summons/hornet.js';
 import ratSwarm         from './summons/rat.js';
 import quadcopterDrone  from './summons/drone.js';
+import craneClaw        from './summons/crane.js';
 
 // Master "stats" slot, cross-tool multipliers live here. Master tree nodes
 // mutate this and individual abilities can opt-in to read e.g. masterStats.moodMul.
@@ -162,7 +163,7 @@ function buildSources() {
     landmine, electrified_panel: electrifiedPanel, buzzsaw_wall: buzzsawWall, cryo_mine: cryoMine,
     gas_cloud: gasCloud, tear_gas: tearGas, chlorine, cryo_fog: cryoFog, subwoofer,
     gravity_well: gravityWell, flood, pin,
-    attack_dog: attackDog, snake, sentry_turret: sentryTurret, hornet_swarm: hornetSwarm, rat_swarm: ratSwarm, quadcopter_drone: quadcopterDrone,
+    attack_dog: attackDog, snake, sentry_turret: sentryTurret, hornet_swarm: hornetSwarm, rat_swarm: ratSwarm, quadcopter_drone: quadcopterDrone, crane_claw: craneClaw,
   };
 }
 

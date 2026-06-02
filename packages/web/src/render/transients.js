@@ -693,6 +693,33 @@ export function renderTransients(ctx, bodies) {
       ctx.fillStyle = lit;
       ctx.beginPath(); ctx.arc(0, 0, 1.8, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
+    } else if (b.partType === 'crane_claw') {
+      // A grabber claw on a cable that runs up to the top of the stage. Prongs
+      // splay OPEN while descending, clamp SHUT once latched. Flat strokes (1 live).
+      const shut = b.phase === 'hoist' || b.phase === 'hold' || b.phase === 'slam';
+      ctx.save();
+      // Cable up to the top of the screen.
+      ctx.strokeStyle = '#8a8f98'; ctx.lineWidth = 1.5; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(b.position.x, 0); ctx.lineTo(b.position.x, b.position.y - 3); ctx.stroke();
+      ctx.translate(b.position.x, b.position.y);
+      // Hub.
+      ctx.fillStyle = '#52565e';
+      ctx.beginPath(); ctx.arc(0, -3, 3.5, 0, Math.PI * 2); ctx.fill();
+      // Prongs (splay when open, vertical when shut).
+      const splay = shut ? 3 : 8;
+      ctx.strokeStyle = '#c2c9d6'; ctx.lineWidth = 2.6; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-3, -2); ctx.lineTo(-splay, 9);
+      ctx.moveTo(3, -2);  ctx.lineTo(splay, 9);
+      ctx.stroke();
+      ctx.restore();
+      // Tether line to the grabbed limb (visual confirmation of the hold).
+      if (shut && b._limbRef && b._limbRef.position) {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(194,201,214,0.6)'; ctx.lineWidth = 1.5;
+        ctx.beginPath(); ctx.moveTo(b.position.x, b.position.y + 6); ctx.lineTo(b._limbRef.position.x, b._limbRef.position.y); ctx.stroke();
+        ctx.restore();
+      }
     }
   }
 }

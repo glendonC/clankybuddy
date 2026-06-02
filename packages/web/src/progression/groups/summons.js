@@ -169,4 +169,32 @@ export default [
     blurb: 'A long-endurance airframe — it loiters and strafes far longer before committing (recon 3s → 5s, strafe 7s → 12s, total flight 13s → 19s).',
     effect: (s) => { s.reconMs = 5000; s.strafeMs = 12000; s.lifeMs = 19000; },
   }),
+
+  // Crane claw <- Quadcopter drone (BAY). A DISTINCT hoist+slam verb (not a stat
+  // fork): an autonomous claw homes on a limb, hauls the whole buddy aloft by it,
+  // then slams it down. Reuses the S3 constraint registry (claw->limb cable) + the
+  // kinematic onTick lane. Leaves cash distinct reads.
+  toolNode({
+    id: 'g.summons.crane_claw', parents: ['g.summons.quadcopter_drone'], cost: 340, toolId: 'crane_claw',
+    label: 'crane claw',
+    blurb: 'Drop an autonomous claw that homes onto a limb, hauls the whole buddy up by it to dangle helpless, then slams it back down hard. Set it and watch the lift-and-drop.',
+  }),
+  statNode({
+    id: 'g.summons.crane_claw.hydraulic', parents: ['g.summons.crane_claw'], cost: 300, toolId: 'crane_claw',
+    label: 'Hydraulic ram',
+    blurb: 'A snappier rig — it hoists faster and barely dangles before dropping (hoist 5 → 8 px/step, hold 0.5s → 0.25s).',
+    effect: (s) => { s.hoistSpeed = 8; s.holdMs = 250; },
+  }),
+  statNode({
+    id: 'g.summons.crane_claw.reinforced', parents: ['g.summons.crane_claw'], cost: 340, toolId: 'crane_claw',
+    label: 'Reinforced grip',
+    blurb: 'A brutal drop — it slams the buddy down harder and hurts more (slam speed 22 → 28, mood damage 32 → 46).',
+    effect: (s) => { s.slamVel = 28; s.slamMood = 46; },
+  }),
+  statNode({
+    id: 'g.summons.crane_claw.boom', parents: ['g.summons.crane_claw'], cost: 260, toolId: 'crane_claw',
+    label: 'Long boom',
+    blurb: 'A rangier, longer-running crane — it reaches farther to snag a limb (grab range 64 → 100) and stays on station longer (9s → 13s).',
+    effect: (s) => { s.grabRange = 100; s.lifeMs = 13000; },
+  }),
 ];

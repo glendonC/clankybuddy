@@ -197,6 +197,8 @@ export const TOOLS = [
     blurb: 'loose a swarm of rats that pours in across the floor and gnaws at the buddy\'s feet: the bites barely sting, but the sheer crawling mass terrifies them — fear builds until the buddy breaks and runs for the corner. cast it and watch them flee' },
   { id: 'quadcopter_drone',label: 'quadcopter drone',key: '', kind: 'click', delta: 'recon→strike', spine: 'negative', group: 'summons', family: 'summons', cost: 420, cd: 12,
     blurb: 'launch a quadcopter that loiters overhead and watches, then strafes the buddy with bullets, then dives in and detonates — an autonomous attack run you set and forget' },
+  { id: 'crane_claw',  label: 'crane claw',   key: '', kind: 'click',   delta: 'hoist→slam', spine: 'negative', group: 'summons', family: 'summons', cost: 340, cd: 12,
+    blurb: 'drop a claw that homes on a limb, hauls the whole buddy up by it to dangle helpless, then slams it back down hard — an autonomous hoist-and-slam you set and forget' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It
