@@ -141,4 +141,32 @@ export default [
     blurb: 'A more harrowing, longer-lived swarm — each gnaw spikes the buddy\'s fear harder (10 → 18) and the rats linger on the floor longer (9s → 14s), holding the panic up.',
     effect: (s) => { s.fear = 18; s.lifeMs = 14000; },
   }),
+
+  // Quadcopter drone — independent BAY root (the first STRUCTURED flyer: a force-
+  // hover aircraft running a recon → strafe → kamikaze mission FSM, vs the hornet's
+  // dumb velocity-set cloud). Crane claw is a FUTURE child toolNode (its own batch).
+  // Leaves are flag/scalar FORKS on the root (FPV / Gun / Patrol), each cashing a read.
+  toolNode({
+    id: 'g.summons.quadcopter_drone', parents: [], cost: 420, toolId: 'quadcopter_drone',
+    label: 'quadcopter drone',
+    blurb: 'Launch a quadcopter that flies in and loiters overhead, strafes the buddy with bullets, then dives in and detonates — an autonomous attack run. Set it and let it fly the mission.',
+  }),
+  statNode({
+    id: 'g.summons.quadcopter_drone.fpv', parents: ['g.summons.quadcopter_drone'], cost: 360, toolId: 'quadcopter_drone',
+    label: 'FPV suicide rig',
+    blurb: 'A direct-attack rig — barely scouts before it commits (recon 3s → 1.2s) and skips strafing entirely, diving straight onto the buddy. All blast, no chip.',
+    effect: (s) => { s.reconMs = 1200; s.strafeMs = 0; },
+  }),
+  statNode({
+    id: 'g.summons.quadcopter_drone.gun', parents: ['g.summons.quadcopter_drone'], cost: 380, toolId: 'quadcopter_drone',
+    label: 'Gun pod',
+    blurb: 'A heavier weapons pod — the strafe run fires faster and bites harder (a shot every 0.7s → 0.45s, 6 → 9 damage) before the dive.',
+    effect: (s) => { s.fireIntervalMs = 450; s.bulletDamage = 9; },
+  }),
+  statNode({
+    id: 'g.summons.quadcopter_drone.patrol', parents: ['g.summons.quadcopter_drone'], cost: 300, toolId: 'quadcopter_drone',
+    label: 'Extended patrol',
+    blurb: 'A long-endurance airframe — it loiters and strafes far longer before committing (recon 3s → 5s, strafe 7s → 12s, total flight 13s → 19s).',
+    effect: (s) => { s.reconMs = 5000; s.strafeMs = 12000; s.lifeMs = 19000; },
+  }),
 ];

@@ -90,6 +90,7 @@ import snake       from './summons/snake.js';
 import sentryTurret from './summons/turret.js';
 import hornetSwarm from './summons/hornet.js';
 import ratSwarm    from './summons/rat.js';
+import quadcopterDrone from './summons/drone.js';
 
 import grab        from './cursor/grab.js';
 import bearTrap    from './cursor/bear-trap.js';
@@ -126,7 +127,7 @@ const ABILITIES = {
   landmine, electrified_panel: electrifiedPanel, buzzsaw_wall: buzzsawWall, cryo_mine: cryoMine,
   gas_cloud: gasCloud, tear_gas: tearGas, chlorine, cryo_fog: cryoFog, subwoofer,
   gravity_well: gravityWell, flood, pin,
-  attack_dog: attackDog, snake, sentry_turret: sentryTurret, hornet_swarm: hornetSwarm, rat_swarm: ratSwarm,
+  attack_dog: attackDog, snake, sentry_turret: sentryTurret, hornet_swarm: hornetSwarm, rat_swarm: ratSwarm, quadcopter_drone: quadcopterDrone,
 };
 
 // flame.js exports id 'flamethrower'; the variable name above is just for

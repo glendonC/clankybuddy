@@ -301,6 +301,20 @@ export const sfx = {
   ratSqueak: () => {
     beep({ freq: 1700, dur: 0.04, type: 'sine', vol: 0.06, sweep: 280 });
   },
+  // Quadcopter drone: a rising rotor whine on launch.
+  droneDeploy: () => {
+    beep({ freq: 180, dur: 0.4, type: 'sawtooth', vol: 0.1, sweep: 90 });
+    noise({ dur: 0.4, vol: 0.05, lpFreq: 1600 });
+  },
+  // Quadcopter drone: a light servo-pop per strafe round (quieter than the gun/turret).
+  droneShot: () => {
+    beep({ freq: 460, dur: 0.045, type: 'square', vol: 0.08, sweep: -180 });
+    noise({ dur: 0.04, vol: 0.06, lpFreq: 3200 });
+  },
+  // Quadcopter drone: a descending dive whine on entering the kamikaze run (telegraph).
+  droneDive: () => {
+    beep({ freq: 900, dur: 0.5, type: 'sawtooth', vol: 0.12, sweep: -520 });
+  },
   // City bus: diesel engine note + two-tone air horn (Eb4 + Bb4).
   cityBus: () => {
     noise({ dur: 0.5, vol: 0.14, lpFreq: 300 });                           // bus engine

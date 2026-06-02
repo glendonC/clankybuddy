@@ -672,6 +672,27 @@ export function renderTransients(ctx, bodies) {
       ctx.fillStyle = '#1c1c20';
       ctx.beginPath(); ctx.arc(8, -1, 0.9, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
+    } else if (b.partType === 'quadcopter_drone') {
+      // Quad-rotor silhouette: X-frame + 4 spinning rotors + a phase status light
+      // (recon cyan / strafe amber / kamikaze pulsing red). Flat strokes (≤2 live).
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.strokeStyle = '#2c2f36'; ctx.lineWidth = 2; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(-9, -7); ctx.lineTo(9, 7); ctx.moveTo(9, -7); ctx.lineTo(-9, 7); ctx.stroke();
+      // Spinning rotors (radius flickers with wall-clock for a blur read).
+      const spin = (Math.floor(performance.now() / 30) % 2) ? 5 : 3.5;
+      ctx.strokeStyle = 'rgba(180,190,200,0.5)'; ctx.lineWidth = 1;
+      for (const [rx, ry] of [[-9, -7], [9, -7], [9, 7], [-9, 7]]) { ctx.beginPath(); ctx.arc(rx, ry, spin, 0, Math.PI * 2); ctx.stroke(); }
+      // Fuselage.
+      ctx.fillStyle = '#3a3f47';
+      ctx.beginPath(); ctx.arc(0, 0, 4.5, 0, Math.PI * 2); ctx.fill();
+      // Phase status light.
+      const lit = b.phase === 'kamikaze' ? ((Math.floor(performance.now() / 120) % 2) ? '#ff3b30' : '#7a1410')
+                : b.phase === 'strafe'   ? '#ffb02e'
+                :                          '#39d0ff';
+      ctx.fillStyle = lit;
+      ctx.beginPath(); ctx.arc(0, 0, 1.8, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
     }
   }
 }
