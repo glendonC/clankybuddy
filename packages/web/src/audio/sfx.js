@@ -262,6 +262,15 @@ export const sfx = {
     noise({ dur: 0.09, vol: 0.16, lpFreq: 1800 });                         // teeth-snap
     beep({ freq: 160, dur: 0.1, type: 'sawtooth', vol: 0.12, sweep: -80 });// low growl
   },
+  // Snake: a dry hiss on spawn (high-passed breathy noise).
+  snakeHiss: () => {
+    noise({ dur: 0.5, vol: 0.12, lpFreq: 7000 });
+  },
+  // Snake: a quick soft strike per venom bite.
+  snakeBite: () => {
+    noise({ dur: 0.05, vol: 0.1, lpFreq: 4000 });
+    beep({ freq: 240, dur: 0.06, type: 'sine', vol: 0.08, sweep: -120 });
+  },
   // City bus: diesel engine note + two-tone air horn (Eb4 + Bb4).
   cityBus: () => {
     noise({ dur: 0.5, vol: 0.14, lpFreq: 300 });                           // bus engine

@@ -599,6 +599,23 @@ export function renderTransients(ctx, bodies) {
       ctx.fillStyle = '#d8c060';
       ctx.beginPath(); ctx.arc(22, -9, 1.6, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
+    } else if (b.partType === 'snake') {
+      // Low serpentine S-curve, flipped by facing. Flat strokes only (hot loop).
+      const f = b._facing < 0 ? -1 : 1;
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.scale(f, 1);
+      ctx.strokeStyle = '#4c7a3a';
+      ctx.lineWidth = 7; ctx.lineCap = 'round';
+      ctx.beginPath();
+      ctx.moveTo(-22, 2);
+      ctx.bezierCurveTo(-8, -8, 6, 12, 20, -2);
+      ctx.stroke();
+      ctx.fillStyle = '#5e8f48';
+      ctx.beginPath(); ctx.arc(20, -2, 5, 0, Math.PI * 2); ctx.fill();   // head
+      ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 1.5;                 // flicking tongue
+      ctx.beginPath(); ctx.moveTo(25, -2); ctx.lineTo(30, -4); ctx.moveTo(25, -2); ctx.lineTo(30, 0); ctx.stroke();
+      ctx.restore();
     }
   }
 }

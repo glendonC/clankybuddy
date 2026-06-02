@@ -114,6 +114,7 @@ import buzzsawWall      from './punish/buzzsaw-wall.js';
 import subwoofer        from './punish/subwoofer.js';
 
 import attackDog        from './summons/dog.js';
+import snake            from './summons/snake.js';
 
 // Master "stats" slot, cross-tool multipliers live here. Master tree nodes
 // mutate this and individual abilities can opt-in to read e.g. masterStats.moodMul.
@@ -157,7 +158,7 @@ function buildSources() {
     landmine, electrified_panel: electrifiedPanel, buzzsaw_wall: buzzsawWall, cryo_mine: cryoMine,
     gas_cloud: gasCloud, tear_gas: tearGas, chlorine, cryo_fog: cryoFog, subwoofer,
     gravity_well: gravityWell, flood, pin,
-    attack_dog: attackDog,
+    attack_dog: attackDog, snake,
   };
 }
 

@@ -187,6 +187,8 @@ export const TOOLS = [
     blurb: 'drag to aim a low pass; a swept gun-run force band rakes every limb it crosses downrange along your line, at any angle, even mid-air' },
   { id: 'attack_dog',  label: 'attack dog',   key: '', kind: 'click',    delta: '−7+bleed', spine: 'negative', group: 'summons', family: 'summons', cost: 240, cd: 8,
     blurb: 'loose an attack dog: it charges in, hunts the buddy down across the floor, lunges, and bites — every chomp tears a lasting wound. place it and walk away' },
+  { id: 'snake',       label: 'snake',        key: '', kind: 'click',    delta: '−3+venom', spine: 'negative', group: 'summons', family: 'summons', cost: 300, cd: 8,
+    blurb: 'loose a snake: it slithers in low and slow, no lunge, and latches on — each bite barely moves the buddy but sinks the venom deeper, the bleed accelerating the longer it stays. place it and walk away' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It
