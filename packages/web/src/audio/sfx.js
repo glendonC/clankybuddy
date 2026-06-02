@@ -292,6 +292,15 @@ export const sfx = {
   hornetSting: () => {
     beep({ freq: 600, dur: 0.05, type: 'sawtooth', vol: 0.07, sweep: -240 });
   },
+  // Rat swarm: a dry chittering skitter on cast (the swarm pouring in).
+  ratSkitter: () => {
+    noise({ dur: 0.4, vol: 0.08, lpFreq: 5200 });
+    beep({ freq: 1400, dur: 0.08, type: 'square', vol: 0.05, sweep: -300 });
+  },
+  // Rat swarm: a tiny squeak per gnaw (probabilistic, so N gnaws aren't a wall).
+  ratSqueak: () => {
+    beep({ freq: 1700, dur: 0.04, type: 'sine', vol: 0.06, sweep: 280 });
+  },
   // City bus: diesel engine note + two-tone air horn (Eb4 + Bb4).
   cityBus: () => {
     noise({ dur: 0.5, vol: 0.14, lpFreq: 300 });                           // bus engine

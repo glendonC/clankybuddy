@@ -652,6 +652,26 @@ export function renderTransients(ctx, bodies) {
       const w = (Math.floor((performance.now() + b.bornAt) / 45) % 2) ? 2 : -2;
       ctx.beginPath(); ctx.moveTo(-1, -2); ctx.lineTo(-3, -4 + w); ctx.moveTo(1, -2); ctx.lineTo(3, -4 - w); ctx.stroke();
       ctx.restore();
+    } else if (b.partType === 'rat') {
+      // Low vermin silhouette + a flicking tail, flipped by facing. Flat fills only
+      // (up to 16 run this hot loop). render.visible:false → drawn only here.
+      const f = b._facing < 0 ? -1 : 1;
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.scale(f, 1);
+      ctx.fillStyle = '#6b6258';
+      ctx.beginPath(); ctx.ellipse(-2, 0, 9, 4, 0, 0, Math.PI * 2); ctx.fill();   // body
+      ctx.beginPath(); ctx.arc(7, -1, 3.2, 0, Math.PI * 2); ctx.fill();           // head
+      ctx.fillStyle = '#7a7066';
+      ctx.beginPath(); ctx.arc(5, -4, 1.6, 0, Math.PI * 2); ctx.fill();           // ear
+      // Flicking tail (wall-clock wiggle, per-rat bornAt phase so the swarm isn't in lockstep).
+      const tw = Math.sin((performance.now() + b.bornAt) * 0.02) * 2;
+      ctx.strokeStyle = '#5a5249'; ctx.lineWidth = 1.4; ctx.lineCap = 'round';
+      ctx.beginPath(); ctx.moveTo(-11, 0); ctx.quadraticCurveTo(-16, tw, -19, -1 + tw); ctx.stroke();
+      // Eye glint (faceward).
+      ctx.fillStyle = '#1c1c20';
+      ctx.beginPath(); ctx.arc(8, -1, 0.9, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
     }
   }
 }

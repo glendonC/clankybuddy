@@ -193,6 +193,8 @@ export const TOOLS = [
     blurb: 'plant a static auto-turret on the floor: it tracks the buddy and fires bullets on its own until it runs dry. set it and walk away' },
   { id: 'hornet_swarm',label: 'hornet swarm', key: '', kind: 'click',   delta: '−2×swarm', spine: 'negative', group: 'summons', family: 'summons', cost: 300, cd: 8,
     blurb: 'loose a buzzing cloud of hornets that swarms the buddy in the air: each tiny sting barely moves them, but a dozen needling at once chips them down and keeps a light bleed open. cast it and let the cloud work' },
+  { id: 'rat_swarm',   label: 'rat swarm',    key: '', kind: 'click',   delta: 'terror', spine: 'negative', group: 'summons', family: 'summons', cost: 320, cd: 8,
+    blurb: 'loose a swarm of rats that pours in across the floor and gnaws at the buddy\'s feet: the bites barely sting, but the sheer crawling mass terrifies them — fear builds until the buddy breaks and runs for the corner. cast it and watch them flee' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It

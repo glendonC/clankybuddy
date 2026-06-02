@@ -112,4 +112,33 @@ export default [
     blurb: 'A rangier, longer-lived cloud — it reaches farther to sting (range 44 → 56) and buzzes the field longer (7s → 11s).',
     effect: (s) => { s.stingRange = 56; s.lifeMs = 11000; },
   }),
+
+  // Rat swarm <- Hornet swarm (NEST). A distinct TERRORIZE-INTO-FLEEING verb: a
+  // GROUND swarm (vs the hornet's air cloud) whose gnaw is near-cosmetic — the
+  // headline is the buddy's FEAR breaking it into a flee-to-corner. The first
+  // hostile to feed mood.fear from a sustained controller. Leaves cash distinct
+  // reads; bleed stays FLAT (the dog/hornet model, never the snake's stack).
+  toolNode({
+    id: 'g.summons.rat_swarm', parents: ['g.summons.hornet_swarm'], cost: 320, toolId: 'rat_swarm',
+    label: 'rat swarm',
+    blurb: 'Loose a swarm of rats that pours across the floor and gnaws at the buddy\'s feet. The bites barely sting — but the crawling mass terrifies them, and the fear builds until the buddy breaks and runs for the corner. Cast it and watch them flee.',
+  }),
+  statNode({
+    id: 'g.summons.rat_swarm.colony', parents: ['g.summons.rat_swarm'], cost: 320, toolId: 'rat_swarm',
+    label: 'Breeding colony',
+    blurb: 'A bigger, faster infestation — twelve rats per cast (8 → 12) gnawing quicker (every 0.6s → 0.45s) so the terror climbs sooner.',
+    effect: (s) => { s.swarmCount = 12; s.gnawIntervalMs = 450; },
+  }),
+  statNode({
+    id: 'g.summons.rat_swarm.diseased', parents: ['g.summons.rat_swarm'], cost: 280, toolId: 'rat_swarm',
+    label: 'Diseased bite',
+    blurb: 'Filthy teeth — each gnaw is likelier to draw blood and the wound festers longer (bleed chance 0.3 → 0.5, bleed 4s → 6.5s).',
+    effect: (s) => { s.bleedChance = 0.5; s.bleedMs = 6500; },
+  }),
+  statNode({
+    id: 'g.summons.rat_swarm.frenzied', parents: ['g.summons.rat_swarm'], cost: 260, toolId: 'rat_swarm',
+    label: 'Frenzied swarm',
+    blurb: 'A more harrowing, longer-lived swarm — each gnaw spikes the buddy\'s fear harder (10 → 18) and the rats linger on the floor longer (9s → 14s), holding the panic up.',
+    effect: (s) => { s.fear = 18; s.lifeMs = 14000; },
+  }),
 ];
