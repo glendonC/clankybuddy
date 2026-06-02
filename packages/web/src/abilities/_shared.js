@@ -15,7 +15,8 @@ import {
 // '<id>', {duration}). They are registered effect ids; spawnDrop's optional
 // concussOnImpact / electrifyMs cfg fields route through the same applyStatus.
 import { markHit } from '../physics/secondary.js';
-import { getBuddyForPart } from '../state/ragdoll-lifecycle.js';
+import { getBuddyForPart, forEachBuddy } from '../state/ragdoll-lifecycle.js';
+import { abilityCtxFor } from '../state/ability-ctx.js';
 import { releaseConstraintsForBody } from '../state/constraint-registry.js';
 import { showCombo } from '../ui/overlays.js';
 import { getMasterMul } from '../progression/master-mults.js';
@@ -250,6 +251,19 @@ export function partRadius(part) {
   return Math.max(b.max.x - b.min.x, b.max.y - b.min.y) / 2;
 }
 
+// Phase-6 AOE friendly-fire seam: run `fn(buddyCtx)` for every buddy that has a
+// live ragdoll, binding a ctx to each. The buddy the passed ctx is already bound
+// to reuses that ctx unchanged (so reactTo/recordHit keep their correct closures
+// and the SINGLE-buddy hot path is byte-for-byte the old single-pass behavior);
+// any other buddy (the rival) gets a fresh abilityCtxFor(b). A blast iterating
+// this hits the player AND the rival, each taking damage to its OWN mood/status.
+function forEachBuddyCtx(ctx, fn) {
+  forEachBuddy(b => {
+    if (!b.ragdoll || !b.ragdoll.parts) return;
+    fn(b.id === ctx.buddyId ? ctx : abilityCtxFor(b));
+  });
+}
+
 // Single source of truth for explosion damage so rocket/grenade/fireball agree.
 //
 // `baseVel` is the additive radial fling in px/step at the blast center
@@ -284,12 +298,15 @@ export function explode(ctx, x, y, opts = {}) {
   // Particle visual layer is the "explosion look" (fire + smoke + sparks).
   // Kept here rather than inside bigImpact so non-explosion impacts (anvil
   // squash, blackhole eject) can choose their own particle palette.
-  const { ragdoll, status } = ctx;
+  // Frozen parts in the radius shatter — per buddy (friendly-fire), so a blast
+  // shatters a frozen rival limb too. Single buddy = the old single-pass loop.
   let combo = false;
-  for (const p of ragdoll.parts) {
-    const dx = p.position.x - x, dy = p.position.y - y;
-    if (Math.hypot(dx, dy) < radius && isBrittle(status, p)) { shatter(ctx, p); combo = true; }
-  }
+  forEachBuddyCtx(ctx, (bctx) => {
+    for (const p of bctx.ragdoll.parts) {
+      const dx = p.position.x - x, dy = p.position.y - y;
+      if (Math.hypot(dx, dy) < radius && isBrittle(bctx.status, p)) { shatter(bctx, p); combo = true; }
+    }
+  });
   P.burst(x, y, Math.min(50, Math.round(radius / 6)),  { type: 'fire',  color: '#ff6b1a', size: 18, life: 700,  speedRange: 1.4, gravity: -0.0006 });
   P.burst(x, y, Math.min(30, Math.round(radius / 10)), { type: 'smoke', color: '#444',    size: 26, life: 1200, speedRange: 0.6, gravity: -0.0006 });
   P.burst(x, y, Math.min(36, Math.round(radius / 7)),  { type: 'spark', color: '#fff',    size: 3,  life: 500,  speedRange: 1.2 });
@@ -314,64 +331,72 @@ export function bigImpact(ctx, x, y, opts = {}) {
     limpMs = 800,
     angularJitter = 0.4,
   } = opts;
-  const { ragdoll, mood, status, screenShake } = ctx;
-  // CONCUSSED consume, once per blast.
-  const concussedPart = findConcussedInRange(status, ragdoll, x, y, radius);
-  const mul = concussedPart ? damageMul(status, concussedPart) : 1;
-  if (mul > 1) consumeConcussed(status, concussedPart);
-  const hitParts = [];
-  for (const p of ragdoll.parts) {
-    const dx = p.position.x - x, dy = p.position.y - y;
-    const d = Math.hypot(dx, dy);
-    if (d >= radius) continue;
-    const falloff = 1 - d / radius;
-    const brittle = isBrittle(status, p);
-    const massMul = brittle ? 1.4 : 1;
-    const nx = dx / (d || 1), ny = dy / (d || 1);
-    const v = baseVel * falloff * massMul;
-    Body.setVelocity(p, {
-      x: p.velocity.x + nx * v,
-      y: p.velocity.y + ny * v - upBias * falloff * massMul,
-    });
-    Body.setAngularVelocity(p, p.angularVelocity + (Math.random() - 0.5) * angularJitter * falloff);
-    // Every part inside the blast goes briefly limp, the orientation pass
-    // shouldn't be fighting the explosion's velocity injection.
-    markHit(p);
-    hitParts.push({ part: p, impulse: v });
-    if (igniteMs > 0 && !hasStatus(status, p, 'frozen')) {
-      // igniteMs is kept as a flag (>0 = ignite). Fire is persistent, it
-      // burns until an opposing input cures it. The numeric value used to
-      // be the burn timer; preserved as the on/off switch for callers.
-      applyStatus(status, p, 'on_fire', { intensity: 1, source: sound });
-    }
-  }
-  const appliedMoodDelta = moodDelta * mul;
-  // Per-part reactTo emits the shock spike + telemetry + stimulus speech for
-  // each part hit by the blast. Source defaults to the sfx key (which doubles
-  // as the persona pool key for blast lines, 'bomb', 'nuke', etc.) so the
-  // buddy says blast-flavored lines instead of generic mood lines.
-  if (appliedMoodDelta && hitParts.length) {
-    const perPartDelta = appliedMoodDelta / hitParts.length;
-    for (const hit of hitParts) {
-      ctx.reactTo?.({
-        source: sound || 'big_explosion',
-        part: hit.part,
-        impulse: hit.impulse,
-        moodDelta: perPartDelta,
-        // Speak only off the head share, otherwise every limb in the blast
-        // tries to talk and the throttle drops them anyway. Pass a long
-        // speakMs to the head and zero-out the others.
-        speakMs: hit.part === ragdoll.head ? 400 : 99999,
+  // Phase-6 friendly-fire: every buddy with parts inside the radius takes the
+  // blast against its OWN ragdoll/mood/status (concussed-consume, fling, ignite,
+  // mood, stun/limp all per buddy). Single buddy = the old single pass exactly;
+  // the global FX (sound + screen shake) still fire once, below.
+  forEachBuddyCtx(ctx, (bctx) => {
+    const { ragdoll, mood, status } = bctx;
+    // CONCUSSED consume, once per buddy per blast.
+    const concussedPart = findConcussedInRange(status, ragdoll, x, y, radius);
+    const mul = concussedPart ? damageMul(status, concussedPart) : 1;
+    if (mul > 1) consumeConcussed(status, concussedPart);
+    const hitParts = [];
+    for (const p of ragdoll.parts) {
+      const dx = p.position.x - x, dy = p.position.y - y;
+      const d = Math.hypot(dx, dy);
+      if (d >= radius) continue;
+      const falloff = 1 - d / radius;
+      const brittle = isBrittle(status, p);
+      const massMul = brittle ? 1.4 : 1;
+      const nx = dx / (d || 1), ny = dy / (d || 1);
+      const v = baseVel * falloff * massMul;
+      Body.setVelocity(p, {
+        x: p.velocity.x + nx * v,
+        y: p.velocity.y + ny * v - upBias * falloff * massMul,
       });
+      Body.setAngularVelocity(p, p.angularVelocity + (Math.random() - 0.5) * angularJitter * falloff);
+      // Every part inside the blast goes briefly limp, the orientation pass
+      // shouldn't be fighting the explosion's velocity injection.
+      markHit(p);
+      hitParts.push({ part: p, impulse: v });
+      if (igniteMs > 0 && !hasStatus(status, p, 'frozen')) {
+        // igniteMs is kept as a flag (>0 = ignite). Fire is persistent, it
+        // burns until an opposing input cures it. The numeric value used to
+        // be the burn timer; preserved as the on/off switch for callers.
+        applyStatus(status, p, 'on_fire', { intensity: 1, source: sound });
+      }
     }
-  } else if (appliedMoodDelta) {
-    // No parts in range but moodDelta supplied, still apply.
-    applyMoodDelta(mood, appliedMoodDelta);
-  }
-  if (stunMs) stun(ragdoll, stunMs);
-  if (limpMs) goLimp(ragdoll, limpMs);
+    const appliedMoodDelta = moodDelta * mul;
+    // Per-part reactTo emits the shock spike + telemetry + stimulus speech for
+    // each part hit by the blast. Source defaults to the sfx key (which doubles
+    // as the persona pool key for blast lines, 'bomb', 'nuke', etc.) so the
+    // buddy says blast-flavored lines instead of generic mood lines.
+    if (appliedMoodDelta && hitParts.length) {
+      const perPartDelta = appliedMoodDelta / hitParts.length;
+      for (const hit of hitParts) {
+        bctx.reactTo?.({
+          source: sound || 'big_explosion',
+          part: hit.part,
+          impulse: hit.impulse,
+          moodDelta: perPartDelta,
+          // Speak only off the head share, otherwise every limb in the blast
+          // tries to talk and the throttle drops them anyway. Pass a long
+          // speakMs to the head and zero-out the others.
+          speakMs: hit.part === ragdoll.head ? 400 : 99999,
+        });
+      }
+    } else if (appliedMoodDelta && bctx.buddyId === ctx.buddyId) {
+      // No parts in range but moodDelta supplied — apply to the CAST TARGET
+      // only (the player), never to an incidental buddy that wasn't in range.
+      applyMoodDelta(mood, appliedMoodDelta);
+    }
+    if (stunMs) stun(ragdoll, stunMs);
+    if (limpMs) goLimp(ragdoll, limpMs);
+  });
+  // Global FX, once per blast (not per buddy).
   if (sound && sfx[sound]) sfx[sound]();
-  if (shake) screenShake(shake, Math.min(800, 200 + radius));
+  if (ctx.screenShake && shake) ctx.screenShake(shake, Math.min(800, 200 + radius));
 }
 
 // Frozen part hit by impact weapon → bonus damage + ice burst + slow-mo.
@@ -485,19 +510,25 @@ export function spawnDrop(ctx, cfg) {
       if (isBrittle(ctx2.status, part)) shatter(ctx2, part);
       Body.setVelocity(part, { x: part.velocity.x, y: part.velocity.y + effSquashVel });
       if (roll) Body.setAngularVelocity(part, part.angularVelocity + (Math.random() < 0.5 ? -roll : roll));
-      for (const other of ctx2.ragdoll.parts) {
-        if (other === part) continue;
-        const dx = other.position.x - part.position.x;
-        const dy = other.position.y - part.position.y;
-        const d = Math.hypot(dx, dy) || 1;
-        if (d < effSplashRadius) {
-          const f = (1 - d / effSplashRadius) * effSplashForce;
-          Body.setVelocity(other, {
-            x: other.velocity.x + (dx / d) * f,
-            y: other.velocity.y + (dy / d) * f * 0.4 + effSquashVel * 0.2,
-          });
+      // Splash crosses buddies (Phase-6 friendly-fire): a drop's impact shoves
+      // every nearby part of every buddy, not just the one it landed on, so an
+      // anvil next to the rival rattles it too. Single buddy = the old splash.
+      forEachBuddy(bd => {
+        if (!bd.ragdoll || !bd.ragdoll.parts) return;
+        for (const other of bd.ragdoll.parts) {
+          if (other === part) continue;
+          const dx = other.position.x - part.position.x;
+          const dy = other.position.y - part.position.y;
+          const d = Math.hypot(dx, dy) || 1;
+          if (d < effSplashRadius) {
+            const f = (1 - d / effSplashRadius) * effSplashForce;
+            Body.setVelocity(other, {
+              x: other.velocity.x + (dx / d) * f,
+              y: other.velocity.y + (dy / d) * f * 0.4 + effSquashVel * 0.2,
+            });
+          }
         }
-      }
+      });
       if (igniteMs > 0 && !hasStatus(ctx2.status, part, 'frozen')) {
         applyStatus(ctx2.status, part, 'on_fire', { source: srcVerb });
       }

@@ -7,6 +7,8 @@ import { applyStatus, clearAll as clearAllStatus } from '../../effects/registry.
 import { showNuke, showCombo } from '../../ui/overlays.js';
 import { startCooldown } from '../../ui/hotbar.js';
 import { getStats } from '../_stats.js';
+import { forEachBuddy } from '../../state/ragdoll-lifecycle.js';
+import { abilityCtxFor } from '../../state/ability-ctx.js';
 
 const { Body, Composite } = Matter;
 
@@ -29,46 +31,54 @@ export default {
     const epoch = ctx._epoch;
     setTimeout(() => {
       if (!ctx._epochValid?.(epoch)) return;
-      const { ragdoll, status, world, screenShake, transientBodies } = ctx;
+      const { ragdoll, world, screenShake, transientBodies } = ctx;
 
       showNuke();
       sfx.nuke();
       screenShake(30, 1600);
       ctx.hitStop?.mega();
-      clearAllStatus(status);
 
+      // Blast centered on the player centroid (the cast reference).
       let cx = 0, cy = 0;
       for (const p of ragdoll.parts) { cx += p.position.x; cy += p.position.y; }
       cx /= ragdoll.parts.length; cy /= ragdoll.parts.length;
 
-      const hitParts = [];
-      for (const p of ragdoll.parts) {
-        const dx = p.position.x - cx, dy = p.position.y - cy;
-        const d = Math.hypot(dx, dy) || 1;
-        // Big radial fling, additive on whatever they're already doing.
-        Body.setVelocity(p, {
-          x: p.velocity.x + (dx / d) * 28 + (Math.random() - 0.5) * 4,
-          y: p.velocity.y + (dy / d) * 28 - 8,
-        });
-        Body.setAngularVelocity(p, p.angularVelocity + (Math.random() - 0.5) * 0.6);
-        applyStatus(status, p, 'on_fire', { source: 'nuke' });
-        hitParts.push(p);
-      }
+      // Phase-6 friendly-fire: the nuke flings + ignites EVERY buddy in the
+      // scene, each taking damage to its own mood/status. Single buddy = the old
+      // behavior (clear status, fling, ignite, mood, stun/limp the one buddy).
       const moodDelta = -s.mood;
-      const perPartDelta = hitParts.length ? moodDelta / hitParts.length : moodDelta;
-      for (const p of hitParts) {
-        ctx.reactTo?.({
-          source: 'nuke',
-          part: p,
-          moodDelta: perPartDelta,
-          impulse: 28,
-          // Only the head speaks; other limbs silent.
-          speakMs: p === ragdoll.head ? 800 : 99999,
-        });
-      }
-      if (!hitParts.length) ctx.reactTo?.({ source: 'nuke', moodDelta, speakMs: 99999 });
-      stun(ragdoll, 2500);
-      goLimp(ragdoll, 1800);
+      forEachBuddy(bd => {
+        if (!bd.ragdoll || !bd.ragdoll.parts || !bd.ragdoll.parts.length) return;
+        const bctx = bd.id === ctx.buddyId ? ctx : abilityCtxFor(bd);
+        clearAllStatus(bd.status);
+        const hitParts = [];
+        for (const p of bd.ragdoll.parts) {
+          const dx = p.position.x - cx, dy = p.position.y - cy;
+          const d = Math.hypot(dx, dy) || 1;
+          // Big radial fling, additive on whatever they're already doing.
+          Body.setVelocity(p, {
+            x: p.velocity.x + (dx / d) * 28 + (Math.random() - 0.5) * 4,
+            y: p.velocity.y + (dy / d) * 28 - 8,
+          });
+          Body.setAngularVelocity(p, p.angularVelocity + (Math.random() - 0.5) * 0.6);
+          applyStatus(bd.status, p, 'on_fire', { source: 'nuke' });
+          hitParts.push(p);
+        }
+        const perPartDelta = hitParts.length ? moodDelta / hitParts.length : moodDelta;
+        for (const p of hitParts) {
+          bctx.reactTo?.({
+            source: 'nuke',
+            part: p,
+            moodDelta: perPartDelta,
+            impulse: 28,
+            // Only the head speaks; other limbs silent.
+            speakMs: p === bd.ragdoll.head ? 800 : 99999,
+          });
+        }
+        if (!hitParts.length && bd.id === ctx.buddyId) bctx.reactTo?.({ source: 'nuke', moodDelta, speakMs: 99999 });
+        stun(bd.ragdoll, 2500);
+        goLimp(bd.ragdoll, 1800);
+      });
 
       P.burst(cx, cy, 60, { type: 'fire',  color: '#ff6b1a', size: 22, life: 1200, speedRange: 2.4, gravity: -0.0008 });
       P.burst(cx, cy, 40, { type: 'smoke', color: '#222',    size: 30, life: 1800, speedRange: 1.2, gravity: -0.0006 });
