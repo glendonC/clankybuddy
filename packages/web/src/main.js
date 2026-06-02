@@ -25,6 +25,7 @@ import {
   transientBodies, getRagdoll, getCurrentBuddy, spawnRagdoll, resetMood,
 } from './state/ragdoll-lifecycle.js';
 import { tickConstraintRegistry } from './state/constraint-registry.js';
+import { getRival } from './state/rival.js';
 import { tickScheduler } from './state/scheduler.js';
 
 // UI / input
@@ -225,6 +226,22 @@ function loop() {
   // submerged: floor → shadow → water → buddy.
   renderFlood(ctx, canvas.width, canvas.height, now);
   if (ragdoll) renderRagdoll(ctx, ragdoll, mood, status);
+  // Rival brawler (Phase A): a 2nd ragdoll drawn with the buddy's own rig/persona
+  // art (neutral mood, no status) under a hostile RED wash — the "shadow twin".
+  // Self-contained here (no render/ module edit); getRival() is null when none live.
+  const rival = getRival();
+  if (rival && rival.ragdoll && rival.ragdoll.parts) {
+    renderRagdoll(ctx, rival.ragdoll, rival.mood, null);
+    ctx.save();
+    ctx.globalAlpha = 0.34;
+    ctx.fillStyle = '#c81e1e';
+    for (const p of rival.ragdoll.parts) {
+      if (!Number.isFinite(p.position.x) || !Number.isFinite(p.position.y)) continue;
+      const r = (p.circleRadius || 16) * 1.06;
+      ctx.beginPath(); ctx.arc(p.position.x, p.position.y, r, 0, Math.PI * 2); ctx.fill();
+    }
+    ctx.restore();
+  }
   renderTransients(ctx, transientBodies);
   renderStrafe(ctx, now);   // gun-run wash sits OVER the buddy (after renderRagdoll/transients)
   P.render(ctx);

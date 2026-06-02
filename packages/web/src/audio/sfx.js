@@ -330,6 +330,16 @@ export const sfx = {
     beep({ freq: 80, dur: 0.22, type: 'sawtooth', vol: 0.26, sweep: -40 });
     noise({ dur: 0.2, vol: 0.2, lpFreq: 650 });
   },
+  // Rival brawler: a low menacing two-note entrance on summon.
+  rivalSummon: () => {
+    beep({ freq: 130, dur: 0.18, type: 'sawtooth', vol: 0.16, sweep: -10 });
+    beep({ freq: 98, dur: 0.3, type: 'sawtooth', vol: 0.14, sweep: -8 });
+  },
+  // Rival brawler: a meaty gloved thwack per landed punch.
+  rivalPunch: () => {
+    beep({ freq: 150, dur: 0.08, type: 'square', vol: 0.18, sweep: -90 });
+    noise({ dur: 0.07, vol: 0.14, lpFreq: 900 });
+  },
   // City bus: diesel engine note + two-tone air horn (Eb4 + Bb4).
   cityBus: () => {
     noise({ dur: 0.5, vol: 0.14, lpFreq: 300 });                           // bus engine

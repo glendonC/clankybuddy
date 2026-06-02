@@ -17,6 +17,7 @@ import { teardownAllConstraints } from './constraint-registry.js';
 import { cancelAllScheduled } from './scheduler.js';
 import { clearFlood } from '../modes/force-flood.js';
 import { clearStrafe } from '../modes/force-strafe.js';
+import { clearRival } from './rival.js';
 import { FLOOR_INSET, RAGDOLL_RIG_HEIGHT } from '../physics/constants.js';
 
 const { Composite } = Matter;
@@ -66,6 +67,10 @@ export function spawnRagdoll(charId) {
   // Same defense for an in-flight strafe sweep (the Mode's per-tick epoch check
   // is the primary guard; this disables it immediately on the swap).
   clearStrafe();
+  // Tear down a live Rival brawler (Phase A): its composite is NOT _buddy.ragdoll
+  // and NOT in transientBodies, so the wipes below miss it — remove it here, beside
+  // clearFlood/clearStrafe, before the old composite + transients are dropped.
+  clearRival();
   if (_buddy.ragdoll) Composite.remove(world, _buddy.ragdoll.composite);
   clearAllStatus(_buddy.status);
   _buddy.epoch++;

@@ -197,4 +197,33 @@ export default [
     blurb: 'A rangier, longer-running crane — it reaches farther to snag a limb (grab range 64 → 100) and stays on station longer (9s → 13s).',
     effect: (s) => { s.grabRange = 100; s.lifeMs = 13000; },
   }),
+
+  // Rival brawler — independent RING root (Phase A: the subsystem closer). A SECOND
+  // ragdoll (a red shadow-twin of the buddy) that walks up and punches it; the
+  // player cannot hurt it (non-damageable). Wrestler / Armed rival are FUTURE
+  // children (Phase B = the damageable multi-buddy milestone), deferred. Leaves
+  // are flag/scalar FORKS on the root, each cashing a read.
+  toolNode({
+    id: 'g.summons.rival_brawler', parents: [], cost: 260, toolId: 'rival_brawler',
+    label: 'rival brawler',
+    blurb: 'Summon a hostile shadow-twin of your buddy that strides in and throws punches. You cannot touch it — you can only watch it work the buddy over until it fades. An opponent, not a tool.',
+  }),
+  statNode({
+    id: 'g.summons.rival_brawler.tempo', parents: ['g.summons.rival_brawler'], cost: 300, toolId: 'rival_brawler',
+    label: 'Boxer’s tempo',
+    blurb: 'A faster fighter — it throws a punch every 0.6s instead of 0.9s, working the buddy over quicker.',
+    effect: (s) => { s.punchIntervalMs = 600; },
+  }),
+  statNode({
+    id: 'g.summons.rival_brawler.heavyweight', parents: ['g.summons.rival_brawler'], cost: 340, toolId: 'rival_brawler',
+    label: 'Heavyweight',
+    blurb: 'A heavier hitter — each punch lands harder and hurts more (force 0.05 → 0.065, mood damage 9 → 14).',
+    effect: (s) => { s.punchForce = 0.065; s.mood = 14; },
+  }),
+  statNode({
+    id: 'g.summons.rival_brawler.relentless', parents: ['g.summons.rival_brawler'], cost: 280, toolId: 'rival_brawler',
+    label: 'Relentless',
+    blurb: 'A tireless aggressor — it advances faster and stays in the ring far longer (12s → 18s).',
+    effect: (s) => { s.seekForce = 0.003; s.lifeMs = 18000; },
+  }),
 ];

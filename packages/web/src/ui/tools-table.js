@@ -199,6 +199,8 @@ export const TOOLS = [
     blurb: 'launch a quadcopter that loiters overhead and watches, then strafes the buddy with bullets, then dives in and detonates — an autonomous attack run you set and forget' },
   { id: 'crane_claw',  label: 'crane claw',   key: '', kind: 'click',   delta: 'hoist→slam', spine: 'negative', group: 'summons', family: 'summons', cost: 340, cd: 12,
     blurb: 'drop a claw that homes on a limb, hauls the whole buddy up by it to dangle helpless, then slams it back down hard — an autonomous hoist-and-slam you set and forget' },
+  { id: 'rival_brawler',label: 'rival brawler',key: '', kind: 'click',   delta: '−9/punch', spine: 'negative', group: 'summons', family: 'summons', cost: 260, cd: 14,
+    blurb: 'summon a hostile shadow twin of your buddy that walks up and throws punches — you cannot hurt it, you can only watch it work the buddy over until it fades' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It
