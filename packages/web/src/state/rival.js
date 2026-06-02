@@ -16,21 +16,35 @@
 
 import Matter from 'matter-js';
 import { world } from './world.js';
+// Phase 6: the rival is a full Buddy now (it has mood + status that take
+// damage), so it registers in the buddy registry → collision routing resolves
+// rival parts to it. Import cycle (ragdoll-lifecycle.js imports clearRival here;
+// this imports registerBuddy/unregisterBuddy there) is benign: both are only
+// CALLED at runtime, inside function bodies, after both modules have loaded.
+import { registerBuddy, unregisterBuddy } from './ragdoll-lifecycle.js';
+import { clearAll as clearAllStatus } from '../effects/registry.js';
 
 const { Composite } = Matter;
 
-// { ragdoll, mood, epoch, spawnAt } — the live rival, or null.
+// A full Buddy { id:'rival', ragdoll, mood, status, epoch, spawnAt } — the live
+// rival, or null.
 let _rival = null;
 
-export function setRival(r) { _rival = r; }
+export function setRival(r) { _rival = r; registerBuddy(r); }
 export function getRival() { return _rival; }
 
-// Idempotent teardown: remove the rival composite from the world + drop the ref.
-// Called on lifeMs expiry (the controller-marker's onExpire) AND on a character
-// switch (state/ragdoll-lifecycle.js spawnRagdoll, beside clearFlood/clearStrafe).
+// Idempotent teardown: clear any status on the rival (drop a live fire/bleed so
+// its onRemove fires while the parts are still valid), deregister it from the
+// buddy registry, remove the composite, drop the ref. Called on lifeMs expiry
+// (the controller-marker's onExpire) AND on a character switch (spawnRagdoll,
+// beside clearFlood/clearStrafe).
 export function clearRival() {
-  if (_rival && _rival.ragdoll && _rival.ragdoll.composite) {
-    Composite.remove(world, _rival.ragdoll.composite);
+  if (_rival) {
+    if (_rival.status) clearAllStatus(_rival.status);
+    unregisterBuddy(_rival.id || 'rival');
+    if (_rival.ragdoll && _rival.ragdoll.composite) {
+      Composite.remove(world, _rival.ragdoll.composite);
+    }
   }
   _rival = null;
 }

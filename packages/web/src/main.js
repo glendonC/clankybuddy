@@ -20,9 +20,9 @@ import { processCollision, cleanupTransients } from './transients/index.js';
 import { canvas, ctx, engine, world, mouseConstraint, resize } from './state/world.js';
 import { FIXED_DT, MAX_SUBSTEPS, MAX_FRAME_DT_MS, GRAB_DRAG_MASK } from './physics/constants.js';
 import { tickHitStop } from './state/time.js';
-import { abilityCtx, flushPendingHitCombo } from './state/ability-ctx.js';
+import { abilityCtx, abilityCtxFor, flushPendingHitCombo } from './state/ability-ctx.js';
 import {
-  transientBodies, getRagdoll, getCurrentBuddy, spawnRagdoll, resetMood,
+  transientBodies, getRagdoll, getCurrentBuddy, spawnRagdoll, resetMood, forEachBuddy,
 } from './state/ragdoll-lifecycle.js';
 import { tickConstraintRegistry } from './state/constraint-registry.js';
 import { getRival } from './state/rival.js';
@@ -145,7 +145,10 @@ function loop() {
       tickBehavior(abilityCtx(), FIXED_DT);
       applyStandPose(ragdoll, engine.gravity.y);
     }
-    if (ragdoll) tickStatuses(status, ragdoll, abilityCtx(), FIXED_DT);
+    // Per-buddy status tick (Phase 6): the player AND a live damageable rival
+    // each tick their own status registry against their own ragdoll/mood/ctx.
+    // With one buddy this is byte-for-byte the old single-buddy call.
+    forEachBuddy(bd => { if (bd.ragdoll) tickStatuses(bd.status, bd.ragdoll, abilityCtxFor(bd), FIXED_DT); });
     // Mode bus replaces direct optional ticker calls (live, panic-moves,
     // plumbing). Live mode gating still flows through the 'liveMode' setting
     // → register-defaults.js syncs it onto the bus.
@@ -162,7 +165,10 @@ function loop() {
     accumulator = FIXED_DT * MAX_SUBSTEPS;
   }
   P.update(frameDt);
-  decayMood(mood, frameDt);
+  // Per-buddy mood decay (Phase 6): the rival's transient axes (fear/joy/shock)
+  // bleed off too so its face reads its state. Identical to the old single call
+  // when only the player buddy is registered.
+  forEachBuddy(bd => decayMood(bd.mood, frameDt));
   tickEarn(mood, getActiveChar());
   cleanupTransients(world, transientBodies, abilityCtx);
   // Constraint registry auto-release valve. Runs OUTSIDE the FIXED_DT loop
@@ -231,7 +237,7 @@ function loop() {
   // Self-contained here (no render/ module edit); getRival() is null when none live.
   const rival = getRival();
   if (rival && rival.ragdoll && rival.ragdoll.parts) {
-    renderRagdoll(ctx, rival.ragdoll, rival.mood, null);
+    renderRagdoll(ctx, rival.ragdoll, rival.mood, rival.status);
     ctx.save();
     ctx.globalAlpha = 0.34;
     ctx.fillStyle = '#c81e1e';

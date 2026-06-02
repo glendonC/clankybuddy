@@ -8,6 +8,8 @@
 
 import Matter from 'matter-js';
 import { sfx } from '../audio/sfx.js';
+import { getBuddyForPart, getPrimaryBuddy, getCurrentBuddy } from '../state/ragdoll-lifecycle.js';
+import { abilityCtxFor } from '../state/ability-ctx.js';
 
 import treat            from './treat.js';
 import gift             from './gift.js';
@@ -43,12 +45,28 @@ const HANDLERS = {};
 export function getTransientHandler(partType) { return HANDLERS[partType] || null; }
 
 // Called from main.js's collisionStart for each ordered (a, b) pair.
+//
+// Phase 6 multi-buddy routing: a hit resolves to the buddy that OWNS the struck
+// body `b` (via b.buddyId), and the handler runs against a ctx bound to THAT
+// buddy's ragdoll/mood/status — so the rival takes its own damage and the
+// player takes the player's. The single-buddy hot path reuses the passed-in
+// player ctx unchanged, so the one-buddy game is byte-for-byte identical.
 export function processCollision(a, b, ctx) {
-  const hitCtx = ctxWithVerb(ctx, a._verb);
-  const { world, transientBodies, ragdoll } = hitCtx;
-  if (!ragdoll) return;
   const pt = a.partType;
   if (!pt) return;
+  const { world, transientBodies } = ctx;
+
+  // Owner of `b` (the thing `a` struck). A ragdoll part carries part.buddyId;
+  // a wall / HUD / other transient does not (-> null).
+  const owner = getBuddyForPart(b);
+  // Bind the hit ctx to the owner. A wall-hit (no owner) binds to the player so
+  // an ad-hoc blast still detonates somewhere. Reuse the passed player ctx when
+  // bindBuddy IS the player (hot path, zero overhead, identical behavior);
+  // only the rival pays for a fresh owner-bound ctx (correct reactTo rebind).
+  const bindBuddy = owner || getPrimaryBuddy();
+  if (!bindBuddy || !bindBuddy.ragdoll) return;
+  const baseCtx = (bindBuddy === getCurrentBuddy()) ? ctx : abilityCtxFor(bindBuddy);
+  const hitCtx = ctxWithVerb(baseCtx, a._verb);
 
   // Pattern 1: ad-hoc onHit (rocket/fireball/anvil, fires against ragdoll OR walls).
   if (a.onHit && !a._spent) {
@@ -60,8 +78,8 @@ export function processCollision(a, b, ctx) {
     return;
   }
 
-  // Pattern 2: only fires on ragdoll-part contact.
-  if (!ragdoll.parts.includes(b)) return;
+  // Pattern 2: only fires on a ragdoll-part contact, routed to that part's buddy.
+  if (!owner || !owner.ragdoll.parts.includes(b)) return;
   const handler = HANDLERS[pt];
   if (!handler?.onContact) return;
   // Guard against double-fire when one transient contacts two ragdoll parts

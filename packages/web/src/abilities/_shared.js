@@ -15,7 +15,7 @@ import {
 // '<id>', {duration}). They are registered effect ids; spawnDrop's optional
 // concussOnImpact / electrifyMs cfg fields route through the same applyStatus.
 import { markHit } from '../physics/secondary.js';
-import { getCurrentBuddy } from '../state/ragdoll-lifecycle.js';
+import { getBuddyForPart } from '../state/ragdoll-lifecycle.js';
 import { releaseConstraintsForBody } from '../state/constraint-registry.js';
 import { showCombo } from '../ui/overlays.js';
 import { getMasterMul } from '../progression/master-mults.js';
@@ -214,11 +214,15 @@ export function applyImpulse(part, fx, fy) {
   const sy = isHit ? fy * dMul : fy;
   Body.applyForce(part, part.position, { x: sx, y: sy });
   if (!isHit) return;
-  // Hit (not just a touch), register for blend-down and propagate.
+  // Hit (not just a touch), register for blend-down and propagate. Propagation
+  // walks the constraints of the buddy that OWNS the struck part (resolved by
+  // part.buddyId), so a hit on the rival flails the rival's limbs, not the
+  // player's. Single-buddy: getBuddyForPart(playerPart) is the player buddy, so
+  // this is byte-for-byte the old getCurrentBuddy().ragdoll path.
   markHit(part);
-  const buddy = getCurrentBuddy();
-  if (buddy?.ragdoll?.composite) {
-    propagateImpulse(buddy.ragdoll, part, sx * PROPAGATE_FACTOR, sy * PROPAGATE_FACTOR);
+  const owner = getBuddyForPart(part);
+  if (owner?.ragdoll?.composite) {
+    propagateImpulse(owner.ragdoll, part, sx * PROPAGATE_FACTOR, sy * PROPAGATE_FACTOR);
   }
 }
 

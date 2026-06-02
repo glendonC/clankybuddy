@@ -39,11 +39,16 @@ let pendingCombo = null;
 let comboTimer = 0;
 
 /**
+ * Build an ability ctx bound to a SPECIFIC buddy. Used by collision routing
+ * (Phase 6): when a hit resolves to the rival, the handler must run against the
+ * rival's ragdoll/mood/status, and reactTo/recordHit must close over THAT ctx
+ * (spreading {...ctx, mood} would leave reactTo bound to the old mood). Building
+ * a fresh ctx per buddy is the only correct rebind.
+ * @param {{id:string, ragdoll:any, mood:any, status:any, epoch:number}} b
  * @param {Partial<AbilityCtx>} [extra]
  * @returns {AbilityCtx}
  */
-export function abilityCtx(extra = {}) {
-  const b = getCurrentBuddy();
+export function abilityCtxFor(b, extra = {}) {
   const ctx = {
     buddyId: b.id,
     ragdoll: b.ragdoll, mood: b.mood, status: b.status, world,
@@ -57,6 +62,14 @@ export function abilityCtx(extra = {}) {
   ctx.recordHit = (hit) => recordHit(ctx, hit);
   ctx.reactTo = (req) => reactTo(ctx, req);
   return ctx;
+}
+
+/**
+ * @param {Partial<AbilityCtx>} [extra]
+ * @returns {AbilityCtx}
+ */
+export function abilityCtx(extra = {}) {
+  return abilityCtxFor(getCurrentBuddy(), extra);
 }
 
 // SHOCK_NORM, mood-delta magnitude that yields intensity=1. Calibrated so a

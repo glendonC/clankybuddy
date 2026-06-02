@@ -28,6 +28,7 @@ import { canvas, world } from '../../state/world.js';
 import { createRagdoll } from '../../physics/ragdoll.js';
 import { setRestAngles, applyStandPose } from '../../physics/stand.js';
 import { createMood } from '../../mood.js';
+import { createStatusRegistry } from '../../effects/registry.js';
 import { GRAVITY_Y, FLOOR_INSET, RAGDOLL_RIG_HEIGHT } from '../../physics/constants.js';
 import { setRival, getRival, clearRival } from '../../state/rival.js';
 import { sfx } from '../../audio/sfx.js';
@@ -133,7 +134,10 @@ export default {
     const group = ragdoll.parts[0].collisionFilter.group;
     for (const p of rag.parts) p.collisionFilter.group = group;
     Composite.add(world, rag.composite);
-    setRival({ ragdoll: rag, mood: createMood(), epoch: ctx._epoch, spawnAt: now });
+    // Phase 6: a full Buddy (id + its OWN mood + status) so it is DAMAGEABLE —
+    // collision routing resolves rival parts to this struct and applies damage
+    // to rival.mood / rival.status (registered in the buddy registry by setRival).
+    setRival({ id: 'rival', ragdoll: rag, mood: createMood(), status: createStatusRegistry(), epoch: ctx._epoch, spawnAt: now });
 
     // Invisible controller-marker (rides the summons Mode + the transient
     // lifecycle). NO render branch for 'rival_ctrl' → never drawn.
