@@ -26,8 +26,9 @@ import Matter from 'matter-js';
 import { getStats } from '../_stats.js';
 import { canvas, world } from '../../state/world.js';
 import { createRagdoll } from '../../physics/ragdoll.js';
-import { setRestAngles, applyStandPose } from '../../physics/stand.js';
-import { createMood } from '../../mood.js';
+import { setRestAngles, applyStandPose, goLimp } from '../../physics/stand.js';
+import { createMood, moodState } from '../../mood.js';
+import * as P from '../../particles.js';
 import { createStatusRegistry } from '../../effects/registry.js';
 import { GRAVITY_Y, FLOOR_INSET, RAGDOLL_RIG_HEIGHT } from '../../physics/constants.js';
 import { setRival, getRival, clearRival } from '../../state/rival.js';
@@ -44,6 +45,7 @@ const PUNCH_CEIL    = 0.07;    // Math.min ceiling on the per-mass punch (just a
 const PUNCH_UPBIAS  = 0.0008;  // mass-scaled upward jerk on a punch (< COUNTER_GRAVITY_NEUTRALIZER 0.001288 → can't levitate a limb)
 const SEEK_CEIL     = 0.0034;  // ceiling on the per-mass horizontal advance force (FLEE_FORCE band)
 const JAB_VEL       = 2.2;     // tiny chest lunge velocity on a punch (cosmetic "jab" read), bounded
+const DEFEAT_FLOP_MS = 700;    // crumple-and-vanish window after the rival's mood breaks (fork C = despawn-as-defeat)
 
 export const defaultStats = {
   punchForce:     0.05,   // per-mass punch coeff (player-punch band; applyImpulseScaled ×part.mass)
@@ -62,6 +64,29 @@ function rivalTick(marker, ctx) {
   const rival = getRival();
   if (!rival || !rival.ragdoll || !rival.ragdoll.parts || !rival.ragdoll.parts.length) { marker._spent = true; return; }
   const rag = rival.ragdoll;
+  const now = performance.now();
+
+  // DEFEAT (Phase 6, fork C = despawn-as-defeat): once the rival's OWN mood
+  // breaks (sustained damage drove its happiness into BROKEN), it stops
+  // fighting, crumples (goLimp), and despawns after a short flop — a visible
+  // "you beat the challenger" beat instead of an instant vanish. Runs BEFORE the
+  // stand driver so the body actually falls. clearRival here is safe: rivalTick
+  // runs in the physics-phase summons tick BEFORE Engine.update (a wholesale
+  // composite removal between force-apply and integrate, NOT a mid-solve
+  // constraint release), and clearRival is idempotent.
+  if (moodState(rival.mood).name === 'BROKEN') {
+    if (!marker._defeatAt) {
+      marker._defeatAt = now;
+      goLimp(rag, DEFEAT_FLOP_MS + 200);
+      sfx.rivalDefeat?.();
+    } else if (now - marker._defeatAt >= DEFEAT_FLOP_MS) {
+      const h = rag.head;
+      if (h) P.burst(h.position.x, h.position.y, 16, { type: 'smoke', color: '#c81e1e', size: 16, life: 700, speedRange: 0.7, gravity: -0.0004 });
+      clearRival();
+      marker._spent = true;
+    }
+    return;   // defeated: no stand, no seek, no punch
+  }
 
   // The rival STANDS via the proven, per-ragdoll-safe stand driver (independent
   // of the player's applyStandPose call in main.js). Runs in this physics-phase
@@ -70,7 +95,6 @@ function rivalTick(marker, ctx) {
 
   const player = ctx.ragdoll;
   if (!player || !player.parts || !player.parts.length) return;   // no buddy → just stand
-  const now = performance.now();
 
   const rcx = rag.chest.position.x, rcy = rag.chest.position.y;
   const nearest = nearestPart(player, rcx, rcy);

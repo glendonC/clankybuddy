@@ -340,6 +340,13 @@ export const sfx = {
     beep({ freq: 150, dur: 0.08, type: 'square', vol: 0.18, sweep: -90 });
     noise({ dur: 0.07, vol: 0.14, lpFreq: 900 });
   },
+  // Rival brawler: a deflating two-note slide + soft thud as the rival is beaten
+  // and crumples (the defeat beat before it despawns).
+  rivalDefeat: () => {
+    beep({ freq: 160, dur: 0.2, type: 'sawtooth', vol: 0.15, sweep: -50 });
+    beep({ freq: 84, dur: 0.36, type: 'sawtooth', vol: 0.13, sweep: -28 });
+    noise({ dur: 0.2, vol: 0.1, lpFreq: 400 });
+  },
   // City bus: diesel engine note + two-tone air horn (Eb4 + Bb4).
   cityBus: () => {
     noise({ dur: 0.5, vol: 0.14, lpFreq: 300 });                           // bus engine
