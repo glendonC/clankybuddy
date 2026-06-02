@@ -189,6 +189,8 @@ export const TOOLS = [
     blurb: 'loose an attack dog: it charges in, hunts the buddy down across the floor, lunges, and bites — every chomp tears a lasting wound. place it and walk away' },
   { id: 'snake',       label: 'snake',        key: '', kind: 'click',    delta: '−3+venom', spine: 'negative', group: 'summons', family: 'summons', cost: 300, cd: 8,
     blurb: 'loose a snake: it slithers in low and slow, no lunge, and latches on — each bite barely moves the buddy but sinks the venom deeper, the bleed accelerating the longer it stays. place it and walk away' },
+  { id: 'sentry_turret',label: 'sentry turret',key: '', kind: 'click',   delta: '−7/shot', spine: 'negative', group: 'summons', family: 'summons', cost: 360, cd: 10,
+    blurb: 'plant a static auto-turret on the floor: it tracks the buddy and fires bullets on its own until it runs dry. set it and walk away' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It

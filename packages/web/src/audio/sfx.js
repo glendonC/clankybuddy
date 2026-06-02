@@ -271,6 +271,17 @@ export const sfx = {
     noise({ dur: 0.05, vol: 0.1, lpFreq: 4000 });
     beep({ freq: 240, dur: 0.06, type: 'sine', vol: 0.08, sweep: -120 });
   },
+  // Sentry turret: a heavy mechanical clank on deploy.
+  turretDeploy: () => {
+    preTransientClick(0.25, 0);
+    beep({ freq: 90, dur: 0.18, type: 'square', vol: 0.16, sweep: -30 });
+    noise({ dur: 0.16, vol: 0.12, lpFreq: 900 });
+  },
+  // Sentry turret: a crisp servo-pop per shot (quieter than the player gun).
+  turretShot: () => {
+    beep({ freq: 380, dur: 0.05, type: 'square', vol: 0.1, sweep: -160 });
+    noise({ dur: 0.05, vol: 0.08, lpFreq: 3500 });
+  },
   // City bus: diesel engine note + two-tone air horn (Eb4 + Bb4).
   cityBus: () => {
     noise({ dur: 0.5, vol: 0.14, lpFreq: 300 });                           // bus engine

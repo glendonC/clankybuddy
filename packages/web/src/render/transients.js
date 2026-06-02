@@ -616,6 +616,28 @@ export function renderTransients(ctx, bodies) {
       ctx.strokeStyle = '#c0392b'; ctx.lineWidth = 1.5;                 // flicking tongue
       ctx.beginPath(); ctx.moveTo(25, -2); ctx.lineTo(30, -4); ctx.moveTo(25, -2); ctx.lineTo(30, 0); ctx.stroke();
       ctx.restore();
+    } else if (b.partType === 'sentry_turret') {
+      // Static pedestal + a rotating head/barrel tracking b._aimAngle. Flat fills.
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.fillStyle = '#3a3f47';
+      ctx.fillRect(-15, 6, 30, 11);                  // base
+      ctx.fillStyle = '#2a2d33';
+      ctx.fillRect(-9, -2, 18, 9);                   // mount
+      // Rotating head + barrel.
+      ctx.save();
+      ctx.rotate(b._aimAngle ?? -Math.PI / 2);
+      ctx.fillStyle = '#52565e';
+      ctx.beginPath(); ctx.arc(0, 0, 9, 0, Math.PI * 2); ctx.fill();   // head
+      ctx.fillStyle = '#1c1c20';
+      ctx.fillRect(0, -3, 22, 6);                    // barrel along the aim
+      ctx.fillStyle = '#15151a';
+      ctx.fillRect(20, -2, 3, 4);                    // muzzle
+      ctx.restore();
+      // Red tracking eye.
+      ctx.fillStyle = '#d24b3a';
+      ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
     }
   }
 }

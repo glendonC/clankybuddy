@@ -87,6 +87,7 @@ import forceQuit    from './chaos/force-quit.js';
 
 import attackDog   from './summons/dog.js';
 import snake       from './summons/snake.js';
+import sentryTurret from './summons/turret.js';
 
 import grab        from './cursor/grab.js';
 import bearTrap    from './cursor/bear-trap.js';
@@ -123,7 +124,7 @@ const ABILITIES = {
   landmine, electrified_panel: electrifiedPanel, buzzsaw_wall: buzzsawWall, cryo_mine: cryoMine,
   gas_cloud: gasCloud, tear_gas: tearGas, chlorine, cryo_fog: cryoFog, subwoofer,
   gravity_well: gravityWell, flood, pin,
-  attack_dog: attackDog, snake,
+  attack_dog: attackDog, snake, sentry_turret: sentryTurret,
 };
 
 // flame.js exports id 'flamethrower'; the variable name above is just for

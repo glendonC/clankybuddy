@@ -64,4 +64,25 @@ export default [
     blurb: 'Two snakes per cast instead of one — twice the wounds creeping open at once.',
     effect: (s) => { s.pack = 2; },
   }),
+
+  // Sentry turret — independent TURRET root (the first static + ranged summon).
+  // Flak cannon / Tesla coil are FUTURE child toolNodes (their tools don't exist
+  // yet → would throw at boot), deferred. Leaves cash distinct reads.
+  toolNode({
+    id: 'g.summons.sentry_turret', parents: [], cost: 360, toolId: 'sentry_turret',
+    label: 'sentry turret',
+    blurb: 'Plant a static auto-turret on the floor. It tracks the buddy and fires bullets on its own until it runs dry — set it and walk away.',
+  }),
+  statNode({
+    id: 'g.summons.sentry_turret.ext_mag', parents: ['g.summons.sentry_turret'], cost: 320, toolId: 'sentry_turret',
+    label: 'Extended magazine',
+    blurb: 'A bigger drum and a hotter barrel — fires faster and hits harder (a shot every 0.8s → 0.55s, 7 → 11 damage).',
+    effect: (s) => { s.fireIntervalMs = 550; s.damage = 11; },
+  }),
+  statNode({
+    id: 'g.summons.sentry_turret.optics', parents: ['g.summons.sentry_turret'], cost: 260, toolId: 'sentry_turret',
+    label: 'Targeting optics',
+    blurb: 'A rangier emplacement that holds the field longer — reaches farther across the floor (range 520 → 760) and runs longer before it empties (14s → 20s).',
+    effect: (s) => { s.range = 760; s.lifeMs = 20000; },
+  }),
 ];
