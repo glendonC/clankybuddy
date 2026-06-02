@@ -252,6 +252,16 @@ export const sfx = {
     beep({ freq: 110, dur: 0.45, type: 'square', vol: 0.2, sweep: -20 });  // cannon rip body
     beep({ freq: 55, dur: 0.5, type: 'sawtooth', vol: 0.16, sweep: -10 }); // sub thrum
   },
+  // Attack dog: a sharp bark on spawn (loose the hound).
+  dogBark: () => {
+    beep({ freq: 420, dur: 0.1, type: 'square', vol: 0.18, sweep: -160 });
+    beep({ freq: 300, dur: 0.12, type: 'sawtooth', vol: 0.12, sweep: -120 });
+  },
+  // Attack dog: a snapping growl-chomp per bite.
+  dogBite: () => {
+    noise({ dur: 0.09, vol: 0.16, lpFreq: 1800 });                         // teeth-snap
+    beep({ freq: 160, dur: 0.1, type: 'sawtooth', vol: 0.12, sweep: -80 });// low growl
+  },
   // City bus: diesel engine note + two-tone air horn (Eb4 + Bb4).
   cityBus: () => {
     noise({ dur: 0.5, vol: 0.14, lpFreq: 300 });                           // bus engine

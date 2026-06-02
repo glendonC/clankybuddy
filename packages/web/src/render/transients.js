@@ -579,6 +579,26 @@ export function renderTransients(ctx, bodies) {
       ctx.fillStyle = b._thermite ? 'rgba(255, 170, 80, 0.8)' : 'rgba(200, 210, 220, 0.6)';
       ctx.beginPath(); ctx.arc(-1, -1, 1.3, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
+    } else if (b.partType === 'attack_dog') {
+      // Low four-legged hound silhouette, flipped by its facing. Flat fills only
+      // (a pack of up to 4 runs this hot loop). render.visible:false → drawn only here.
+      const f = b._facing < 0 ? -1 : 1;
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.scale(f, 1);
+      ctx.fillStyle = '#5a4632';
+      ctx.fillRect(-22, -6, 40, 14);                 // body
+      ctx.fillRect(14, -14, 14, 12);                 // head
+      ctx.fillRect(26, -10, 6, 5);                   // snout
+      ctx.fillStyle = '#433526';
+      ctx.fillRect(-18, 6, 5, 9); ctx.fillRect(-6, 6, 5, 9);   // legs
+      ctx.fillRect(6, 6, 5, 9);   ctx.fillRect(15, 6, 5, 9);
+      ctx.beginPath(); ctx.moveTo(14, -14); ctx.lineTo(18, -20); ctx.lineTo(22, -14); ctx.closePath(); ctx.fill();  // ear
+      ctx.fillRect(-30, -4, 9, 3);                   // tail
+      // Eye glint (faceward).
+      ctx.fillStyle = '#d8c060';
+      ctx.beginPath(); ctx.arc(22, -9, 1.6, 0, Math.PI * 2); ctx.fill();
+      ctx.restore();
     }
   }
 }

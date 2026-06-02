@@ -185,6 +185,8 @@ export const TOOLS = [
     blurb: 'mark a zone; a volley of ice chunks pelts the buddy, freezing each limb it strikes brittle' },
   { id: 'strafe_run',  label: 'strafe run',   key: '', kind: 'drag',     delta: '−14+sweep', spine: 'negative', group: 'siege', cost: 340, cd: 10,
     blurb: 'drag to aim a low pass; a swept gun-run force band rakes every limb it crosses downrange along your line, at any angle, even mid-air' },
+  { id: 'attack_dog',  label: 'attack dog',   key: '', kind: 'click',    delta: '−7+bleed', spine: 'negative', group: 'summons', family: 'summons', cost: 240, cd: 8,
+    blurb: 'loose an attack dog: it charges in, hunts the buddy down across the floor, lunges, and bites — every chomp tears a lasting wound. place it and walk away' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It
@@ -264,6 +266,7 @@ export const TAXONOMY = [
     { id: 'cataclysm',  label: 'cataclysm' },
     { id: 'siege',      label: 'siege' },
     { id: 'hazard',     label: 'hazard' },
+    { id: 'summons',    label: 'summons' },
   ]},
   { spine: 'utility', groups: [
     { id: 'manipulation', label: 'manipulation' },

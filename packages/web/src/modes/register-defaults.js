@@ -21,6 +21,10 @@ import './force-flood.js';
 // sweep clears the run end (no forceMode mouseup seam — like flood/well, not
 // the held magnet/crook), so importing it just self-registers the Mode.
 import './force-strafe.js';
+// Summons substrate (phase:'physics'): the shared per-frame driver for every
+// autonomous hostile summon (Attack dog first). Stateless — dispatches each live
+// summon body's _summonTick; the ability flips it on, it self-disables when empty.
+import './summons.js';
 // B4: cursor-follow Mode (phase:'frame'). Self-registers; stays disabled until a
 // consumer (shepherd's crook / marionette) latches a part. The crook's TOOLS row
 // declares forceMode:'cursor.follow' so the generic mouseup/tool-switch seam
