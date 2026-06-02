@@ -179,4 +179,21 @@ export default [
     blurb: 'A denser volley — more chunks per cast (10 → 15) to lock the limbs solid.',
     effect: (s) => { s.count = 15; s.intervalMs = 100; },
   }),
+
+  // Strafe run — an aimed swept directional force band (replaces the cut bomb-run
+  // airstrike). Independent siege root; the verb is the TRAVELING force window,
+  // distinct from the radial force-Modes and the floor-level body rollers.
+  toolNode({
+    id: 'g.siege.strafe_run', parents: [], cost: 340, toolId: 'strafe_run',
+    label: 'strafe run',
+    blurb: 'Drag to aim a low pass; a swept gun-run force band rakes a directional shove down your line, dragging every limb it crosses downrange — works mid-air, at any angle.',
+  }),
+  statNode({
+    id: 'g.siege.strafe_run.heavy', parents: ['g.siege.strafe_run'], cost: 320, toolId: 'strafe_run',
+    label: 'heavier rounds',
+    blurb: 'A harder, angrier pass: more shove (drags limbs farther) and a bigger morale hit (mood 14 → 18).',
+    // shove lands at the Mode's MAX_SHOVE clamp (0.012, solver-safe); the Mode
+    // clamps regardless, so this can never smuggle a larger applied force.
+    effect: (s) => { s.shove = 0.012; s.mood = 18; },
+  }),
 ];

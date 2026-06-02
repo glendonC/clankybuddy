@@ -87,6 +87,7 @@ import batteringRam from './siege/battering-ram.js';
 import wreckingBall from './siege/wrecking-ball.js';
 import meteorShower from './siege/meteor-shower.js';
 import hailstorm    from './siege/hailstorm.js';
+import strafeRun    from './siege/strafe-run.js';
 
 import anvil        from './chaos/anvil.js';
 import blackhole    from './chaos/blackhole.js';
@@ -148,7 +149,7 @@ function buildSources() {
     cannon, grapeshot, chain_shot: chainShot, hot_shot: hotShot, mortar, flashbang, sonic_cannon: sonicCannon, creeping_barrage: creepingBarrage,
     breaching_charge: breachingCharge, cluster_munition: clusterMunition, lightning_storm: lightningStorm,
     bat, battle_axe: battleAxe, fire_axe: fireAxe, hunting_knife: huntingKnife, cattle_prod: cattleProd, blowtorch, power_drill: powerDrill, nail_gun: nailGun, caltrops,
-    brick, bowling_ball: bowlingBall, piano, crt, car, steamroller, city_bus: cityBus, trebuchet, office_chair: officeChair, battering_ram: batteringRam, wrecking_ball: wreckingBall, meteor_shower: meteorShower, hailstorm,
+    brick, bowling_ball: bowlingBall, piano, crt, car, steamroller, city_bus: cityBus, trebuchet, office_chair: officeChair, battering_ram: batteringRam, wrecking_ball: wreckingBall, meteor_shower: meteorShower, hailstorm, strafe_run: strafeRun,
     anvil, blackhole, nuke, force_quit: forceQuit,
     grab, bear_trap: bearTrap, meathook, magnet, shepherds_crook: shepherdsCrook,
     landmine, electrified_panel: electrifiedPanel, buzzsaw_wall: buzzsawWall, cryo_mine: cryoMine,

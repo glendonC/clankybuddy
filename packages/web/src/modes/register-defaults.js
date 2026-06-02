@@ -17,6 +17,10 @@ import { getSetting, onSettingsChange } from '../state/settings.js';
 import './force-magnet.js';
 import './force-gravity-well.js';
 import './force-flood.js';
+// Strafe run: a one-shot swept directional force band. Self-disables when the
+// sweep clears the run end (no forceMode mouseup seam — like flood/well, not
+// the held magnet/crook), so importing it just self-registers the Mode.
+import './force-strafe.js';
 // B4: cursor-follow Mode (phase:'frame'). Self-registers; stays disabled until a
 // consumer (shepherd's crook / marionette) latches a part. The crook's TOOLS row
 // declares forceMode:'cursor.follow' so the generic mouseup/tool-switch seam

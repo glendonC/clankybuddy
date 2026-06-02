@@ -62,6 +62,10 @@ import './modes/register-defaults.js';
 // body to hang a render branch on). The Mode itself self-registers via the
 // side-effect import above; this named import is just for the render call.
 import { renderFlood } from './modes/force-flood.js';
+// renderStrafe is owned by the strafe Mode (a swept slab has no transient body).
+// Called AFTER renderRagdoll (a gun-run wash passes IN FRONT of the buddy),
+// unlike renderFlood which renders behind.
+import { renderStrafe } from './modes/force-strafe.js';
 // Side-effect import: registers the 4 Mode events (Antitrust, Board Drama,
 // Sora Wave, Compliance Theater), Phase 7 of the 2026-05-02 ability
 // redesign (see docs/abilities.md §6).
@@ -222,6 +226,7 @@ function loop() {
   renderFlood(ctx, canvas.width, canvas.height, now);
   if (ragdoll) renderRagdoll(ctx, ragdoll, mood, status);
   renderTransients(ctx, transientBodies);
+  renderStrafe(ctx, now);   // gun-run wash sits OVER the buddy (after renderRagdoll/transients)
   P.render(ctx);
   const ms = getMouseState();
   if (ragdoll && ms.mouseHover) {

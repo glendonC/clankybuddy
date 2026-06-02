@@ -246,6 +246,12 @@ export const sfx = {
     noise({ dur: 0.8, vol: 0.16, lpFreq: 180 });                           // diesel rumble bed
     beep({ freq: 60, dur: 0.7, type: 'sawtooth', vol: 0.2, sweep: -8 });   // drum weight sub
   },
+  // Strafe run: an aircraft autocannon gun-run BRRRT (a low buzzy rip + jet wash).
+  strafeRun: () => {
+    noise({ dur: 0.55, vol: 0.22, lpFreq: 900 });                          // jet/contrail wash
+    beep({ freq: 110, dur: 0.45, type: 'square', vol: 0.2, sweep: -20 });  // cannon rip body
+    beep({ freq: 55, dur: 0.5, type: 'sawtooth', vol: 0.16, sweep: -10 }); // sub thrum
+  },
   // City bus: diesel engine note + two-tone air horn (Eb4 + Bb4).
   cityBus: () => {
     noise({ dur: 0.5, vol: 0.14, lpFreq: 300 });                           // bus engine

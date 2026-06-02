@@ -183,6 +183,8 @@ export const TOOLS = [
     blurb: 'mark a zone; a staggered barrage of flaming rocks rains down and detonates with fire' },
   { id: 'hailstorm',   label: 'hailstorm',    key: '', kind: 'click',    delta: 'freeze×10', spine: 'negative', group: 'siege', cost: 360, cd: 10,
     blurb: 'mark a zone; a volley of ice chunks pelts the buddy, freezing each limb it strikes brittle' },
+  { id: 'strafe_run',  label: 'strafe run',   key: '', kind: 'drag',     delta: '−14+sweep', spine: 'negative', group: 'siege', cost: 340, cd: 10,
+    blurb: 'drag to aim a low pass; a swept gun-run force band rakes every limb it crosses downrange along your line, at any angle, even mid-air' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It
