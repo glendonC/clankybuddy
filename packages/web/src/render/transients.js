@@ -638,6 +638,20 @@ export function renderTransients(ctx, bodies) {
       ctx.fillStyle = '#d24b3a';
       ctx.beginPath(); ctx.arc(0, 0, 2, 0, Math.PI * 2); ctx.fill();
       ctx.restore();
+    } else if (b.partType === 'hornet') {
+      // Tiny striped body + wing flicker (up to 16 run this loop — keep it minimal/flat).
+      ctx.save();
+      ctx.translate(b.position.x, b.position.y);
+      ctx.fillStyle = '#caa23a';
+      ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fill();   // body
+      ctx.fillStyle = '#2a2620';
+      ctx.fillRect(-2, -0.7, 4, 1.4);                                   // dark stripe
+      // Wing flicker — alternates with wall-clock time (per-hornet bornAt phase
+      // offset so the swarm doesn't flap in lockstep) for a buzz read.
+      ctx.strokeStyle = 'rgba(220,225,235,0.55)'; ctx.lineWidth = 0.8;
+      const w = (Math.floor((performance.now() + b.bornAt) / 45) % 2) ? 2 : -2;
+      ctx.beginPath(); ctx.moveTo(-1, -2); ctx.lineTo(-3, -4 + w); ctx.moveTo(1, -2); ctx.lineTo(3, -4 - w); ctx.stroke();
+      ctx.restore();
     }
   }
 }

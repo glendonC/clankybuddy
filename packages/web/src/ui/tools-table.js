@@ -191,6 +191,8 @@ export const TOOLS = [
     blurb: 'loose a snake: it slithers in low and slow, no lunge, and latches on — each bite barely moves the buddy but sinks the venom deeper, the bleed accelerating the longer it stays. place it and walk away' },
   { id: 'sentry_turret',label: 'sentry turret',key: '', kind: 'click',   delta: '−7/shot', spine: 'negative', group: 'summons', family: 'summons', cost: 360, cd: 10,
     blurb: 'plant a static auto-turret on the floor: it tracks the buddy and fires bullets on its own until it runs dry. set it and walk away' },
+  { id: 'hornet_swarm',label: 'hornet swarm', key: '', kind: 'click',   delta: '−2×swarm', spine: 'negative', group: 'summons', family: 'summons', cost: 300, cd: 8,
+    blurb: 'loose a buzzing cloud of hornets that swarms the buddy in the air: each tiny sting barely moves them, but a dozen needling at once chips them down and keeps a light bleed open. cast it and let the cloud work' },
 
   // UTILITY / manipulation
   // `system: true`, grab is a permanent cursor verb, not a hotbar choice. It

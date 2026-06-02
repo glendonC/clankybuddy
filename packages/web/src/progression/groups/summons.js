@@ -85,4 +85,31 @@ export default [
     blurb: 'A rangier emplacement that holds the field longer — reaches farther across the floor (range 520 → 760) and runs longer before it empties (14s → 20s).',
     effect: (s) => { s.range = 760; s.lifeMs = 20000; },
   }),
+
+  // Hornet swarm — independent NEST root (the first air-flyer + first swarm).
+  // Rat swarm + Locusts are FUTURE child toolNodes of this root (their tools
+  // don't exist yet → would throw at boot), deferred. Leaves cash distinct reads.
+  toolNode({
+    id: 'g.summons.hornet_swarm', parents: [], cost: 300, toolId: 'hornet_swarm',
+    label: 'hornet swarm',
+    blurb: 'Loose a buzzing cloud of hornets that swarms the buddy in the air — each tiny sting barely moves them, but a dozen needling at once chips them down and keeps a light bleed open. Cast it and let the cloud work.',
+  }),
+  statNode({
+    id: 'g.summons.hornet_swarm.nest', parents: ['g.summons.hornet_swarm'], cost: 320, toolId: 'hornet_swarm',
+    label: 'Wasp nest',
+    blurb: 'A bigger, angrier cloud — twelve stingers per cast (8 → 12) needling faster (sting every 0.6s → 0.42s).',
+    effect: (s) => { s.swarmCount = 12; s.stingIntervalMs = 420; },
+  }),
+  statNode({
+    id: 'g.summons.hornet_swarm.venom', parents: ['g.summons.hornet_swarm'], cost: 280, toolId: 'hornet_swarm',
+    label: 'Venomous stings',
+    blurb: 'Each sting is likelier to draw blood and the wound lingers longer (bleed chance 0.3 → 0.45, bleed 4s → 6s).',
+    effect: (s) => { s.bleedChance = 0.45; s.bleedMs = 6000; },
+  }),
+  statNode({
+    id: 'g.summons.hornet_swarm.agitated', parents: ['g.summons.hornet_swarm'], cost: 240, toolId: 'hornet_swarm',
+    label: 'Agitated swarm',
+    blurb: 'A rangier, longer-lived cloud — it reaches farther to sting (range 44 → 56) and buzzes the field longer (7s → 11s).',
+    effect: (s) => { s.stingRange = 56; s.lifeMs = 11000; },
+  }),
 ];

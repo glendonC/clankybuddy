@@ -282,6 +282,16 @@ export const sfx = {
     beep({ freq: 380, dur: 0.05, type: 'square', vol: 0.1, sweep: -160 });
     noise({ dur: 0.05, vol: 0.08, lpFreq: 3500 });
   },
+  // Hornet swarm: a layered buzzy drone on release (loose the cloud).
+  hornetBuzz: () => {
+    beep({ freq: 220, dur: 0.5, type: 'sawtooth', vol: 0.1, sweep: -20 });
+    beep({ freq: 180, dur: 0.5, type: 'sawtooth', vol: 0.08, sweep: 15 });
+    noise({ dur: 0.45, vol: 0.06, lpFreq: 2400 });
+  },
+  // Hornet swarm: a short angry zip per sting (probabilistic, so N stings aren't a wall).
+  hornetSting: () => {
+    beep({ freq: 600, dur: 0.05, type: 'sawtooth', vol: 0.07, sweep: -240 });
+  },
   // City bus: diesel engine note + two-tone air horn (Eb4 + Bb4).
   cityBus: () => {
     noise({ dur: 0.5, vol: 0.14, lpFreq: 300 });                           // bus engine
