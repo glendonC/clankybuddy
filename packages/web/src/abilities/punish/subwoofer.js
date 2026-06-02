@@ -66,9 +66,9 @@ export default {
     const cab = Bodies.circle(cx, cy, s.radius, {
       isStatic: true, isSensor: true,
       // No onContact (the pulse is scheduler-driven proximity), so collide with
-      // NOTHING — a render-only marker. mask:0 also keeps this large zone from
-      // tripping isGrounded() (stand.js doesn't filter sensor pairs), so a buddy
-      // merely in range is never falsely treated as standing.
+      // NOTHING — a render-only marker. mask:0 means this large zone forms no
+      // pairs at all, so it never trips isGrounded() (which now also skips sensor
+      // pairs anyway), and a buddy merely in range is never falsely standing.
       collisionFilter: { mask: 0 },
       label: 'subwoofer', render: { visible: false },
     });

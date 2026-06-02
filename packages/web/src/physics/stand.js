@@ -72,19 +72,37 @@ export function tickLimp(ragdoll) {
   ragdoll._limpSaved = null;
 }
 
-// Grounded check: any ragdoll part in active contact with a static body
+// Grounded check: any ragdoll part in active contact with a SOLID static body
 // (canvas floor, HUD obstacle, etc.). Replaces the older "any part within
 // 50px of canvas.height - 40" heuristic, which fails when the buddy is
 // resting *on* a HUD obstacle (hotbar / chat cluster), the part Y is
 // well above the canvas floor band, so the heuristic said "not grounded"
 // and the righting force never kicked in, leaving the buddy permanently
 // flopped on the hotbar.
+//
+// SENSOR SKIP (a.isSensor || b.isSensor → continue): many placed hazards spawn
+// static SENSOR bodies with the default collision mask (gas_cloud, gravity_well
+// marker, landmine, cryo_mine, electrified_panel, buzzsaw_wall, firepool,
+// acid_pool, caltrops, bear_trap, mode_collapse_zone). Matter STILL enqueues an
+// active overlap pair for a sensor (it generates collisionStart/End events; the
+// solver just skips the impulse), so without this skip a part merely overlapping
+// a sensor read as "grounded" even while airborne. A sensor NEVER provides
+// physical support (the buddy passes through it), so skipping ALL sensor pairs is
+// unconditionally correct, there is no case where a sensor legitimately grounds
+// the buddy. This also closes the magnet rocket: force-magnet.js gates its -y
+// COUNTER_GRAVITY lift on isStanding (→ isGrounded); a sensor false-ground let
+// that lift stack on the stand pose's lift while airborne → ceiling rocket.
+// The floor/walls + HUD obstacles are SOLID (non-sensor) static, so floor- and
+// HUD-grounding are preserved. (pin + breaching_charge markers use mask:0 and
+// form no pairs, so they were already immune; this fix covers the default-mask
+// sensors that DO form pairs.)
 function isGrounded(ragdoll) {
   const partSet = new Set(ragdoll.parts);
   const pairsList = engine.pairs?.list || [];
   for (const pair of pairsList) {
     if (!pair.isActive) continue;
     const a = pair.bodyA, b = pair.bodyB;
+    if (a.isSensor || b.isSensor) continue;   // sensor overlaps are not physical support
     const aIsPart = partSet.has(a);
     const bIsPart = partSet.has(b);
     if (aIsPart && b.isStatic) return true;

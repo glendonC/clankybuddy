@@ -145,12 +145,11 @@ function tick(ctx) {
       // isStanding so it only cancels a lift that's actually there — never adds
       // a second upward force, never a sink-when-falling artifact.
       //
-      // NOTE: the well body is a static SENSOR; isGrounded() (and thus
-      // isStanding) doesn't filter sensor pairs yet, so a part overlapping the
-      // small well marker can briefly read as "grounded". Benign here — the
-      // cancel is +y DOWN, so a false-true just adds harmless extra sink, never
-      // lift. (The clean isGrounded sensor-skip fix is tracked separately; it
-      // also moves isStanding, so it isn't smuggled into this batch.)
+      // NOTE: the well body is a static SENSOR. isGrounded() now skips sensor
+      // pairs (stand.js), so a part overlapping the small well marker no longer
+      // reads as "grounded" — isStanding is true only on a genuine solid floor.
+      // (Even before that fix this cancel was benign: +y DOWN only ever added
+      // harmless extra sink, never lift.)
       if (lifting) {
         Body.applyForce(part, part.position, {
           x: 0, y: COUNTER_GRAVITY_NEUTRALIZER * part.mass,

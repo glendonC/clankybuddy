@@ -47,3 +47,6 @@ Desktop.ini
 .dev.vars
 
 docs/
+
+# Untracked local physics sim harnesses (never committed)
+packages/web/sim/

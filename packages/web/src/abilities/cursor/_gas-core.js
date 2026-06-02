@@ -56,13 +56,9 @@ export function makeGasCloud(variant) {
 
       // The cloud MUST generate collision pairs so its onContact fires the choke,
       // so (unlike the subwoofer's mask:0 render-only marker) it can't opt out of
-      // collisions. KNOWN LIMITATION: isGrounded() (physics/stand.js) doesn't
-      // filter sensor pairs, so a cloud dropped MID-AIR briefly reads the
-      // overlapping buddy as "grounded" and the stand pose lifts it. Harmless (no
-      // NaN; the choking stun drops the pose anyway for base/chlorine/cryo) and
-      // matches every existing placed-sensor trap. The clean fix (skip sensor
-      // pairs in isGrounded) also moves isStanding(), which the force Modes rely
-      // on, so it's deferred to a dedicated pass rather than smuggled in here.
+      // collisions. isGrounded() (physics/stand.js) now skips sensor pairs, so a
+      // cloud dropped MID-AIR no longer reads the overlapping buddy as "grounded"
+      // — the stand pose stays off until the buddy is on a genuine solid floor.
       const cloud = Bodies.circle(x, y, s.radius, {
         isStatic: true, isSensor: true,
         label: 'gas_cloud', render: { visible: false },
