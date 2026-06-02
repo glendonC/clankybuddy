@@ -41,11 +41,43 @@ const _buddy = createBuddy({
   epoch: 0,
 });
 
-export function getCurrentBuddy() { return _buddy; }
+// Buddy registry, keyed by buddyId (the tag createRagdoll stamps on every
+// part, physics/ragdoll.js). 'main' is the player buddy and is the ONLY entry
+// today; the damageable Rival (Phase 6 / Rival Phase B) registers a 'rival'
+// entry so a hit can resolve to the buddy that OWNS the struck part via
+// getBuddyForPart. The player struct is mutated in place across spawns (never
+// replaced), so the Map holds a stable reference and captured _epoch values
+// stay comparable.
+const _buddies = new Map();
+_buddies.set('main', _buddy);
 
-export function getRagdoll() { return _buddy.ragdoll; }
-export function getEpoch() { return _buddy.epoch; }
-export function epochValid(e) { return e === _buddy.epoch; }
+export function getCurrentBuddy() { return _buddies.get('main'); }
+
+export function getRagdoll() { return _buddies.get('main').ragdoll; }
+// Epoch is a GLOBAL world-generation counter (bumped only by spawnRagdoll on a
+// character switch), NOT a per-buddy value: every world-owned consumer
+// (constraint-registry / scheduler / hazard-field / summons / events / ctx
+// _epoch) shares it and a char-switch wipes them all. It lives on 'main'.
+export function getEpoch() { return _buddies.get('main').epoch; }
+export function epochValid(e) { return e === _buddies.get('main').epoch; }
+
+// Resolve the buddy that owns a ragdoll part (by its part.buddyId tag). Returns
+// null for a transient body / wall (no buddyId) or an unregistered id. Phase-6
+// collision routing keys off this so a hit lands on the RIGHT buddy's
+// ragdoll/mood/status. Today only 'main' is registered, so a non-'main' part
+// resolves to null until the Rival registers (Batch 2).
+export function getBuddy(id) { return _buddies.get(id) || null; }
+export function getBuddyForPart(part) {
+  return part && part.buddyId ? (_buddies.get(part.buddyId) || null) : null;
+}
+export function forEachBuddy(fn) { for (const b of _buddies.values()) fn(b); }
+export function getPrimaryBuddy() { return _buddies.get('main'); }
+
+// Registration seam for non-player buddies (the damageable Rival, Batch 2).
+// registerBuddy is idempotent (Map.set overwrites); unregisterBuddy refuses to
+// drop 'main' so the player can never be deregistered.
+export function registerBuddy(buddy) { if (buddy?.id) _buddies.set(buddy.id, buddy); }
+export function unregisterBuddy(id) { if (id && id !== 'main') _buddies.delete(id); }
 
 // Mutates _buddy in place; never replaces it (would break the _epoch guard).
 export function spawnRagdoll(charId) {
