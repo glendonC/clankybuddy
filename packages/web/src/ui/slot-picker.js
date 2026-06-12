@@ -112,10 +112,13 @@ function _open({ barIdx, slotIdx, anchorEl }) {
   window.addEventListener('resize', position);
   _unsubscribe = onProgressionChange(() => {
     if (!_root) return;
+    // While the inspect overlay is open it occludes the picker. Rebuilding the
+    // grid underneath is wasted work and (since the overlay backdrop is
+    // translucent) shows a flicker, so update the overlay in place and defer
+    // the grid refresh to closeInspect(). Inspect updates in place
+    // (syncInspectOverlay) so a purchase animates the row instead of blinking.
+    if (_ovEl) { syncInspectOverlay(); return; }
     rerenderPicker();
-    // Inspect updates in place (syncInspectOverlay) rather than rebuilding its
-    // innerHTML, so a purchase animates the row instead of blinking it owned.
-    if (_ovEl) syncInspectOverlay();
   });
 }
 
@@ -132,7 +135,10 @@ function rerenderPicker() {
   _root.appendChild(buildHeader());
   _root.appendChild(buildLeftPane());
   _root.appendChild(buildFooter());
-  position();
+  // No position() here. The picker has a fixed size, so a content refresh must
+  // NOT relocate the panel, calling position() on every purchase was making
+  // the grid jump (visible behind the translucent inspect overlay). Placement
+  // is owned by open + the window-resize listener only.
 }
 
 // ---------- DOM build (picker shell) ----------
@@ -558,6 +564,10 @@ function closeInspect() {
   _ovEl = null;
   _ovKind = null;
   _ovId = null;
+  // Refresh the grid we deferred while the overlay was open, so purchases made
+  // in inspect show on the tiles (owned state, tier dots) when the player
+  // returns to the grid. Content-only now, this no longer repositions.
+  if (_root) rerenderPicker();
 }
 
 function renderInspectOverlay() {
