@@ -199,14 +199,19 @@
    Scoped via [data-group="X"] so any element with the attribute consumes
    the pair (--group-hue / --group-hue-bright). Pastels tuned for vivid
    reads on dark surfaces while staying readable in light theme. */
+/* One pair per live TAXONOMY group, in render order. recognition + injection
+   were retired in the grounded-roster redesign; siege / hazard / summons are
+   the live groups that lacked a hue, without one their headers fell back to
+   neutral gray on every surface (hotbar, slot-picker, dev spawn list). */
 [data-group="affection"]    { --group-hue: #f4a07a; --group-hue-bright: #ffb98f; }
 [data-group="provision"]    { --group-hue: #f5c542; --group-hue-bright: #ffd966; }
-[data-group="recognition"]  { --group-hue: #7ec8ff; --group-hue-bright: #a8dcff; }
 [data-group="kinetic"]      { --group-hue: #cbd5e1; --group-hue-bright: #e2e8f0; }
 [data-group="ordnance"]     { --group-hue: #b08968; --group-hue-bright: #d4a574; }
-[data-group="injection"]    { --group-hue: #ec4899; --group-hue-bright: #f472b6; }
 [data-group="corruption"]   { --group-hue: #ef4444; --group-hue-bright: #f87171; }
 [data-group="cataclysm"]    { --group-hue: #a78bfa; --group-hue-bright: #c4b5fd; }
+[data-group="siege"]        { --group-hue: #8198c4; --group-hue-bright: #a6bce4; }
+[data-group="hazard"]       { --group-hue: #a3bf4a; --group-hue-bright: #c2dc66; }
+[data-group="summons"]      { --group-hue: #e06ec0; --group-hue-bright: #f48fd4; }
 [data-group="manipulation"] { --group-hue: #22d3ee; --group-hue-bright: #67e8f9; }
 
 /* Chat handle palette, per-theme so each VALID_COLORS name stays legible

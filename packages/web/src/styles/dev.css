@@ -274,8 +274,3 @@
   flex: none;
   border-top: 1px solid var(--surface-2);
 }
-
-/* Groups missing a hue token fall back to neutral. */
-.dev-spawn-group[data-group="siege"],
-.dev-spawn-group[data-group="hazard"],
-.dev-spawn-group[data-group="summons"] { --group-hue: var(--fg-2); }
