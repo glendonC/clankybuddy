@@ -472,7 +472,7 @@ export default [
     id: 'g.ordnance.sawblade.lodge', parents: ['g.ordnance.sawblade.edge'], cost: 1000, toolId: 'sawblade',
     label: 'Lodge',
     iconHint: '⚡',
-    blurb: 'A1, 30% chance the disc embeds in the part on hit and ticks BLEED for 1.5s before falling out (PR5 consumer reads lodgeChance/lodgeBleedMs).',
+    blurb: '30% chance the disc embeds in the part on hit and ticks BLEED for 1.5s before falling out.',
     effect: (s) => { s.lodgeChance = 0.3; s.lodgeBleedMs = 1500; },
   }),
   statNode({
@@ -485,7 +485,7 @@ export default [
     id: 'g.ordnance.sawblade.possessed', parents: ['g.ordnance.sawblade.spin'], cost: 1000, toolId: 'sawblade',
     label: 'Possessed Disc',
     iconHint: '⚡',
-    blurb: 'B1, Lifetime 2200 → 4000ms. On each wall-bounce, gently homes toward the nearest part (5°/bounce). Feels haunted (PR5 consumer reads bounceHomingDeg).',
+    blurb: 'Lifetime 2200 → 4000ms. On each wall-bounce it homes toward the nearest part (5°/bounce). Feels haunted.',
     effect: (s) => { s.lifeMs = 4000; s.bounceHomingDeg = 5; },
   }),
 ];

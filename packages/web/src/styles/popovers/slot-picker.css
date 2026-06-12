@@ -462,14 +462,15 @@ body.theme-light .slot-picker {
   font-style: italic;
 }
 
+/* Flows as part of the panel body, separated from the blurb by a single
+   hairline, no nested card/squircle. */
 .slot-picker-inspect-progress {
-  border: 1px solid var(--hairline);
-  border-radius: 4px;
-  background: var(--surface-2);
-  padding: 9px 10px 8px;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 4px;
+  padding-top: 12px;
+  margin-top: 2px;
+  border-top: 1px solid var(--hairline);
 }
 .ip-progress-head {
   display: flex;
@@ -504,7 +505,7 @@ body.theme-light .slot-picker {
   align-items: start;
   padding: 6px 0;
 }
-.ip-node + .ip-node { border-top: 1px dashed color-mix(in srgb, var(--border) 60%, transparent); }
+.ip-node + .ip-node { border-top: 1px solid color-mix(in srgb, var(--border) 45%, transparent); }
 .ip-node-bullet {
   width: 10px;
   height: 10px;

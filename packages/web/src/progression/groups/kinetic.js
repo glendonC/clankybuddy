@@ -34,14 +34,14 @@ export default [
   statNode({
     id: 'g.kinetic.punch.heft', parents: ['g.kinetic.punch.haymaker'], cost: 300, toolId: 'punch',
     label: 'Heft',
-    blurb: 'A1, Force +30%. Punches launch limbs across the stage.',
+    blurb: 'Force +30%. Punches launch limbs across the stage.',
     effect: (s) => { s.force *= 1.3; },
   }),
   statNode({
     id: 'g.kinetic.punch.crushing', parents: ['g.kinetic.punch.heft'], cost: 1200, toolId: 'punch',
     label: 'Crushing',
     iconHint: '⚡',
-    blurb: 'A2, Force +60%, mood 10 → 14. Single-strike specialist.',
+    blurb: 'Force +60%, mood 10 → 14. Single-strike specialist.',
     effect: (s) => { s.force *= 1.6; s.mood = 14; },
   }),
 
@@ -55,14 +55,14 @@ export default [
   statNode({
     id: 'g.kinetic.punch.quickdraw', parents: ['g.kinetic.punch.jab'], cost: 300, toolId: 'punch',
     label: 'Quickdraw',
-    blurb: 'B1, Stun recovery halved (350 → 175ms). Chain into the next hit.',
+    blurb: 'Stun recovery halved (350 → 175ms). Chain into the next hit.',
     effect: (s) => { s.stunMs = 175; },
   }),
   statNode({
     id: 'g.kinetic.punch.flurry', parents: ['g.kinetic.punch.quickdraw'], cost: 1200, toolId: 'punch',
     label: 'Flurry',
     iconHint: '⚡',
-    blurb: 'B2, Each hit within 0.5s of the last adds +1 mood damage (cap +8).',
+    blurb: 'Each hit within 0.5s of the last adds +1 mood damage (cap +8).',
     effect: (s) => { s.flurryWindowMs = 500; s.flurryStep = 1; s.flurryCap = 8; },
   }),
 
@@ -80,7 +80,7 @@ export default [
   statNode({
     id: 'g.kinetic.punch.riposte', parents: ['g.kinetic.punch.counter'], cost: 600, toolId: 'punch',
     label: 'Riposte',
-    blurb: 'C1, knockback range 70 → 95, strips one POWERED buff from the buddy on connect.',
+    blurb: 'Knockback range 70 → 95, strips one POWERED buff from the buddy on connect.',
     effect: (s) => { s.range = 95; s.stripBuffOnHit = true; },
   }),
 
@@ -157,7 +157,7 @@ export default [
     id: 'g.kinetic.whip.indiana', parents: ['g.kinetic.whip.spread'], cost: 1000, toolId: 'whip',
     label: 'Indiana',
     iconHint: '⚡',
-    blurb: 'A2, Chain count 4 → 6, chain radius +30%. The crack-line afterimage lingers (visual flag, PR5 consumer).',
+    blurb: 'Chain count 4 → 6, chain radius +30%. The crack-line afterimage lingers.',
     effect: (s) => { s.chains = 6; s.chainRadius = 170; s.crackAfterimage = true; },
   }),
   statNode({
@@ -170,7 +170,7 @@ export default [
     id: 'g.kinetic.whip.welt_marker', parents: ['g.kinetic.whip.barbed'], cost: 1000, toolId: 'whip',
     label: 'Welt-Marker',
     iconHint: '⚡',
-    blurb: 'B2, LASHED at cap intensity renders persistent welts on the chibi (sprite flag, PR5 consumer). Primary mood 7 → 9.',
+    blurb: 'At full LASHED intensity, lasting welts mark the buddy. Primary mood 7 → 9.',
     effect: (s) => { s.mood = 9; s.persistentWelts = true; },
   }),
 
@@ -194,7 +194,7 @@ export default [
     id: 'g.kinetic.chainsaw.thirtysix', parents: ['g.kinetic.chainsaw.bar'], cost: 1000, toolId: 'chainsaw',
     label: '36-inch Bar',
     iconHint: '⚡',
-    blurb: 'A2, Bar 110 → 150. Two parts at BLEED cap simultaneously → twin limp-limb (PR5 consumer reads limpAtBleedCap).',
+    blurb: 'Bar 110 → 150. Two parts at full BLEED at once leaves both limbs limp.',
     effect: (s) => { s.bladeLen = 150; s.limpAtBleedCap = true; s.twinLimp = true; },
   }),
   statNode({
@@ -207,7 +207,7 @@ export default [
     id: 'g.kinetic.chainsaw.tree_surgeon', parents: ['g.kinetic.chainsaw.teeth'], cost: 1200, toolId: 'chainsaw',
     label: 'Tree-Surgeon',
     iconHint: '⚡',
-    blurb: 'B2, BLEED reaches intensity cap in 3 ticks instead of 5. At cap, the limb goes limp (constraint stiffness drops to 0). PR5 consumer.',
+    blurb: 'BLEED reaches full intensity in 3 ticks instead of 5. At the cap, the limb goes limp.',
     effect: (s) => { s.bleedCapTicks = 3; s.limpAtBleedCap = true; },
   }),
 
@@ -230,7 +230,7 @@ export default [
     id: 'g.kinetic.bear_trap.jaws_of_life', parents: ['g.kinetic.bear_trap.bite'], cost: 1000, toolId: 'bear_trap',
     label: 'Jaws-of-Life',
     iconHint: '⚡',
-    blurb: 'A1, Lock 5s → 7s. Trap attaches to the limb and travels with the buddy as they hop (PR5 consumer reads trapAttachesToLimb).',
+    blurb: 'Lock 5s → 7s. The trap clamps onto the limb and travels with the buddy as they hop.',
     effect: (s) => { s.lockMs = 7000; s.trapAttachesToLimb = true; },
   }),
 
@@ -253,7 +253,7 @@ export default [
     id: 'g.kinetic.meathook.marionette', parents: ['g.kinetic.meathook.yank'], cost: 1000, toolId: 'meathook',
     label: 'Marionette',
     iconHint: '⚡',
-    blurb: 'A1, Mood 12 → 16. Post-yank, the cursor stays linked to the part for 1.5s, drag it like a puppet (PR5 consumer reads cursorPuppetMs).',
+    blurb: 'Mood 12 → 16. After the yank the cursor stays linked to the part for 1.5s — drag it like a puppet.',
     effect: (s) => { s.mood = 16; s.cursorPuppetMs = 1500; },
   }),
 
