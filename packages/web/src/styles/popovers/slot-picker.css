@@ -377,6 +377,8 @@ body.theme-light .slot-picker {
   grid-template-columns: 64px 1fr;
   align-items: center;
   gap: 14px;
+  /* Keep a long name from running under the corner × dismiss button. */
+  padding-right: 30px;
 }
 .slot-picker-inspect-icon {
   width: 64px;
@@ -407,7 +409,7 @@ body.theme-light .slot-picker {
 .slot-picker-inspect-meta {
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 7px;
   min-width: 0;
 }
 .slot-picker-inspect-name {
@@ -568,9 +570,11 @@ body.theme-light .slot-picker {
 .ip-node-cost[data-state="locked"]     { opacity: 0.6; }
 
 .slot-picker-inspect-footer {
-  margin-top: auto;
+  flex: none;
   display: flex;
-  padding-top: 6px;
+  padding: 12px 14px;
+  border-top: 1px solid var(--border);
+  background: color-mix(in srgb, var(--surface) 70%, transparent);
 }
 .slot-picker-cta {
   flex: 1 1 100%;
@@ -639,6 +643,33 @@ body.theme-light .slot-picker {
 }
 .ip-node[data-buyable="true"] + .ip-node,
 .ip-node + .ip-node[data-buyable="true"] { border-top-color: transparent; }
+
+/* On a buyable row the cost reads as a clickable pill, so "click to buy" is
+   unmistakable rather than just a hover wash. */
+.ip-node[data-buyable="true"] .ip-node-cost {
+  padding: 2px 9px;
+  border-radius: 999px;
+  border: 1px solid color-mix(in srgb, var(--ip-hue, var(--char-accent)) 55%, var(--border-2));
+  background: color-mix(in srgb, var(--ip-hue, var(--char-accent)) 16%, transparent);
+  color: var(--fg);
+}
+.ip-node[data-buyable="true"]:hover .ip-node-cost {
+  background: color-mix(in srgb, var(--ip-hue, var(--char-accent)) 32%, transparent);
+  border-color: color-mix(in srgb, var(--ip-hue, var(--char-accent)) 80%, var(--border-2));
+}
+
+/* A just-purchased row pulses once with the group hue, then settles. The
+   bullet's own .12s transition handles hollow→filled underneath, now that the
+   row is patched in place instead of rebuilt. Honors prefers-reduced-motion
+   via the global guard in style.css. */
+@keyframes ip-node-bought {
+  0%   { background: color-mix(in srgb, var(--ip-hue, var(--char-accent)) 42%, transparent); }
+  100% { background: transparent; }
+}
+.ip-node-bought {
+  animation: ip-node-bought .55s ease-out;
+  border-radius: 6px;
+}
 
 /* ----- footer ----- */
 .slot-picker-footer {
@@ -833,6 +864,7 @@ body.theme-light .slot-picker {
 body.theme-light .sp-inspect-overlay { background: rgba(20, 20, 30, 0.35); }
 @keyframes sp-fade { from { opacity: 0; } to { opacity: 1; } }
 .sp-inspect-card {
+  position: relative;
   width: 720px;
   max-width: calc(100vw - 24px);
   height: 540px;
@@ -845,41 +877,39 @@ body.theme-light .sp-inspect-overlay { background: rgba(20, 20, 30, 0.35); }
   box-shadow: 0 18px 44px rgba(0,0,0,0.55);
   overflow: hidden;
   animation: shop-pop .18s ease-out;
+  /* Footer CTA lives outside the scroll region, so the hue lives on the card
+     (not just .slot-picker-right) for the pinned CTA to read it. */
+  --ip-hue: var(--group-hue-bright);
 }
 body.theme-light .sp-inspect-card { box-shadow: 0 24px 64px rgba(20, 20, 30, 0.2); }
-.sp-inspect-header {
+
+/* The identity (icon + name + chips) IS the header now, no separate bar.
+   One quiet dismiss control floats in the corner; esc and a backdrop click
+   also close. */
+.sp-inspect-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  width: 28px;
+  height: 28px;
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 10px 12px 9px;
-  border-bottom: 1px solid var(--border);
-}
-.sp-inspect-eyebrow {
-  font-size: var(--t-xs);
-  text-transform: lowercase;
-  letter-spacing: var(--type-track-wide);
-  color: var(--fg-3);
-  font-weight: var(--w-reg);
-}
-.sp-inspect-back, .sp-inspect-close {
+  justify-content: center;
   background: transparent;
   border: 0;
-  color: var(--fg-2);
-  font-size: var(--t-xs);
+  border-radius: 6px;
+  color: var(--fg-3);
+  font-size: var(--type-close-size);
+  line-height: 1;
   cursor: pointer;
-  padding: 4px 8px;
-  border-radius: 4px;
-  text-transform: lowercase;
-  letter-spacing: 0;
-  font-weight: var(--w-reg);
+  transition: color .12s ease, background .12s ease;
 }
-.sp-inspect-close { font-size: var(--type-close-size); line-height: 1; padding: 2px 8px; margin-left: auto; }
-.sp-inspect-back:hover, .sp-inspect-close:hover {
-  color: var(--fg);
-  background: var(--char-accent-soft);
-}
-/* The inspect body re-uses .slot-picker-right rules from earlier in the file. */
-.sp-inspect-card .slot-picker-right {
+.sp-inspect-close:hover { color: var(--fg); background: var(--char-accent-soft); }
+
+/* Scroll region (identity + blurb + progression); the footer is pinned below
+   it. Re-uses .slot-picker-right rules from earlier in the file. */
+.sp-inspect-card .sp-inspect-scroll {
   flex: 1 1 auto;
   overflow-y: auto;
 }

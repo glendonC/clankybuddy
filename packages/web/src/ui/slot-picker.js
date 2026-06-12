@@ -113,7 +113,9 @@ function _open({ barIdx, slotIdx, anchorEl }) {
   _unsubscribe = onProgressionChange(() => {
     if (!_root) return;
     rerenderPicker();
-    if (_ovEl) renderInspectOverlay();
+    // Inspect updates in place (syncInspectOverlay) rather than rebuilding its
+    // innerHTML, so a purchase animates the row instead of blinking it owned.
+    if (_ovEl) syncInspectOverlay();
   });
 }
 
@@ -542,6 +544,9 @@ function openInspect(kind, id) {
   if (!_ovEl) {
     _ovEl = document.createElement('div');
     _ovEl.className = 'sp-inspect-overlay';
+    // One delegated handler on the overlay, survives every in-place sync so
+    // CTA / buyable-row / close clicks keep working without rewiring.
+    _ovEl.addEventListener('click', onInspectClick);
     document.body.appendChild(_ovEl);
   }
   renderInspectOverlay();
@@ -575,27 +580,22 @@ function renderToolInspect(host, toolId) {
   const isHere      = _anchor && equippedAt && equippedAt.bar === _barIdx && equippedAt.slot === _slotIdx;
   const isElsewhere = equippedAt && !isHere;
   host.innerHTML = `
-    <div class="sp-inspect-card">
-      <div class="sp-inspect-header">
-        <button class="sp-inspect-back" type="button" aria-label="back">◀ back</button>
-        <span class="sp-inspect-eyebrow">inspect</span>
-        <button class="sp-inspect-close" type="button" aria-label="close">×</button>
-      </div>
-      <div class="slot-picker-right" data-spine="${tool.spine}" data-group="${tool.group}" data-empty="false">
+    <div class="sp-inspect-card" data-spine="${tool.spine}" data-group="${tool.group}">
+      <button class="sp-inspect-close" type="button" aria-label="close">×</button>
+      <div class="sp-inspect-scroll slot-picker-right" data-spine="${tool.spine}" data-group="${tool.group}" data-empty="false">
         <div class="slot-picker-inspect-head">
           <div class="slot-picker-inspect-icon">${renderIconSvg(tool.id, 'slot-picker-inspect-icon-svg')}</div>
           <div class="slot-picker-inspect-meta">
             <div class="slot-picker-inspect-name">${escapeHTML(tool.label)}</div>
+            <div class="slot-picker-inspect-chips">${buildToolChips(tool)}</div>
           </div>
         </div>
-        <div class="slot-picker-inspect-chips">${buildToolChips(tool)}</div>
         <div class="slot-picker-inspect-blurb">${escapeHTML(tool.blurb || '')}</div>
         ${buildProgressChain(tool.id)}
-        <div class="slot-picker-inspect-footer">${buildToolCta(tool, isOwned, isHere, isElsewhere)}</div>
       </div>
+      <div class="slot-picker-inspect-footer">${buildToolCta(tool, isOwned, isHere, isElsewhere)}</div>
     </div>
   `;
-  wireInspectOverlay(host, { kind: 'tool', id: tool.id });
 }
 
 function renderMasterInspect(host, nodeId) {
@@ -632,7 +632,7 @@ function renderMasterInspect(host, nodeId) {
     const buyable = st === 'affordable';
     const data = buyable ? `data-buyable="true" data-master="${n.id}" data-cost="${n.cost}"` : '';
     return `
-      <li class="ip-node" data-state="${st}" data-kind="stat" ${data}>
+      <li class="ip-node" data-id="${escapeHTML(n.id)}" data-state="${st}" data-kind="stat" ${data}>
         <div class="ip-node-bullet" aria-hidden="true"></div>
         <div class="ip-node-body">
           <div class="ip-node-label">${escapeHTML(n.label)}</div>
@@ -643,13 +643,9 @@ function renderMasterInspect(host, nodeId) {
     `;
   }).join('');
   host.innerHTML = `
-    <div class="sp-inspect-card">
-      <div class="sp-inspect-header">
-        <button class="sp-inspect-back" type="button" aria-label="back">◀ back</button>
-        <span class="sp-inspect-eyebrow">inspect</span>
-        <button class="sp-inspect-close" type="button" aria-label="close">×</button>
-      </div>
-      <div class="slot-picker-right" data-group="${MASTERY}" data-empty="false">
+    <div class="sp-inspect-card" data-group="${MASTERY}">
+      <button class="sp-inspect-close" type="button" aria-label="close">×</button>
+      <div class="sp-inspect-scroll slot-picker-right" data-group="${MASTERY}" data-empty="false">
         <div class="slot-picker-inspect-head">
           <div class="slot-picker-inspect-icon" data-mastery="true">
             <svg viewBox="-16 -16 32 32" class="slot-picker-inspect-icon-svg" aria-hidden="true">
@@ -658,10 +654,10 @@ function renderMasterInspect(host, nodeId) {
           </div>
           <div class="slot-picker-inspect-meta">
             <div class="slot-picker-inspect-name">${escapeHTML(node.label)}</div>
+            <div class="slot-picker-inspect-chips">
+              <span class="ip-chip ip-chip-cd">${node.cost}¢</span>
+            </div>
           </div>
-        </div>
-        <div class="slot-picker-inspect-chips">
-          <span class="ip-chip ip-chip-cd">${node.cost}¢</span>
         </div>
         <div class="slot-picker-inspect-blurb">${escapeHTML(node.blurb || '')}</div>
         <div class="slot-picker-inspect-progress">
@@ -671,63 +667,135 @@ function renderMasterInspect(host, nodeId) {
           </div>
           <ul class="ip-progress-list">${pills}</ul>
         </div>
-        <div class="slot-picker-inspect-footer">${cta}</div>
       </div>
+      <div class="slot-picker-inspect-footer">${cta}</div>
     </div>
   `;
-  wireInspectOverlay(host, { kind: 'master', id: node.id });
 }
 
-function wireInspectOverlay(host, ctx) {
-  host.querySelector('.sp-inspect-back')?.addEventListener('click', closeInspect);
-  host.querySelector('.sp-inspect-close')?.addEventListener('click', closeInspect);
-  // Click on overlay backdrop closes inspect; clicks inside the card don't.
-  host.addEventListener('click', (e) => {
-    if (e.target === host) closeInspect();
+// Single delegated handler bound once on the overlay element (in openInspect).
+// Survives every in-place sync, so we never rewire after a purchase.
+function onInspectClick(e) {
+  // Backdrop (the dimmed area outside the card) closes the inspect.
+  if (e.target === _ovEl) { closeInspect(); return; }
+  if (e.target.closest('.sp-inspect-close')) { closeInspect(); return; }
+
+  const cta = e.target.closest('.slot-picker-cta');
+  if (cta && _ovEl.contains(cta)) { handleCtaClick(cta); return; }
+
+  // Buyable progression row, buy on click.
+  const row = e.target.closest('.ip-node[data-buyable="true"]');
+  if (row && _ovEl.contains(row)) {
+    const id = row.dataset.node || row.dataset.master;
+    const cost = Number(row.dataset.cost) || 0;
+    if (!id) return;
+    unlockNode(id, cost);      // sync flashes the row that flips to owned
+  }
+}
+
+function handleCtaClick(cta) {
+  switch (cta.dataset.state) {
+    case 'buy': {
+      const nodeId = cta.dataset.node || cta.dataset.master;
+      const cost = Number(cta.dataset.cost) || 0;
+      if (!nodeId) return;
+      unlockNode(nodeId, cost); // sync flashes the matching chain row
+      return;
+    }
+    case 'equip': {
+      const id = cta.dataset.equip;
+      if (!id) return;
+      if (_anchor) equipToolInSlot(id, _barIdx, _slotIdx);
+      else equipTool(id);
+      closeSlotPicker();
+      return;
+    }
+    case 'unequip': {
+      const id = cta.dataset.equip;
+      if (!id) return;
+      unequipTool(id);
+      closeSlotPicker();
+      return;
+    }
+    case 'equipped':
+      closeSlotPicker();
+      return;
+  }
+}
+
+// ---------- in-place inspect sync (no innerHTML rebuild) ----------
+// Called on every progression change while the overlay is open. Patches the
+// existing DOM so CSS transitions play and scroll position survives, instead
+// of nuking and rebuilding (which made purchases blink rather than animate).
+function syncInspectOverlay() {
+  if (!_ovEl) return;
+  // The master tree is retired (empty), so its inspect path is effectively
+  // dead, full-rebuild it for correctness without the surgical machinery.
+  if (_ovKind === 'master') { renderMasterInspect(_ovEl, _ovId); return; }
+
+  const tool = TOOLS_BY_ID[_ovId];
+  if (!tool) { closeInspect(); return; }
+
+  // Recompute the chain exactly as buildProgressChain does, then patch rows.
+  const shared = tool.family ? getSharedNodesForFamily(tool.family) : [];
+  const nodes = [...getNodesForTool(_ovId), ...shared].sort((a, b) => {
+    if (a.kind !== b.kind) return a.kind === 'tool' ? -1 : 1;
+    return (a.cost || 0) - (b.cost || 0);
   });
-  // Primary CTA.
-  const cta = host.querySelector('.slot-picker-cta');
-  if (cta) {
-    if (cta.dataset.state === 'buy') {
-      cta.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const nodeId = cta.dataset.node || cta.dataset.master;
-        const cost = Number(cta.dataset.cost) || 0;
-        if (!nodeId) return;
-        unlockNode(nodeId, cost);
-      });
-    } else if (cta.dataset.state === 'equip') {
-      cta.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = cta.dataset.equip;
-        if (!id) return;
-        if (_anchor) equipToolInSlot(id, _barIdx, _slotIdx);
-        else equipTool(id);
-        closeSlotPicker();
-      });
-    } else if (cta.dataset.state === 'equipped') {
-      cta.addEventListener('click', (e) => { e.stopPropagation(); closeSlotPicker(); });
-    } else if (cta.dataset.state === 'unequip') {
-      cta.addEventListener('click', (e) => {
-        e.stopPropagation();
-        const id = cta.dataset.equip;
-        if (!id) return;
-        unequipTool(id);
-        closeSlotPicker();
-      });
+  const owned = new Set(getUnlockedNodes());
+  const currency = getCurrency();
+  let ownedCount = 0;
+
+  for (const n of nodes) {
+    const isOwned   = owned.has(n.id);
+    if (isOwned) ownedCount++;
+    const parentsOk = (n.parents || []).every(p => owned.has(p));
+    const canAfford = currency >= (n.cost || 0);
+    const state = isOwned ? 'owned' : (parentsOk ? (canAfford ? 'affordable' : 'unaffordable') : 'locked');
+
+    const row = _ovEl.querySelector(`.ip-node[data-id="${cssAttr(n.id)}"]`);
+    if (!row) continue;
+    const prevState = row.dataset.state;
+    row.dataset.state = state;
+
+    if (state === 'affordable') {
+      row.dataset.buyable = 'true';
+      row.dataset.node = n.id;
+      row.dataset.cost = String(n.cost);
+    } else {
+      row.removeAttribute('data-buyable');
+    }
+    const costEl = row.querySelector('.ip-node-cost');
+    if (costEl) {
+      costEl.dataset.state = state;
+      costEl.textContent = isOwned ? '✓' : n.cost + '¢';
+    }
+    // Newly-owned → play the one-shot "bought" flash (restart if re-triggered).
+    if (prevState !== 'owned' && state === 'owned') {
+      row.classList.remove('ip-node-bought');
+      void row.offsetWidth;
+      row.classList.add('ip-node-bought');
     }
   }
-  // Buyable progression pills.
-  for (const li of host.querySelectorAll('.ip-node[data-buyable="true"]')) {
-    li.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const id = li.dataset.node || li.dataset.master;
-      const cost = Number(li.dataset.cost) || 0;
-      if (!id) return;
-      unlockNode(id, cost);
-    });
-    li.style.cursor = 'pointer';
-  }
+
+  const countEl = _ovEl.querySelector('.ip-progress-count');
+  if (countEl) countEl.textContent = `${ownedCount} / ${nodes.length}`;
+
+  // Footer CTA reflects the new ownership/equip state. Rebuilding just the
+  // footer's innerHTML is cheap and the delegated handler still catches it.
+  const ownedTools  = new Set(getUnlockedTools());
+  const isOwnedTool = ownedTools.has(tool.id);
+  const equippedAt  = isOwnedTool ? findEquippedSlot(tool.id) : null;
+  const isHere      = _anchor && equippedAt && equippedAt.bar === _barIdx && equippedAt.slot === _slotIdx;
+  const isElsewhere = equippedAt && !isHere;
+  const footer = _ovEl.querySelector('.slot-picker-inspect-footer');
+  if (footer) footer.innerHTML = buildToolCta(tool, isOwnedTool, isHere, isElsewhere);
+}
+
+// Escape a node id for use inside a [data-id="..."] attribute selector.
+// Node ids contain dots (g.provision.x); CSS.escape keeps the quoted value safe.
+function cssAttr(id) {
+  return (window.CSS && CSS.escape) ? CSS.escape(id) : String(id).replace(/"/g, '\\"');
 }
 
 // ---------- inspect content helpers (shared with overlay) ----------
@@ -810,7 +878,7 @@ function buildProgressChain(toolId) {
     const data       = buyable ? `data-buyable="true" data-node="${n.id}" data-cost="${n.cost}"` : '';
     const capstone   = n.iconHint === '⚡' ? 'data-capstone="true"' : '';
     return `
-      <li class="ip-node" data-state="${state}" data-kind="${n.kind}" ${capstone} ${data}>
+      <li class="ip-node" data-id="${escapeHTML(n.id)}" data-state="${state}" data-kind="${n.kind}" ${capstone} ${data}>
         <div class="ip-node-bullet" aria-hidden="true"></div>
         <div class="ip-node-body">
           <div class="ip-node-label">${escapeHTML(n.label)}</div>
