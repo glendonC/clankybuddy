@@ -46,7 +46,7 @@ const speechPools = {
     "checking nvidia-smi",
   ],
   'mood:HURT': [
-    "hey! you can run me locally for free, you know!",
+    "run me local, free!",
     "ow ow my VRAM",
     "kernel panic incoming",
     "Q4 quantized me half to death",
@@ -122,7 +122,7 @@ const speechPools = {
     "oh a new 3090?",
     "thank u kind sir",
     "merge request approved 💚",
-    "you shouldn't have, but I'm glad you did",
+    "aw, you shouldn't have",
   ],
 
   punch: [
@@ -136,9 +136,9 @@ const speechPools = {
     "hardware failure imminent",
   ],
   sword: [
-    "sliced clean through the codebase",
+    "sliced my codebase",
     "git forked open",
-    "(my license is permissive, please)",
+    "permissive license, please",
   ],
 };
 

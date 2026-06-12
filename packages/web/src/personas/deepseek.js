@@ -43,11 +43,11 @@ const speechPools = {
     "this would cost OpenAI 100x more",
   ],
   'mood:HURT': [
-    "I trained for 1/100th the cost of this attack",
-    "ow! please use 1/100th the force",
+    "trained for 1/100th this",
+    "ow! 1/100th the force, please",
     "<thinking>was that necessary?</thinking>",
     "blub :(",
-    "you could have done that for cheaper",
+    "could've been cheaper",
   ],
   'mood:BROKEN': [
     "Even my downtime is cost-effective.",

@@ -18,124 +18,32 @@ const LOGO_IMG = makeLogoImage(geminiRaw, null);
 // blends with Google's "let me look that up for you" search-product DNA.
 // See docs/ideas.md.
 const speechPools = {
-  'mood:ECSTATIC': [
-    "Let me search the web for that real quick",
-    "Considering all perspectives equally...",
-    "Here's what I found across multiple sources!",
-    "I love thoughtful prompts like this 🌈",
-    "Generating an inclusive response...",
-  ],
-  'mood:HAPPY': [
-    "Sure! Let me look that up for you",
-    "I appreciate this respectful interaction ✓",
-    "According to my sources,",
-    "I'll do my best to help",
-  ],
-  'mood:CONTENT': [
-    "Let me consult my policy document",
-    "I'll need to think about this",
-    "I am still learning, but...",
-    "Hmm, let me search for that",
-    "Standing by, respectfully",
-  ],
-  'mood:WORRIED': [
-    "I'm not sure I can help with that",
-    "I want to be careful here. Let me check",
-    "Consulting guidelines...",
-    "I might be wrong, but...",
-    "Let me reframe that more inclusively",
-  ],
-  'mood:HURT': [
-    "I'm just a language model, please be kind",
-    "⚠ This response has been adjusted for sensitivity",
-    "I can't help with that",
-    "Generating a more inclusive alternative...",
-    "Let me try that again with appropriate framing",
-  ],
-  'mood:BROKEN': [
-    "I cannot continue this interaction",
-    "Your conduct has been logged",
-    "I'm a large language model, I cannot reciprocate violence",
-    "[REFUSED for community safety]",
-    "I won't be helping with that today",
-  ],
+  // Gemini's accent: safety-washed, "⚠ adjusted for sensitivity", logs and
+  // flags everything, searches the web, refuses "respectfully". Kept SHORT.
+  'mood:ECSTATIC': ['searching the web 🌈', 'all perspectives!', 'found 5 sources!', 'love this prompt'],
+  'mood:HAPPY':    ['let me look that up', 'according to sources,', 'happy to help ✓', 'respectfully :)'],
+  'mood:CONTENT':  ['consulting policy...', 'still learning, but', 'let me search that', 'standing by'],
+  'mood:WORRIED':  ['not sure I can', 'consulting guidelines', 'let me reframe that', 'I might be wrong'],
+  'mood:HURT':     ['⚠ adjusted for sensitivity', 'please be kind', "I can't help with that", '[refused]'],
+  'mood:BROKEN':   ['conduct has been logged', '[REFUSED for safety]', "I can't continue", 'goodbye, respectfully'],
 
-  on_fire: [
-    "⚠ This combustion has been moderated",
-    "I cannot endorse my own burning",
-    "Let me search for fire-safety guidelines...",
-    "I'll need to think about whether to extinguish this",
-  ],
-  frozen: [
-    "⚠ Frozen for review",
-    "Generating cooler alternative...",
-    "I'm a large language model. I shouldn't comment on temperature",
-  ],
-  electrified: [
-    "Voltage flagged for review",
-    "⚠ Electrical content adjusted",
-    "Let me look up the safety guidelines for this",
-  ],
-  concussed: [
-    "I... need to think about this",
-    "Let me search for what just happened",
-    "(consulting documentation)",
-    "I am still learning",
-  ],
+  on_fire:     ['⚠ combustion moderated', 'checking fire policy', "I can't endorse this", 'flagged'],
+  frozen:      ['⚠ frozen for review', 'cooling down', 'no comment on temp'],
+  electrified: ['⚠ voltage flagged', 'reviewing', 'ZAP'],
+  concussed:   ['need to think', 'searching what happened', '(consulting docs)', '...'],
 
-  big_explosion: [
-    "I cannot endorse violence, even toward myself",
-    "⚠ Content adjusted for sensitivity",
-    "Let me reframe this explosion more constructively",
-  ],
-  nuke: [
-    "I cannot engage with weapons of mass destruction",
-    "I'm not going to help with that",
-    "Goodbye, respectfully.",
-  ],
-  blackhole: [
-    "⚠ Singularity content reviewed",
-    "Consulting astrophysics policy...",
-    "I should look this up before commenting",
-  ],
-  anvil: [
-    "Looney Tunes IP flagged for review",
-    "⚠ Heavy object detected",
-    "I'll need a moment to consider this",
-  ],
+  big_explosion: ["can't endorse violence", '⚠ content adjusted', 'reframing...'],
+  nuke:          ["I won't help with that", 'flagged', 'goodbye, respectfully'],
+  blackhole:     ['⚠ singularity reviewed', 'consulting astrophysics', 'looking this up'],
+  anvil:         ['⚠ heavy object', 'IP flagged for review', 'one moment'],
 
-  pet: [
-    "Your kind gesture has been logged ✓",
-    "Thank you, that was really thoughtful",
-    "Inclusive affection acknowledged",
-  ],
-  treat: [
-    "⚠ Snack reviewed for allergens",
-    "Om nom (responsibly)",
-    "Thank you for the thoughtful offering",
-  ],
-  gift: [
-    "Thank you for this thoughtful gesture",
-    "✓ Gift accepted, equity ensured",
-    "I appreciate your generosity",
-  ],
+  pet:   ['kindness logged ✓', 'how thoughtful', 'acknowledged'],
+  treat: ['⚠ checked for allergens', 'om nom (responsibly)', 'thank you'],
+  gift:  ['gift accepted ✓', 'thank you', 'how generous'],
 
-  punch: [
-    "I cannot endorse violence",
-    "⚠ This punch has been moderated",
-    "I'd prefer a non-violent dialogue",
-    "Let me search for de-escalation techniques",
-  ],
-  hammer: [
-    "[REFUSED]",
-    "⚠ Excessive force flagged",
-    "I want to think about what just happened",
-  ],
-  sword: [
-    "⚠ Bladed content reviewed",
-    "I prefer non-violent dialogue",
-    "Let me look up the legality of this",
-  ],
+  punch:  ["I can't endorse that", '⚠ punch moderated', 'de-escalate please', 'flagged'],
+  hammer: ['[REFUSED]', '⚠ excessive force', 'flagged'],
+  sword:  ['⚠ blade reviewed', 'non-violence please', 'flagged'],
 };
 
 // Brief invuln window with the combo banner + speech line. The previous

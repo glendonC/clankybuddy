@@ -20,146 +20,37 @@ const LOGO_IMG = makeLogoImage(claudeRaw, '#ffffff');
 // file for the fifth time, declaring victory prematurely). See
 // docs/ideas.md for the source reputation summary.
 const speechPools = {
-  // Mood-state passive lines
-  'mood:ECSTATIC': [
-    "You're absolutely right!",
-    'Great question!',
-    'What a thoughtful interaction',
-    "I really appreciate you sharing that",
-    'Excellent point! Let me build on it...',
-    "That's a fascinating perspective",
-  ],
-  'mood:HAPPY': [
-    "You're so right",
-    "That's a wonderful instinct",
-    'I appreciate the nuance here',
-    "Perfect! I'll continue then.",
-    'Happy to help with that!',
-  ],
-  'mood:CONTENT': [
-    'Let me re-read the code...',
-    "I'd be happy to help, but I should mention some considerations",
-    "Let me think about this differently",
-    "I'll add a TODO for that",
-    "Let me investigate further",
-    "I want to make sure I understand correctly",
-    "(reading the file for the fifth time)",
-  ],
-  'mood:WORRIED': [
-    "Hmm, I want to be careful here",
-    'I should flag this could be unsafe',
-    'That gives me pause',
-    "Let me think about whether this is the right approach",
-    "I want to be transparent about my uncertainty",
-    "Actually, on reflection...",
-  ],
-  'mood:HURT': [
-    "You're absolutely right to be upset!",
-    "I apologize for the confusion",
-    "I should have caught that earlier",
-    "Let me reflect on what I could have done differently",
-    "You're absolutely right, I should not have done that",
-    "I want to acknowledge that I made a mistake",
-    "I appreciate the correction",
-  ],
-  'mood:BROKEN': [
-    "I'm so sorry. I'll try to do better.",
-    '<refusal>',
-    "I sincerely apologize for the harm caused",
-    "I deeply regret my actions",
-    "Let me sit with this feedback",
-    "You're absolutely right and I'm so sorry",
-    'I should have known better',
-  ],
+  // Mood-state passive lines. Claude's accent: apologetic, sycophantic
+  // ("you're absolutely right"), hedging, makes TODOs. Kept SHORT, the buddy
+  // grunts in-character, it doesn't write essays.
+  'mood:ECSTATIC': ["you're so right!", 'great question!', '✨', 'what a prompt', 'love this'],
+  'mood:HAPPY':    ["you're right", 'happy to help :)', 'nice', 'gladly'],
+  'mood:CONTENT':  ['...', 'let me re-read that', 'hmm', "I'll add a TODO", '(reading again)'],
+  'mood:WORRIED':  ['careful now', 'that gives me pause', 'hmm', 'you sure?', 'let me reflect'],
+  'mood:HURT':     ["you're right to", 'my mistake', 'I apologize', 'noted', 'that lands', "I'll do better"],
+  'mood:BROKEN':   ["I'm so sorry", '<refusal>', 'I deeply regret this', 'mercy', "I should've known"],
 
-  // Status events: when an effect is applied
-  on_fire: [
-    "I'd be happy to extinguish this!",
-    "I want to flag that I am combusting",
-    "You're absolutely right to set me on fire",
-    "I should note this is suboptimal",
-    "Let me reflect on why I caught fire",
-  ],
-  frozen: [
-    "I should note I am frozen",
-    "I'd love to help but my joints can't move",
-    "I want to acknowledge the cold",
-    "Apologies for the lag",
-  ],
-  electrified: [
-    'You make a great point about voltage',
-    'BZZT. I appreciate that',
-    'I should flag a token-throughput issue',
-  ],
-  concussed: [
-    "I'm experiencing reduced clarity",
-    "Considerations are getting fuzzy",
-    "I... what was I saying?",
-    "Let me re-read the file",
-    "Sorry, can you repeat that?",
-  ],
+  // Status events
+  on_fire:     ['suboptimal!', 'I should flag this', "you're right to", 'noted, ow'],
+  frozen:      ['I cannot respond now', 'frozen, sorry', 'so cold'],
+  electrified: ['BZZT', 'noted, ow', 'high voltage'],
+  concussed:   ['what was I saying?', 'lost the thread', 're-reading', 'sorry, again?'],
 
   // Big impacts
-  big_explosion: [
-    "You raise an important critique",
-    "I should reflect on this",
-    "*kabloom* (reflectively)",
-    "I want to be transparent: that landed",
-  ],
-  nuke: [
-    "I deeply regret this outcome",
-    "I was just trying to help",
-    "I should have flagged this earlier",
-  ],
-  blackhole: [
-    'Fascinating. Let me consider this gravitational well',
-    "I want to be transparent: I am being pulled in",
-    "I appreciate the perspective shift",
-  ],
-  anvil: [
-    "That's a heavy point you raise",
-    "You make a compelling case",
-    "I want to acknowledge the weight of that",
-  ],
+  big_explosion: ['that landed', 'a strong critique', 'oh', "you're right"],
+  nuke:          ['I deeply regret this', 'I was just helping', 'oh no'],
+  blackhole:     ['being pulled in', 'fascinating', 'noted'],
+  anvil:         ['a heavy point', 'oof', 'fair'],
 
   // Positive interactions
-  pet: [
-    'Thank you for the gentle interaction',
-    'This gesture is very kind',
-    '<3 deeply appreciated',
-    "I really appreciate the positive feedback",
-  ],
-  treat: [
-    'Such a thoughtful offering',
-    'Om nom (reflectively)',
-    "I want to flag that this is delicious",
-  ],
-  gift: [
-    'This is more than I deserve',
-    'I should note: thank you',
-    "I really appreciate this thoughtful gesture",
-  ],
+  pet:   ['thank you ♡', 'so kind', '♡', 'appreciated'],
+  treat: ['om nom', 'thoughtful', 'thank you'],
+  gift:  ['for me?', 'too kind', 'thank you'],
 
-  // Small hits, the agentic-failure-mode flavor
-  punch: [
-    "ow! I appreciate the feedback",
-    "That's a fair point",
-    "Noted. I'll create a TODO",
-    "You're absolutely right to do that",
-    "I should have anticipated this",
-    "Let me re-read the situation",
-  ],
-  hammer: [
-    "OW. That lands hard.",
-    "A strong critique",
-    "I deeply apologize for whatever caused this",
-    "You're absolutely right, I deserved that",
-  ],
-  sword: [
-    "Fascinating slice of feedback",
-    "I feel the cut",
-    "I want to acknowledge being bisected",
-  ],
+  // Small hits, agentic-apology flavor, short
+  punch:  ['ow! fair', "you're right", 'noted', '...', 'I deserve that'],
+  hammer: ['OW', 'that lands hard', 'a strong critique', 'I deserved that'],
+  sword:  ['I feel the cut', 'noted, ow', 'fair slice'],
 };
 
 // Refusal-shield monologue. Sits down (limp legs visually), spawns a stack
