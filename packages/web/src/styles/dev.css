@@ -3,7 +3,10 @@
   position: fixed;
   top: 12px;
   right: 12px;
-  width: 280px;
+  width: 312px;
+  max-height: calc(100vh - 24px);
+  display: flex;
+  flex-direction: column;
   z-index: var(--z-dev);
   background: var(--surface-overlay);
   border: 1px solid var(--border-2);
@@ -20,25 +23,35 @@
   from { opacity: 0; transform: translateX(20px); }
   to   { opacity: 1; transform: translateX(0); }
 }
+
+/* ----- header + live readout ----- */
 .dev-panel-header {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   padding: 8px 12px;
   border-bottom: 1px solid var(--border);
+  flex: none;
+}
+.dev-panel-brand {
   font-weight: var(--w-bold);
   text-transform: uppercase;
   letter-spacing: var(--tr-loose);
   color: var(--mood-negative);
 }
-.dev-panel-amount {
+.dev-readout {
   margin-left: auto;
-  color: var(--fg);
-  font-weight: var(--w-bold);
-  letter-spacing: var(--type-track-flat);
-  text-transform: none;
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-variant-numeric: tabular-nums;
 }
+.dev-readout > span {
+  white-space: nowrap;
+}
+.dev-readout-mood { font-weight: var(--w-bold); }
+.dev-readout-fps  { color: var(--fg-3); }
+.dev-readout-amount { color: var(--fg); font-weight: var(--w-bold); }
 .dev-panel-close {
   background: transparent;
   border: 1px solid var(--border-2);
@@ -47,13 +60,50 @@
   border-radius: 4px;
   font-size: var(--t-base);
   line-height: 1;
+  flex: none;
 }
 .dev-panel-close:hover { color: var(--fg); }
+
+/* ----- tabs ----- */
+.dev-tabs {
+  display: flex;
+  gap: 2px;
+  padding: 6px 8px 0 8px;
+  border-bottom: 1px solid var(--border);
+  flex: none;
+}
+.dev-tab {
+  flex: 1 1 auto;
+  background: transparent;
+  border: 1px solid transparent;
+  border-bottom: none;
+  color: var(--fg-3);
+  padding: 5px 4px;
+  border-radius: 6px 6px 0 0;
+  font-size: var(--t-xs);
+  text-transform: lowercase;
+  letter-spacing: var(--tr-loose);
+}
+.dev-tab:hover { color: var(--fg); }
+.dev-tab.active {
+  color: var(--fg);
+  background: var(--surface-2);
+  border-color: var(--border-2);
+}
+
+/* ----- scrollable body ----- */
+.dev-body {
+  overflow-y: auto;
+  flex: 1 1 auto;
+}
+.dev-tabpanel[hidden] { display: none; }
+
+/* ----- sections + rows ----- */
 .dev-section {
   padding: 8px 12px;
   border-bottom: 1px solid var(--surface-2);
 }
-.dev-section:last-of-type { border-bottom: none; }
+.dev-section:last-child { border-bottom: none; }
 .dev-section-title {
   font-size: var(--t-xs);
   text-transform: uppercase;
@@ -68,7 +118,17 @@
   margin-bottom: 4px;
 }
 .dev-row:last-child { margin-bottom: 0; }
-.dev-row button {
+.dev-note {
+  font-size: var(--t-xs);
+  color: var(--fg-3);
+  font-variant-numeric: tabular-nums;
+  margin-top: 6px;
+}
+
+/* ----- generic buttons ----- */
+.dev-row button,
+.dev-chip,
+.dev-spawn-tile {
   background: var(--surface-2);
   border: 1px solid var(--border-2);
   color: var(--fg-2);
@@ -79,10 +139,22 @@
   flex: 1 1 auto;
   min-width: 0;
 }
-.dev-row button:hover {
+.dev-row button:hover,
+.dev-chip:hover,
+.dev-spawn-tile:hover {
   background: var(--border);
   color: var(--fg);
   border-color: #3a3a44;
+}
+/* Mood-jump buttons carry their state color as a left tick. */
+.dev-row button[style*="--btn-tint"] {
+  border-left: 3px solid var(--btn-tint, var(--border-2));
+}
+.dev-row button.active,
+.dev-spawn-tile.active {
+  border-color: var(--char-accent);
+  color: var(--fg);
+  box-shadow: inset 0 0 0 1px var(--char-accent);
 }
 .dev-row button.danger {
   border-color: rgba(248, 113, 113, 0.4);
@@ -93,7 +165,22 @@
   border-color: var(--mood-negative);
   color: #fff;
 }
-.dev-row input {
+
+/* ----- character chips ----- */
+.dev-chips { gap: 4px; }
+.dev-chip {
+  flex: 0 1 auto;
+  border-left: 3px solid var(--chip-accent, var(--border-2));
+}
+.dev-chip.active {
+  color: var(--fg);
+  border-color: var(--chip-accent, var(--char-accent));
+  box-shadow: inset 0 0 0 1px var(--chip-accent, var(--char-accent));
+}
+
+/* ----- inputs ----- */
+.dev-row input[type="number"],
+.dev-search {
   flex: 1 1 auto;
   background: var(--bg);
   border: 1px solid var(--border-2);
@@ -104,7 +191,15 @@
   font-family: var(--sans);
   min-width: 0;
 }
-.dev-row input:focus { outline: none; border-color: var(--char-accent); }
+.dev-row input[type="number"]:focus,
+.dev-search:focus { outline: none; border-color: var(--char-accent); }
+.dev-search {
+  display: block;
+  margin: 8px 12px;
+  width: calc(100% - 24px);
+}
+
+/* ----- toggles ----- */
 .dev-toggle {
   display: inline-flex;
   align-items: center;
@@ -115,10 +210,72 @@
   user-select: none;
 }
 .dev-toggle input { accent-color: var(--char-accent); }
+
+/* ----- mode inspector ----- */
+.dev-mode-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 2px 0;
+  font-variant-numeric: tabular-nums;
+}
+.dev-mode-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--border);
+  flex: none;
+  box-shadow: inset 0 0 0 1px var(--border-2);
+}
+.dev-mode-dot.on {
+  background: var(--mood-positive);
+  box-shadow: 0 0 6px var(--mood-positive);
+}
+.dev-mode-id { color: var(--fg-2); }
+.dev-mode-phase { margin-left: auto; color: var(--fg-3); }
+
+/* ----- spawn list ----- */
+.dev-spawn-list { padding: 0 12px 8px; }
+.dev-spawn-group { margin-top: 8px; }
+.dev-spawn-group-title {
+  font-size: var(--t-xs);
+  text-transform: uppercase;
+  letter-spacing: var(--tr-loose);
+  color: var(--group-hue, var(--fg-3));
+  margin-bottom: 4px;
+}
+.dev-spawn-grid { gap: 4px; }
+.dev-spawn-tile {
+  flex: 1 1 calc(50% - 4px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 4px;
+  text-align: left;
+}
+.dev-spawn-tile[hidden] { display: none; }
+.dev-key {
+  font-size: 9px;
+  color: var(--fg-3);
+  border: 1px solid var(--border-2);
+  border-radius: 3px;
+  padding: 0 3px;
+  line-height: 1.4;
+  flex: none;
+  text-transform: uppercase;
+}
+
+/* ----- footer hint ----- */
 .dev-panel-hint {
   padding: 6px 12px 8px 12px;
   font-size: var(--t-xs);
   color: var(--fg-3);
   text-align: center;
   font-style: italic;
+  flex: none;
+  border-top: 1px solid var(--surface-2);
 }
+
+/* Groups missing a hue token fall back to neutral. */
+.dev-spawn-group[data-group="siege"],
+.dev-spawn-group[data-group="hazard"],
+.dev-spawn-group[data-group="summons"] { --group-hue: var(--fg-2); }

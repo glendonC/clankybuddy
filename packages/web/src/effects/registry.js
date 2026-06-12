@@ -61,6 +61,11 @@ const EFFECT_LIST = Object.values(EFFECTS);
 
 export function getEffect(id) { return EFFECTS[id] || null; }
 
+// Registry-order list of every effect id. Lets registry-derived UIs (the dev
+// panel's status painter) stay in sync as effects are added/removed instead of
+// hardcoding the set.
+export function listEffectIds() { return Object.keys(EFFECTS); }
+
 export function createStatusRegistry() {
   return { map: new Map() };
 }
